@@ -26,6 +26,7 @@
   <tr>
     <th>EQPT</th>
     <th>STATUS</th>
+    <th>LINK</th>
   </tr>
 </table>
 
@@ -47,26 +48,36 @@
   const table = document.getElementById("statusTable");
 
   modules.forEach(module => {
-    fetch(module.file)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error ${response.status}`);
-        }
-        return response.text();
-      })
-      .then(status => {
-        const row = document.createElement("tr");
-        row.innerHTML = `<td>${module.name}</td><td>${status.trim()}</td>`;
-        table.appendChild(row);
-      })
-      .catch(error => {
-        console.error(`Failed to load ${module.file}:`, error);
-        const row = document.createElement("tr");
-        row.innerHTML = `<td>${module.name}</td><td style="color:red;">Status not available yet</td>`;
-        table.appendChild(row);
-      });
+    const pngFile = module.file.replace(/\.log$/, ".png");
+
+    Promise.all([
+      fetch(module.file).then(res => {
+        if (!res.ok) throw new Error(`Status fetch failed`);
+        return res.text();
+      }),
+      fetch(pngFile).then(res => res.ok ? pngFile : null).catch(() => null)
+    ])
+    .then(([status, imageLink]) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${module.name}</td>
+        <td>${status.trim()}</td>
+        <td>${imageLink ? `<a href="${imageLink}" target="_blank">View Image</a>` : ''}</td>
+      `;
+      table.appendChild(row);
+    })
+    .catch(error => {
+      console.error(`Error processing ${module.name}:`, error);
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${module.name}</td>
+        <td style="color:red;">Status not available yet</td>
+        <td></td>
+      `;
+      table.appendChild(row);
+    });
   });
 </script>
 
-</body>
+
 </html>
