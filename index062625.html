@@ -2,7 +2,6 @@
 <html>
 <head>
   <title>ESSProdStatus</title>
-  
   <style>
     table {
       border-collapse: collapse;
@@ -18,12 +17,10 @@
       background-color: #f0f0f0;
     }
   </style>
-
-
-
 </head>
 <body>
-<h2 style="text-align: center;">ESS HANDLERS</h2>
+
+<h2 style="text-align: center;">ESS PRODUCTION STATUS</h2>
 
 <table id="statusTable">
   <tr>
@@ -35,6 +32,13 @@
 
 <script>
   const modules = [
+    { name: "AP-1", file: "AP-1.log" },
+    { name: "AP-2", file: "AP-2.log" },
+    { name: "AP-3", file: "AP-3.log" },
+    { name: "S100-1", file: "S100_1.log" },
+    { name: "S100-2", file: "S100_2.log" },
+    { name: "HP-1", file: "HP-1.log" },
+    { name: "HP-2", file: "HP-2.log" },
     { name: "NS-3", file: "NS-3.log" },
     { name: "NS-4", file: "NS-4.log" },
     { name: "NS-5", file: "NS-5.log" },
@@ -78,39 +82,5 @@ modules.forEach(module => {
 });
 </script>
 
-  <h2 style="text-align: center;">ESS TESTERS</h2>
 
-  <script>
-    async function loadCSV() {
-      const response = await fetch('ESSTesters.csv');
-      const text = await response.text();
-
-      const rows = text.trim().split('\n').map(row => row.split(','));
-      const table = document.createElement('table');
-      table.border = 1;
-
-      for (let row of rows) {
-
-    	const nonEmptyCount = row.filter(cell => cell.trim() !== '').length;
-    	if (nonEmptyCount < row.length / 2) continue;  // skip if more than half are blank
-
-
-        const tr = document.createElement('tr');
-        for (let cell of row) {
-          const td = document.createElement('td');
-          td.textContent = cell;
-          tr.appendChild(td);
-        }
-        table.appendChild(tr);
-      }
-
-      document.body.appendChild(table);
-    }
-
-    window.onload = loadCSV;
-  </script>
-
-
-
-</body>
 </html>
