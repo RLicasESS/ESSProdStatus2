@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ESSProdStatus</title>
+  
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 60%;
+      margin: 20px auto;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+  </style>
+
+
+
+</head>
+<body>
+<h2 style="text-align: center;">ESS HANDLERS</h2>
+
+<table id="statusTable">
+  <tr>
+    <th>EQPT</th>
+    <th>STATUS</th>
+    <th>LINK</th>
+  </tr>
+</table>
+
+<script>
+  const modules = [
+    { name: "NS-3", file: "NS-3.log" },
+    { name: "NS-4", file: "NS-4.log" },
+    { name: "NS-5", file: "NS-5.log" },
+    { name: "CHROMA", file: "CHROMA.log" }
+  ];
+
+  const table = document.getElementById("statusTable");
+
+modules.forEach(module => {
+  const pngFile = module.file.replace(/\.log$/, ".png");
+
+  const logUrl = `${module.file}?t=${Date.now()}`;
+  const pngUrl = `${pngFile}?t=${Date.now()}`;
+
+  Promise.all([
+    fetch(logUrl).then(res => {
+      if (!res.ok) throw new Error(`Status fetch failed`);
+      return res.text();
+    }),
+    fetch(pngUrl).then(res => res.ok ? pngFile : null).catch(() => null)
+  ])
+  .then(([status, imageLink]) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${module.name}</td>
+      <td>${status.trim()}</td>
+      <td>${imageLink ? `<a href="${imageLink}?t=${Date.now()}" target="_blank">Error</a>` : ''}</td>
+    `;
+    table.appendChild(row);
+  })
+  .catch(error => {
+    console.error(`Error processing ${module.name}:`, error);
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${module.name}</td>
+      <td style="color:red;">Status not available yet</td>
+      <td></td>
+    `;
+    table.appendChild(row);
+  });
+});
+</script>
+
+  <h2 style="text-align: center;">ESS TESTERS</h2>
+
+  <script>
+    async function loadCSV() {
+      const response = await fetch('ESSTesters.csv');
+      const text = await response.text();
+
+      const rows = text.trim().split('\n').map(row => row.split(','));
+      const table = document.createElement('table');
+      table.border = 1;
+
+      for (let row of rows) {
+
+    	const nonEmptyCount = row.filter(cell => cell.trim() !== '').length;
+    	if (nonEmptyCount < row.length / 2) continue;  // skip if more than half are blank
+
+
+        const tr = document.createElement('tr');
+        for (let cell of row) {
+          const td = document.createElement('td');
+          td.textContent = cell;
+          tr.appendChild(td);
+        }
+        table.appendChild(tr);
+      }
+
+      document.body.appendChild(table);
+    }
+
+    window.onload = loadCSV;
+  </script>
+
+
+
+</body>
+</html>
