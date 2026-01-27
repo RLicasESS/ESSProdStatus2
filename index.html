@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ESSProdStatus</title>
-  
+  <meta charset="utf-8" />
+  <title>ESS PRODUCTION</title>
   <style>
     table {
       border-collapse: collapse;
       width: 60%;
       margin: 20px auto;
+      font-family: Arial, sans-serif;
     }
     th, td {
       border: 1px solid #aaa;
@@ -15,102 +16,969 @@
       text-align: left;
     }
     th {
-      background-color: #f0f0f0;
+      background-color: #2c3e50;
+      color: white;
+      font-weight: bold;
     }
+
+    /* Default links (everything else on the page) */
+    a {
+      color: #007bff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+  
+    /* ✅ Status links must inherit the status color (green/red/etc) */
+    a.statusLink,
+    a.statusLink:visited,
+    a.statusLink:hover,
+    a.statusLink:active {
+      color: inherit !important;     /* inherit td's color */
+      font-weight: inherit !important;
+      text-decoration: underline;     /* looks clickable */
+    }
+
+    /* Make status links keep the same color as the STATUS cell */
+    td a.statusLink {
+      color: inherit !important;
+      font-weight: inherit;
+      text-decoration: underline;   /* or none if you prefer */
+    }
+    
+    /* Debug line (hidden unless ?debug=1) */
+    #dbg {
+      width: 60%;
+      margin: 6px auto 0 auto;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      color: #555;
+      display: none;
+    }
+
+    /* Progress bars */
+    .lc-wrap { display: flex; flex-direction: column; gap: 6px; }
+    .lc-num  { font-weight: 600; }
+    .prog {
+      height: 12px;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+      background: #f2f2f2;
+      overflow: hidden;
+    }
+    .prog > .bar {
+      height: 100%;
+      width: 0%;
+      background: #2e7d32;
+    }
+    .lc-pct { font-size: 12px; color: #444; }
   </style>
-
-
-
 </head>
+
 <body>
-<h2 style="text-align: center;">ESS HANDLERS</h2>
+  <h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION</h2>
+  <div id="dbg"></div>
+<!-- ===== SITE STATUS (today) ===== -->
+<div id="siteStatus" style="
+  width:60%;
+  margin: 10px auto 0 auto;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  border: 1px solid #d33;
+  background: #fff3f3;
+  border-radius: 10px;
+  padding: 10px 12px;
+  white-space: pre-wrap;
+"></div>
 
-<table id="statusTable">
-  <tr>
-    <th>EQPT</th>
-    <th>STATUS</th>
-    <th>LINK</th>
-  </tr>
-</table>
+<!-- LOT LOOKUP (Tags Sheet + compare vs LOT NUMBER row in table) -->
+<div id="lotBox" style="display:none; width:60%; margin:10px auto 0 auto; font-family:Arial,sans-serif;">
+  <div style="border:1px solid #ccc; border-radius:8px; padding:12px;">
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <div style="font-weight:700; width:120px;">ESS TAG</div>
+      <input id="tagLookup" placeholder="Scan ESS Tag" style="padding:8px; font-size:16px; flex:1; min-width:220px;" />
+      <button id="tagLookupBtn" style="padding:9px 14px; font-size:16px; font-weight:700; cursor:pointer;">
+        LOOKUP
+      </button>
+    </div>
 
-<script>
-  const modules = [
-    { name: "NS-3", file: "NS-3.log" },
-    { name: "NS-4", file: "NS-4.log" },
-    { name: "NS-5", file: "NS-5.log" },
-    { name: "CHROMA", file: "CHROMA.log" }
-  ];
+    <div id="lotStatus" style="margin-top:10px; font-size:13px; color:#555;"></div>
 
-  const table = document.getElementById("statusTable");
+    <!-- Action buttons -->
+    <div id="lotActions" style="display:none; margin-top:10px; gap:10px;">
+      <button id="lotEditBtn" style="padding:9px 14px; font-size:16px; font-weight:700; cursor:pointer;">
+        EDIT
+      </button>
+      <button id="lotEndBtn" style="padding:9px 14px; font-size:16px; font-weight:700; cursor:pointer; color:#b00020;">
+        END
+      </button>
+    </div>
 
-modules.forEach(module => {
-  const pngFile = module.file.replace(/\.log$/, ".png");
+    <!-- EDIT PANEL -->
+    <div id="lotEditPanel" style="display:none; margin-top:12px; border:1px solid #ddd; border-radius:8px; padding:12px;">
+      <div style="font-weight:700; margin-bottom:8px;">Edit Tag Record (Tags tab)</div>
 
-  const logUrl = `${module.file}?t=${Date.now()}`;
-  const pngUrl = `${pngFile}?t=${Date.now()}`;
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+        <div style="font-weight:700; width:120px;">TAG ID</div>
+        <input id="edit_tag" readonly style="padding:8px; font-size:16px; flex:1; background:#f2f2f2;" />
+      </div>
 
-  Promise.all([
-    fetch(logUrl).then(res => {
-      if (!res.ok) throw new Error(`Status fetch failed`);
-      return res.text();
-    }),
-    fetch(pngUrl).then(res => res.ok ? pngFile : null).catch(() => null)
-  ])
-  .then(([status, imageLink]) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${module.name}</td>
-      <td>${status.trim()}</td>
-      <td>${imageLink ? `<a href="${imageLink}?t=${Date.now()}" target="_blank">Error</a>` : ''}</td>
-    `;
-    table.appendChild(row);
-  })
-  .catch(error => {
-    console.error(`Error processing ${module.name}:`, error);
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${module.name}</td>
-      <td style="color:red;">Status not available yet</td>
-      <td></td>
-    `;
-    table.appendChild(row);
-  });
-});
-</script>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+        <div style="font-weight:700; width:120px;">LOT ID</div>
+        <input id="edit_lot" readonly style="padding:8px; font-size:16px; flex:1; background:#f2f2f2;" />
+      </div>
 
-  <h2 style="text-align: center;">ESS TESTERS</h2>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+        <div style="font-weight:700; width:120px;">LOT QTY</div>
+        <input id="edit_qty" style="padding:8px; font-size:16px; flex:1;" />
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+        <div style="font-weight:700; width:120px;">PRODUCT</div>
+        <input id="edit_product" style="padding:8px; font-size:16px; flex:1;" />
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button id="edit_save" style="padding:9px 14px; font-size:16px; font-weight:700; cursor:pointer;">SAVE CHANGES</button>
+        <button id="edit_cancel" style="padding:9px 14px; font-size:16px; font-weight:700; cursor:pointer;">CANCEL</button>
+      </div>
+    </div>
+
+    <!-- END PANEL -->
+    <div id="lotEndPanel" style="display:none; margin-top:12px; border:1px solid #ddd; border-radius:8px; padding:12px;">
+      <div style="font-weight:700; margin-bottom:8px;">End Step (save to STEPS tab)</div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+        <div style="font-weight:700; width:120px;">IN</div>
+        <input id="end_in" readonly style="padding:8px; font-size:16px; flex:1; background:#f2f2f2;" />
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+        <div style="font-weight:700; width:120px;">STEP</div>
+        <input id="end_step" readonly style="padding:8px; font-size:16px; flex:1; background:#f2f2f2;" />
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+        <div style="font-weight:700; width:120px;">BIN 1</div>
+        <input id="end_bin1" inputmode="numeric" style="padding:8px; font-size:16px; flex:1;" />
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+        <div style="font-weight:700; width:120px;">BIN 2</div>
+        <input id="end_bin2" inputmode="numeric" style="padding:8px; font-size:16px; flex:1;" />
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+        <div style="font-weight:700; width:120px;">REJECT</div>
+        <input id="end_rej" inputmode="numeric" style="padding:8px; font-size:16px; flex:1;" />
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button id="end_save" style="padding:9px 14px; font-size:16px; font-weight:700; cursor:pointer;">SAVE</button>
+        <button id="end_cancel" style="padding:9px 14px; font-size:16px; font-weight:700; cursor:pointer;">CANCEL</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
   <script>
-    async function loadCSV() {
-      const response = await fetch('ESSTesters.csv');
-      const text = await response.text();
 
-      const rows = text.trim().split('\n').map(row => row.split(','));
-      const table = document.createElement('table');
-      table.border = 1;
+    // ===== SITE STATUS (today) =====
+    (function () {
+      const d = new Date();
+      const today = d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'2-digit' });
+      const msg = 'DOWN - fixing repo storage, counts are inaccurate right now';
+      const el = document.getElementById('siteStatus');
+      if (el) el.textContent = `${today}: ${msg}`;
+    })();
 
-      for (let row of rows) {
+    const params = new URLSearchParams(window.location.search);
+    const showLinks = params.get("links") === "1";
+    const debug = params.get("debug") === "1";
 
-    	const nonEmptyCount = row.filter(cell => cell.trim() !== '').length;
-    	if (nonEmptyCount < row.length / 2) continue;  // skip if more than half are blank
+    const dbgEl = document.getElementById("dbg");
+    if (debug) dbgEl.style.display = "block";
+    function dbg(msg) { if (debug) dbgEl.textContent = msg; }
 
-
-        const tr = document.createElement('tr');
-        for (let cell of row) {
-          const td = document.createElement('td');
-          td.textContent = cell;
-          tr.appendChild(td);
-        }
-        table.appendChild(tr);
-      }
-
-      document.body.appendChild(table);
+    if (showLinks) {
+      document.getElementById("pageTitle").innerHTML =
+        `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION`;
     }
 
-    window.onload = loadCSV;
+    // const CSV_URL = "./ESSProd.csv";
+    const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus/main/ESSProd.csv";
+    const showTagIfPresent = params.get("tag") === "1";
+
+    // NEW: only these columns get STATUS links
+    const HANDLER_SET = new Set(["CHROMA", "NS-3", "NS-4", "NS-5"]);
+
+    // Helper: given the header row and a column index, determine the column name
+    function getColNameFromHeader(rows, colIndex) {
+      const header = (rows && rows[0]) ? rows[0] : null;
+      if (!header) return "";
+      return String(header[colIndex] || "").trim().toUpperCase();
+    }
+
+    function equalizeLastColumn(table) {
+      if (!table) return;
+
+      const headerRow = table.querySelector("tr");
+      if (!headerRow) return;
+
+      const heads = Array.from(headerRow.children);
+      if (heads.length < 3) return;
+
+      const lastIdx = heads.length - 1;
+
+      const widths = [];
+      for (let i = 1; i <= lastIdx - 1; i++) {
+        const w = heads[i].getBoundingClientRect().width;
+        if (w > 0) widths.push(w);
+      }
+      if (!widths.length) return;
+
+      const avg = widths.reduce((a, b) => a + b, 0) / widths.length;
+
+      for (const row of Array.from(table.rows)) {
+        const cell = row.cells[lastIdx];
+        if (cell) {
+          cell.style.width = avg.toFixed(1) + "px";
+          cell.style.maxWidth = avg.toFixed(1) + "px";
+        }
+      }
+    }
+
+    function showTagBox(on) {
+      const el = document.getElementById("lotBox");
+      if (el) el.style.display = on ? "" : "none";
+    }
+
+    function shouldShowTagBoxFromTable(rows) {
+      if (!showTagIfPresent) return false;
+      if (!rows) return false;
+
+      const lotRow = (rows || []).find(r => norm(r?.[0]) === "LOT NUMBER");
+      if (!lotRow) return false;
+
+      for (let c = 1; c < lotRow.length; c++) {
+        const v = String(lotRow[c] ?? "").trim();
+        if (v && v.toUpperCase() !== "NA") return true;
+      }
+      return false;
+    }
+
+    // ===== TAGS API (Apps Script Web App) =====
+    const TAGS_API_URL =
+      "https://script.google.com/macros/s/AKfycbytwPIElO5czOhnY5wmDUnQMCltrxApfADq_C2131TjY7uo8iFbVUafTAHJAIJTYjEjSw/exec";
+
+    function $(id){ return document.getElementById(id); }
+
+    let lastCSVRows = null;
+    let lotLookupCtx = null;
+    let prevRowsByLabel = null;
+
+    function norm(s) {
+      return (s || "").toString().replace(/\r/g, "").trim().toUpperCase();
+    }
+    function toInt(x) {
+      const v = parseInt((x || "").toString().replace(/,/g, "").trim(), 10);
+      return Number.isNaN(v) ? null : v;
+    }
+
+    function sumAutosForCol(rows, colIndex) {
+      const a1 = rows.find(r => norm(r[0]) === "AUTO1") || [];
+      const a2 = rows.find(r => norm(r[0]) === "AUTO2") || [];
+      const a3 = rows.find(r => norm(r[0]) === "AUTO3") || [];
+      return (toInt(a1[colIndex]) || 0) + (toInt(a2[colIndex]) || 0) + (toInt(a3[colIndex]) || 0);
+    }
+
+    function parseCSV(text) {
+      const lines = text.replace(/\r/g, "").trim().split(/\n/);
+      if (!lines.length) return [];
+      const first = lines[0];
+      const delim = first.includes("\t") ? "\t" : ",";
+      return lines.map(line => line.split(delim));
+    }
+
+    function cleanUrl_(s) {
+      return String(s || "")
+        .replace(/[\s\u200B-\u200D\uFEFF]/g, "")
+        .trim();
+    }
+
+    async function tagsApiGet(action, params = {}) {
+      const base = cleanUrl_(TAGS_API_URL);
+      if (!base.startsWith("http")) {
+        throw new Error("TAGS_API_URL missing/invalid: " + base);
+      }
+
+      const qp = new URLSearchParams({ action, ...params }).toString();
+      const url = base + (base.includes("?") ? "&" : "?") + qp;
+
+      const res = await fetch(url, { cache: "no-store" });
+      const text = await res.text();
+
+      let json;
+      try { json = JSON.parse(text); }
+      catch { throw new Error(`Non-JSON response. First 200 chars:\n${text.slice(0, 200)}`); }
+
+      if (!json.ok) throw new Error(json.error || "Tags API error");
+      return json;
+    }
+
+    async function tagsApiPost(payload) {
+      const base = cleanUrl_(TAGS_API_URL);
+      if (!base.startsWith("http")) {
+        throw new Error("TAGS_API_URL missing/invalid: " + base);
+      }
+
+      const res = await fetch(base, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+        cache: "no-store",
+      });
+
+      const text = await res.text();
+
+      let json;
+      try { json = JSON.parse(text); }
+      catch { throw new Error(`Non-JSON response. First 200 chars:\n${text.slice(0, 200)}`); }
+
+      if (!json.ok) throw new Error(json.error || "Tags API error");
+      return json;
+    }
+
+    function parseDateTimeLocal(s) {
+      const raw = (s || "").toString().trim();
+      if (!raw) return null;
+
+      let x = raw.replace(" ", "T");
+      x = x.replace(/\.(\d{3})\d+/, ".$1");
+
+      const d = new Date(x);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+    function pad2(n) { return String(n).padStart(2, "0"); }
+    function fmtDateTime(d) {
+      return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    }
+
+    window.addEventListener("resize", () => {
+      const t = document.querySelector("table");
+      if (t) requestAnimationFrame(() => equalizeLastColumn(t));
+    });
+
+    async function loadCSV() {
+      try {
+        dbg("Loading CSV…");
+
+        const resp = await fetch(
+          CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "v=" + Date.now(),
+          { cache: "no-store" }
+        );
+
+        if (!resp.ok) {
+          dbg(`CSV fetch failed: ${resp.status} ${resp.statusText}`);
+          return;
+        }
+
+        const text = await resp.text();
+        const rows = parseCSV(text);
+        const lu = (rows.slice().reverse().find(r => norm(r[0]) === "LAST UPDATE") || [])[1];
+        dbg("Fetched CSV. LAST UPDATE col1=" + (lu || ""));
+
+        if (!rows.length) {
+          dbg("CSV parsed but rows is empty.");
+          return;
+        }
+
+        showTagBox(shouldShowTagBoxFromTable(rows));
+
+        // STATUS per column
+        const statusRow = rows.find(r => norm(r[0]) === "STATUS") || [];
+        const statusByCol = {};
+        for (let c = 1; c < statusRow.length; c++) {
+          statusByCol[c] = (statusRow[c] || "").toString().trim().toLowerCase();
+        }
+
+        // TOTAL IN per column
+        const totalInRow = rows.find(r => norm(r[0]) === "TOTAL IN") || [];
+        const totalInByCol = {};
+        for (let c = 1; c < totalInRow.length; c++) {
+          const v = toInt(totalInRow[c]);
+          if (v !== null) totalInByCol[c] = v;
+        }
+
+        // TOTAL row
+        const totalRow = rows.find(r => norm(r[0]) === "TOTAL") || [];
+
+        // Freeze numeric values when STATUS=error for that column
+        const freezeLabels = new Set(["TOTAL IN", "LOADING COUNTS", "TOTAL", "AUTO1", "AUTO2", "AUTO3"]);
+        if (prevRowsByLabel) {
+          for (const r of rows) {
+            const label = norm(r[0]);
+            if (!freezeLabels.has(label)) continue;
+
+            const prevRow = prevRowsByLabel[label];
+            if (!prevRow) continue;
+
+            for (let c = 1; c < r.length; c++) {
+              if ((statusByCol[c] || "") === "error") {
+                const prevVal = prevRow[c];
+                if (prevVal !== undefined && String(prevVal).trim() !== "") {
+                  r[c] = prevVal;
+                }
+              }
+            }
+          }
+        }
+
+        lastCSVRows = rows;
+
+        function findLastRow(rows, label) {
+          const want = norm(label);
+          for (let i = rows.length - 1; i >= 0; i--) {
+            if (norm(rows[i]?.[0]) === want) return rows[i];
+          }
+          return null;
+        }
+
+        const startRow   = rows.find(r => norm(r[0]) === "DATE LOT STARTED") || [];
+        const lastUpdRow = findLastRow(rows, "LAST UPDATE") || [];
+        const loadingRow = rows.find(r => norm(r[0]) === "LOADING COUNTS") || [];
+
+        const estFinishRow = [];
+        estFinishRow[0] = "ESTIMATED FINISH";
+
+        const maxColsEF = Math.max(...rows.map(r => r.length));
+        for (let c = 1; c < maxColsEF; c++) {
+          const startDt = parseDateTimeLocal(startRow[c]);
+          const updDt   = parseDateTimeLocal(lastUpdRow[c]);
+
+          const loading = toInt(loadingRow[c]);
+          const totalIn = totalInByCol[c];
+
+          if (!startDt || !updDt || loading === null || !totalIn || totalIn <= 0) {
+            estFinishRow[c] = "";
+            continue;
+          }
+
+          const elapsedMs = updDt.getTime() - startDt.getTime();
+          const progress = loading / totalIn;
+
+          if (elapsedMs <= 0 || progress <= 0) {
+            estFinishRow[c] = "";
+            continue;
+          }
+
+          const p = Math.min(1, progress);
+          const estTotalMs = elapsedMs / p;
+          const finishDt = new Date(startDt.getTime() + estTotalMs);
+
+          estFinishRow[c] = fmtDateTime(finishDt);
+        }
+
+        const idxTotalIn = rows.findIndex(r => norm(r[0]) === "TOTAL IN");
+        const insertAt = idxTotalIn >= 0 ? idxTotalIn + 1 : rows.length;
+        rows.splice(insertAt, 0, estFinishRow);
+
+        // Precompute autoSum
+        const autoSumByCol = {};
+        const maxCols = Math.max(...rows.map(r => r.length));
+        for (let c = 1; c < maxCols; c++) {
+          autoSumByCol[c] = sumAutosForCol(rows, c);
+        }
+
+        // Build table
+        const table = document.createElement("table");
+
+        rows.forEach((row, rowIndex) => {
+          const nonEmptyCount = row.filter(cell => {
+            const cc = norm(cell);
+            return cc !== "" && cc !== "NA";
+          }).length;
+          if (nonEmptyCount === 0) return;
+
+          const tr = document.createElement("tr");
+          const isHeader = rowIndex === 0;
+          const rowLabel = norm(row[0]);
+          const isTesterOrHandlerRow = !isHeader && row.some(cell => /tester|handler/i.test((cell || "").toString()));
+
+          row.forEach((cell, colIndex) => {
+            let cellContent = (cell ?? "").toString();
+            const c = cellContent.trim().toUpperCase();
+
+            // links.html behavior: TESTER header links in links mode
+            if (isHeader && c === "TESTER") {
+              cellContent = showLinks
+                ? `<a href="https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0" target="_blank">TESTER</a>`
+                : "TESTER";
+            }
+
+            // Handler links (non-header only)
+            if (!isHeader) {
+              if (c === "CHROMA") {
+                cellContent = showLinks
+                  ? `<a href="https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e" target="_blank">CHROMA</a>`
+                  : "CHROMA";
+              }
+              if (c === "NS-3") {
+                cellContent = showLinks
+                  ? `<a href="https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46" target="_blank">NS-3</a>`
+                  : "NS-3";
+              }
+              if (c === "NS-4") {
+                cellContent = showLinks
+                  ? `<a href="https://connect.raspberrypi.com/devices/66fa4727-e6b5-4a1a-855d-1f266270b950" target="_blank">NS-4</a>`
+                  : "NS-4";
+              }
+              if (c === "NS-5") {
+                cellContent = showLinks
+                  ? `<a href="https://connect.raspberrypi.com/devices/468fc957-7879-440e-b1ea-b7e7dfef37f6" target="_blank">NS-5</a>`
+                  : "NS-5";
+              }
+            }
+
+            // VNC links
+            if (showLinks && c === "AP-1")   cellContent = `<a href="vnc://AP-1">AP-1</a>`;
+            if (showLinks && c === "AP-2")   cellContent = `<a href="vnc://AP-2">AP-2</a>`;
+            if (showLinks && c === "S100_1") cellContent = `<a href="vnc://S100-1">S100_1</a>`;
+            if (showLinks && c === "S100_2") cellContent = `<a href="vnc://S100-2">S100_2</a>`;
+
+            // ===== STATUS row: link to handler_view based on HANDLER row value for this column =====
+            if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
+              const handlerRow = rows.find(r => norm(r[0]) === "HANDLER") || [];
+              const handlerName = String(handlerRow[colIndex] || "").trim().toUpperCase(); // e.g. "NS-4"
+            
+              if (HANDLER_SET.has(handlerName)) {
+                const stTxt = (cell ?? "").toString().trim() || handlerName;
+                cellContent =
+                  `<a href="handler_view.html?handler=${encodeURIComponent(handlerName)}" target="_blank" rel="noopener">${stTxt}</a>`;
+              }
+            }
+            
+            // LOADING COUNTS progress
+            if (!isHeader && rowLabel === "LOADING COUNTS" && colIndex > 0) {
+              const loading = toInt(cell);
+              const totalIn = totalInByCol[colIndex];
+              if (loading !== null && totalIn && totalIn > 0) {
+                let pct = (loading / totalIn) * 100;
+                pct = Math.max(0, Math.min(100, pct));
+                cellContent = `
+                  <div class="lc-wrap">
+                    <div class="lc-num">${loading.toLocaleString()}</div>
+                    <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                  </div>
+                `;
+              }
+            }
+
+            // AUTO1 progress
+            if (!isHeader && (rowLabel === "AUTO1" || rowLabel === "AUTO 1") && colIndex > 0) {
+              const auto1 = toInt(cell);
+              const total = toInt(totalRow[colIndex]);
+              if (auto1 !== null && total !== null && total > 0) {
+                let pct = (auto1 / total) * 100;
+                pct = Math.max(0, Math.min(100, pct));
+                cellContent = `
+                  <div class="lc-wrap">
+                    <div class="lc-num">${auto1.toLocaleString()}</div>
+                    <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                  </div>
+                `;
+              }
+            }
+
+            // AUTO2 progress
+            if (!isHeader && (rowLabel === "AUTO2" || rowLabel === "AUTO 2") && colIndex > 0) {
+              const auto2 = toInt(cell);
+              const total = toInt(totalRow[colIndex]);
+              if (auto2 !== null && total !== null && total > 0) {
+                let pct = (auto2 / total) * 100;
+                pct = Math.max(0, Math.min(100, pct));
+                cellContent = `
+                  <div class="lc-wrap">
+                    <div class="lc-num">${auto2.toLocaleString()}</div>
+                    <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                  </div>
+                `;
+              }
+            }
+
+            // --- STATUS row: make each status cell clickable, but keep the status color ---
+            if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
+              // Column header name (AP-1, AP-2, S100_1, CHROMA, NS-3, NS-4, NS-5, etc.)
+              const headerName = ((rows[0] && rows[0][colIndex]) ? rows[0][colIndex] : "").toString().trim();
+            
+              // Only link handlers (edit this list if you want testers too)
+              const isHandler = ["CHROMA", "NS-3", "NS-4", "NS-5"].includes(headerName.toUpperCase());
+            
+              if (isHandler) {
+                // for now, link to the PNG in the repo (we can swap to “request+wait” later)
+                // const pngUrl = `./${encodeURIComponent(headerName)}.png?v=${Date.now()}`;
+                const pngUrl = `https://raw.githubusercontent.com/RLicasESS/ESSProdStatus/main/${encodeURIComponent(headerName)}.png?v=${Date.now()}`;
+                cellContent = `<a class="statusLink" href="${pngUrl}" target="_blank" rel="noopener">${cellContent}</a>`;
+              }
+            }
+            
+            const cellEl = document.createElement(isHeader ? "th" : "td");
+            cellEl.innerHTML = cellContent;
+
+            // First column styling
+            if (colIndex === 0) {
+              cellEl.style.backgroundColor = isHeader ? "#2c3e50" : "#dff0d8";
+              if (isHeader) {
+                cellEl.style.color = "white";
+                cellEl.style.fontWeight = "bold";
+              }
+            }
+
+            // Tester/Handler row highlight
+            if (isTesterOrHandlerRow && !isHeader) {
+              cellEl.style.backgroundColor = "#fef2d0";
+              cellEl.style.fontWeight = "bold";
+            }
+
+            if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
+              const st = (cell || "").toString().trim().toLowerCase();
+            
+              if (st === "running") {
+                cellEl.style.color = "green";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#dff6df"; // light green
+              }
+              if (st === "error") {
+                cellEl.style.color = "red";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#ffd6d6"; // light red
+              }
+              if (st === "stopped") {
+                cellEl.style.color = "goldenrod";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#fff3cd"; // light yellow
+              }
+              if (st === "maint") {
+                cellEl.style.color = "blue";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#d6e6ff"; // light blue
+              }
+            }
+
+            
+            // ===== Number checks =====
+            if (!isHeader && colIndex > 0) {
+              const autoSum = autoSumByCol[colIndex] || 0;
+
+              if (rowLabel === "LOADING COUNTS") {
+                const loading = toInt(cell);
+                if (loading !== null && loading < autoSum) {
+                  cellEl.style.backgroundColor = "#ffd6d6";
+                  cellEl.style.fontWeight = "bold";
+                  cellEl.style.color = "red";
+                }
+              }
+
+              if (rowLabel === "TOTAL") {
+                const total = toInt(cell);
+                if (total !== null && total < autoSum) {
+                  cellEl.style.backgroundColor = "#ffd6d6";
+                  cellEl.style.fontWeight = "bold";
+                  cellEl.style.color = "red";
+                }
+              }
+
+              if (rowLabel === "TOTAL IN") {
+                const totalIn = toInt(cell);
+                const loading = toInt(loadingRow[colIndex]);
+                if (totalIn !== null && loading !== null && totalIn < loading) {
+                  cellEl.style.backgroundColor = "#ffd6d6";
+                  cellEl.style.fontWeight = "bold";
+                  cellEl.style.color = "red";
+                }
+              }
+            }
+
+            tr.appendChild(cellEl);
+          });
+
+          table.appendChild(tr);
+        });
+
+        const old = document.querySelector("table");
+        if (old) old.remove();
+        document.body.appendChild(table);
+        requestAnimationFrame(() => equalizeLastColumn(table));
+
+        const lotBox = document.getElementById("lotBox");
+        if (lotBox) document.body.appendChild(lotBox);
+
+        const newPrev = {};
+        for (const r of rows) {
+          const label = norm(r[0]);
+          if (label) newPrev[label] = r.slice();
+        }
+        prevRowsByLabel = newPrev;
+
+        dbg("Rendered OK.");
+      } catch (e) {
+        console.error(e);
+        dbg("JS error. Open console.");
+      }
+    }
+
+    function showLotStatus(msg, danger=false) {
+      const el = $("lotStatus");
+      el.style.color = danger ? "#b00020" : "#555";
+      el.textContent = msg;
+    }
+
+    function hideLotPanels() {
+      $("lotActions").style.display = "none";
+      $("lotEditPanel").style.display = "none";
+      $("lotEndPanel").style.display = "none";
+    }
+
+    function getCellIntByLabel(rows, label, colIndex) {
+      const r = findRowByLabel(rows, label);
+      if (!r) return 0;
+      return toInt0(r[colIndex]);
+    }
+
+    function findRowByLabel(rows, label) {
+      const want = norm(label);
+      return (rows || []).find(r => norm(r[0]) === want) || null;
+    }
+
+    function findMatchingColsForLot(rows, lotId) {
+      const lotRow = findRowByLabel(rows, "LOT NUMBER");
+      if (!lotRow) return [];
+
+      const want = norm(lotId);
+      const cols = [];
+      for (let c = 1; c < lotRow.length; c++) {
+        if (norm(lotRow[c]) === want) cols.push(c);
+      }
+      return cols;
+    }
+
+    function getStepForCol(rows, colIndex) {
+      const stepRow = findRowByLabel(rows, "TEST STEP");
+      if (!stepRow) return "";
+      return (stepRow[colIndex] || "").toString().trim();
+    }
+
+    async function onTagLookup() {
+      hideLotPanels();
+      lotLookupCtx = null;
+
+      const tag = $("tagLookup").value.trim();
+      if (!tag) {
+        showLotStatus("Please scan an ESS TAG.", true);
+        return;
+      }
+
+      if (!lastCSVRows) {
+        showLotStatus("Table not loaded yet. Wait 1–2 seconds then try again.", true);
+        return;
+      }
+
+      let out;
+      try {
+        out = await tagsApiGet("lookup", { tag });
+      } catch (e) {
+        showLotStatus(`Tags API error: ${e.message}`, true);
+        return;
+      }
+
+      if (!out.found) {
+        showLotStatus(`Tag not found in Tags sheet: ${tag}`, true);
+        return;
+      }
+
+      const lotId = String(out.data.LOT_ID || "").trim();
+      const matchedCols = findMatchingColsForLot(lastCSVRows, lotId);
+      if (matchedCols.length === 0) {
+        showLotStatus(`LOT not found in table (LOT NUMBER): ${lotId}`, true);
+        return;
+      }
+
+      const step = getStepForCol(lastCSVRows, matchedCols[0]);
+
+      lotLookupCtx = {
+        ...out.data,
+        STEP_FROM_TABLE: step,
+        MATCHED_COLS: matchedCols
+      };
+
+      const note = matchedCols.length > 1
+        ? `Found LOT in table on ${matchedCols.length} column(s). Using first match for STEP.`
+        : `Found LOT in table.`;
+
+      showLotStatus(`Tag found ✅ ${note}`, false);
+      $("lotActions").style.display = "flex";
+    }
+
+    function openEditLot() {
+      if (!lotLookupCtx) return;
+
+      $("lotEditPanel").style.display = "block";
+      $("lotEndPanel").style.display = "none";
+
+      $("edit_tag").value = lotLookupCtx.TAG_ID || "";
+      $("edit_lot").value = lotLookupCtx.LOT_ID || "";
+      $("edit_qty").value = lotLookupCtx.LOT_QTY || "";
+      $("edit_product").value = lotLookupCtx.PRODUCT_NAME || "";
+    }
+
+    function openEndLot() {
+      if (!lotLookupCtx) return;
+
+      $("lotEndPanel").style.display = "block";
+      $("lotEditPanel").style.display = "none";
+
+      $("end_in").value = lotLookupCtx.LOT_QTY || "";
+      $("end_step").value = lotLookupCtx.STEP_FROM_TABLE || "";
+
+      const col = (lotLookupCtx.MATCHED_COLS && lotLookupCtx.MATCHED_COLS[0]) ? lotLookupCtx.MATCHED_COLS[0] : null;
+
+      if (col && lastCSVRows) {
+        $("end_bin1").value = String(getCellIntByLabel(lastCSVRows, "AUTO1", col) || 0);
+        $("end_bin2").value = String(getCellIntByLabel(lastCSVRows, "AUTO2", col) || 0);
+        $("end_rej").value  = String(getCellIntByLabel(lastCSVRows, "AUTO3", col) || 0);
+      } else {
+        $("end_bin1").value = "";
+        $("end_bin2").value = "";
+        $("end_rej").value  = "";
+      }
+    }
+
+    function toInt0(x) {
+      const n = parseInt(String(x ?? "").replace(/[^\d-]/g, ""), 10);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    async function saveEditLot() {
+      if (!lotLookupCtx) return;
+
+      const tag = String($("edit_tag").value || "").trim();
+      const lot = String($("edit_lot").value || "").trim();
+      const qty = String($("edit_qty").value || "").trim();
+      const product = String($("edit_product").value || "").trim();
+
+      if (!tag || !lot || !qty || !product) {
+        showLotStatus("All fields are required for EDIT.", true);
+        return;
+      }
+
+      try {
+        await tagsApiPost({ action: "update", tag, lot, qty, product });
+        showLotStatus("Saved changes ✅", false);
+        $("lotEditPanel").style.display = "none";
+      } catch (e) {
+        showLotStatus(`Save failed: ${e.message}`, true);
+      }
+    }
+
+    async function saveEndStep() {
+      if (!lotLookupCtx) return;
+
+      const lot = String(lotLookupCtx.LOT_ID || "").trim();
+      const tag = String(lotLookupCtx.TAG_ID || "").trim();
+      const product = String(lotLookupCtx.PRODUCT_NAME || "").trim();
+      const step = String($("end_step").value || "").trim();
+      const inQty = toInt0($("end_in").value);
+
+      const bin1 = toInt0($("end_bin1").value);
+      const bin2 = toInt0($("end_bin2").value);
+      const rej  = toInt0($("end_rej").value);
+
+      if (!lot || !step || inQty <= 0) {
+        showLotStatus("END: Missing LOT/STEP or invalid IN qty.", true);
+        return;
+      }
+
+      try {
+        await tagsApiPost({
+          action: "save_step",
+          lot,
+          tag,
+          product,
+          step,
+          in_qty: inQty,
+          bin1,
+          bin2,
+          reject: rej
+        });
+      } catch (e) {
+        showLotStatus(`END save failed: ${e.message}`, true);
+        return;
+      }
+
+      const nextRaw = prompt("Next step? RT1, RT2, BIN1_70C_FT1, BIN2_25C_FT1 (or cancel to skip)", "");
+      if (nextRaw === null) {
+        showLotStatus("Saved END to STEPS ✅ (skipped next step)", false);
+        $("lotEndPanel").style.display = "none";
+        return;
+      }
+
+      const nextStep = String(nextRaw).trim();
+      const a = nextStep.toUpperCase();
+
+      let newQty = null;
+      if (a.startsWith("RT")) newQty = rej;
+      else if (a.startsWith("BIN1")) newQty = bin1;
+      else if (a.startsWith("BIN2")) newQty = bin2;
+
+      if (newQty === null) {
+        showLotStatus(`Saved END to STEPS ✅ (next step not recognized: "${nextStep}")`, true);
+        $("lotEndPanel").style.display = "none";
+        return;
+      }
+
+      try {
+        await tagsApiPost({
+          action: "update",
+          tag,
+          lot,
+          qty: String(newQty),
+          product
+        });
+
+        lotLookupCtx.LOT_QTY = String(newQty);
+        $("end_in").value = String(newQty);
+
+        showLotStatus(`Saved END ✅ | Next="${nextStep}" | New LOT_QTY=${newQty}`, false);
+        $("lotEndPanel").style.display = "none";
+      } catch (e) {
+        showLotStatus(`Saved END ✅ but failed to update Tags LOT_QTY: ${e.message}`, true);
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      $("tagLookupBtn").onclick = () => onTagLookup();
+      $("tagLookup").addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter") onTagLookup();
+      });
+
+      $("lotEditBtn").onclick = () => openEditLot();
+      $("lotEndBtn").onclick  = () => openEndLot();
+
+      $("edit_save").onclick   = () => saveEditLot();
+      $("edit_cancel").onclick = () => { $("lotEditPanel").style.display = "none"; };
+
+      $("end_save").onclick    = () => saveEndStep();
+      $("end_cancel").onclick  = () => { $("lotEndPanel").style.display = "none"; };
+    });
+
+    window.addEventListener("load", () => {
+      loadCSV();
+      setInterval(loadCSV, 30000);
+    });
   </script>
-
-
-
 </body>
 </html>
