@@ -185,7 +185,7 @@
     }
 
     // const CSV_URL = "./ESSProd.csv";
-    const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus/main/ESSProd.csv";
+    const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
     const showTagIfPresent = params.get("tag") === "1";
 
     // NEW: only these columns get STATUS links
@@ -599,7 +599,7 @@
               if (isHandler) {
                 // for now, link to the PNG in the repo (we can swap to “request+wait” later)
                 // const pngUrl = `./${encodeURIComponent(headerName)}.png?v=${Date.now()}`;
-                const pngUrl = `https://raw.githubusercontent.com/RLicasESS/ESSProdStatus/main/${encodeURIComponent(headerName)}.png?v=${Date.now()}`;
+                const pngUrl = `https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/${encodeURIComponent(headerName)}.png?v=${Date.now()}`;
                 cellContent = `<a class="statusLink" href="${pngUrl}" target="_blank" rel="noopener">${cellContent}</a>`;
               }
             }
@@ -960,3 +960,4 @@
   </script>
 </body>
 </html>
+
