@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Handler Screenshot</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 18px; }
+    .wrap { max-width: 900px; margin: 0 auto; }
+    h2 { margin: 0 0 10px 0; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 10px 0; }
+    button { padding: 10px 14px; font-weight: 700; cursor: pointer; }
+    .msg { margin-top: 10px; color: #333; white-space: pre-wrap; }
+    .err { color: #b00020; }
+    img { width: 100%; max-width: 900px; border: 1px solid #ccc; border-radius: 10px; margin-top: 12px; }
+    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h2>Handler Screenshot</h2>
+    <div id="hdr"></div>
+
+    <div class="row">
+      <button id="btnReq">Request Latest Screenshot</button>
+    </div>
+
+    <div id="msg" class="msg"></div>
+
+    <img id="img" alt="Handler screenshot" />
+  </div>
+
+<script>
+  // ===== CONFIG =====
+  // Put your screenshot-request Apps Script Web App /exec URL here:
+  // Example: https://script.google.com/macros/s/AAAA.../exec
+  const REQUEST_API_URL = "https://script.google.com/macros/s/AKfycbzhMd6QdDh-X9kwYjvgD1TvwFJFtclhClkcDfMmZ83zFHuQQsi-MliLQaWaQvQMC9nZ/exec";
+
+  // Where the image will be served from (raw GitHub)
+  function rawPngUrl(handler) {
+    return `https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/${encodeURIComponent(handler)}.png`;
+  }
+
+  // ===== HELPERS =====
+  const $ = (id) => document.getElementById(id);
+
+  function setMsg(s, isErr=false) {
+    $("msg").textContent = s || "";
+    $("msg").className = "msg" + (isErr ? " err" : "");
+  }
+
+  function handlerFromQuery() {
+    const p = new URLSearchParams(location.search);
+    return (p.get("handler") || "").trim();
+  }
+
+  function setImage(handler, bust=true) {
+    const base = rawPngUrl(handler);
+    const url = bust ? (base + "?v=" + Date.now()) : base;
+    $("img").src = url;
+  }
+
+  async function requestLatest(handler) {
+    if (!handler) return;
+    if (!REQUEST_API_URL || !REQUEST_API_URL.startsWith("http")) {
+      setMsg("REQUEST_API_URL is not set. Paste your Apps Script /exec URL into handler_view.html.", true);
+      return;
+    }
+
+    // Prefer an explicit action so your Code.gs can route cleanly
+    // Your Code.gs should create: requests/<handler>.request
+    const url = REQUEST_API_URL
+      + (REQUEST_API_URL.includes("?") ? "&" : "?")
+      + "action=" + encodeURIComponent("request_png")
+      + "&handler=" + encodeURIComponent(handler)
+      + "&reason=" + encodeURIComponent("github_io")
+      + "&ts=" + Date.now();
+
+    setMsg("Requesting screenshot…\n" + url);
+
+    let txt = "";
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      txt = await res.text();
+    } catch (e) {
+      setMsg("Request failed:\n" + e, true);
+      return;
+    }
+
+    setMsg("Request result:\n" + txt);
+
+    // Poll for the PNG to appear/update
+    await pollForPng(handler, 30, 2000);
+  }
+
+  async function pollForPng(handler, tries = 30, sleepMs = 2000) {
+    const base = rawPngUrl(handler);
+  
+    for (let i = 1; i <= tries; i++) {
+      const url = base + "?v=" + Date.now();
+  
+      try {
+        // 1) Quick existence check
+        const head = await fetch(url, { method: "HEAD", cache: "no-store" });
+  
+        if (head.ok) {
+          // 2) Verify the image actually loads (avoids "HEAD ok but image still stale/blocked")
+          const ok = await new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
+            img.src = url;
+          });
+  
+          if (ok) {
+            setMsg(`PNG is available ✅ (try ${i}/${tries})`);
+            setImage(handler, true, url); // pass url if your setImage supports it
+            return;
+          }
+  
+          setMsg(`PNG exists but hasn't propagated yet… (${i}/${tries})`);
+        } else {
+          setMsg(`Waiting for PNG… (${i}/${tries}) [HTTP ${head.status}]`);
+        }
+      } catch (e) {
+        setMsg(`Waiting for PNG… (${i}/${tries}) [network hiccup]`);
+      }
+  
+      await new Promise(r => setTimeout(r, sleepMs));
+    }
+  
+    setMsg("Timed out waiting for PNG. It may still be processing on the handler.", true);
+  }
+  
+  // ===== INIT =====
+  const handler = handlerFromQuery();
+
+  if (!handler) {
+    $("hdr").innerHTML = `<div class="err">Missing handler. Use <code>?handler=NS-4</code></div>`;
+    setMsg("No handler specified.", true);
+    $("btnReq").disabled = true;
+  } else {
+    $("hdr").innerHTML = `Handler: <code>${handler}</code>`;
+    setImage(handler, true);
+    $("btnReq").onclick = () => requestLatest(handler);
+  }
+</script>
+
+</body>
+</html>
