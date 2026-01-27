@@ -78,18 +78,6 @@
 <body>
   <h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION</h2>
   <div id="dbg"></div>
-<!-- ===== SITE STATUS (today) ===== -->
-<div id="siteStatus" style="
-  width:60%;
-  margin: 10px auto 0 auto;
-  font-family: Arial, sans-serif;
-  font-weight: 700;
-  border: 1px solid #d33;
-  background: #fff3f3;
-  border-radius: 10px;
-  padding: 10px 12px;
-  white-space: pre-wrap;
-"></div>
 
 <!-- LOT LOOKUP (Tags Sheet + compare vs LOT NUMBER row in table) -->
 <div id="lotBox" style="display:none; width:60%; margin:10px auto 0 auto; font-family:Arial,sans-serif;">
@@ -183,16 +171,6 @@
 </div>
 
   <script>
-
-    // ===== SITE STATUS (today) =====
-    (function () {
-      const d = new Date();
-      const today = d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'2-digit' });
-      const msg = 'DOWN - fixing repo storage, counts are inaccurate right now';
-      const el = document.getElementById('siteStatus');
-      if (el) el.textContent = `${today}: ${msg}`;
-    })();
-
     const params = new URLSearchParams(window.location.search);
     const showLinks = params.get("links") === "1";
     const debug = params.get("debug") === "1";
