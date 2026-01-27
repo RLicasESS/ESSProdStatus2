@@ -1,0 +1,6 @@
+github_token.txt
+
+# secrets
+*.key
+*.pem
+*.json
