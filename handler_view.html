@@ -38,7 +38,7 @@
 
   // Where the image will be served from (raw GitHub)
   function rawPngUrl(handler) {
-    return `https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/${encodeURIComponent(handler)}.png`;
+    return `https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/requests/${encodeURIComponent(handler)}.png`;
   }
 
   // ===== HELPERS =====
@@ -54,7 +54,7 @@
     return (p.get("handler") || "").trim();
   }
 
-  function setImage(handler, bust=true) {
+  function (handler, bust=true) {
     const base = rawPngUrl(handler);
     const url = bust ? (base + "?v=" + Date.now()) : base;
     $("img").src = url;
@@ -114,7 +114,10 @@
   
           if (ok) {
             setMsg(`PNG is available ✅ (try ${i}/${tries})`);
-            setImage(handler, true, url); // pass url if your setImage supports it
+            setImage(handler, true); 
+            // auto-request on load (optional)
+            requestLatest(handler);
+
             return;
           }
   
