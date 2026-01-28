@@ -1,24 +1,22 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Handler</title>
+  <title>Handler View</title>
   <style>
     html, body { margin:0; padding:0; background:#000; width:100%; height:100%; }
-    img {
-      display:block;
-      width:100vw;
-      height:100vh;
-      object-fit:contain;
-      background:#000;
-    }
+    img { width:100vw; height:100vh; object-fit:contain; display:block; background:#000; }
   </style>
 </head>
 <body>
+  <div style="position:fixed;top:0;left:0;z-index:9999;background:yellow;color:#000;padding:6px;font:18px monospace;">
+    SIMPLE PIC VIEW v1
+  </div>
+
   <img id="img" alt="handler screenshot" />
+
   <script>
-    // Map handler -> RequestServer base URL
     const MAP = {
       "NS-5": "http://10.20.10.98:8080",
       // "NS-3": "http://10.20.10.99:8080",
@@ -26,25 +24,20 @@
       // "CHROMA": "http://10.20.10.101:8080",
     };
 
-    const REFRESH_MS = 2000; // refresh interval
+    const REFRESH_MS = 2000;
 
-    function handlerFromQS() {
-      const p = new URLSearchParams(location.search);
-      return (p.get("handler") || "NS-5").toUpperCase();
+    function handler() {
+      return (new URLSearchParams(location.search).get("handler") || "NS-5").toUpperCase();
+    }
+    function baseUrl(h) { return MAP[h] || MAP["NS-5"]; }
+
+    function refresh() {
+      const h = handler();
+      document.getElementById("img").src = baseUrl(h) + "/latest.png?ts=" + Date.now();
     }
 
-    function baseUrl(handler) {
-      return MAP[handler] || MAP["NS-5"];
-    }
-
-    function setImage() {
-      const h = handlerFromQS();
-      const base = baseUrl(h);
-      document.getElementById("img").src = base + "/latest.png?ts=" + Date.now();
-    }
-
-    setImage();
-    setInterval(setImage, REFRESH_MS);
+    refresh();
+    setInterval(refresh, REFRESH_MS);
   </script>
 </body>
 </html>
