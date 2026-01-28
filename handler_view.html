@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Handler View</title>
+  <title>Handler</title>
   <style>
-    html, body { margin:0; padding:0; background:#000; }
+    html, body { margin:0; padding:0; background:#000; width:100%; height:100%; }
     img {
       display:block;
       width:100vw;
@@ -17,51 +17,34 @@
 </head>
 <body>
   <img id="img" alt="handler screenshot" />
+  <script>
+    // Map handler -> RequestServer base URL
+    const MAP = {
+      "NS-5": "http://10.20.10.98:8080",
+      // "NS-3": "http://10.20.10.99:8080",
+      // "NS-4": "http://10.20.10.100:8080",
+      // "CHROMA": "http://10.20.10.101:8080",
+    };
 
-<script>
-  // Map handler name -> RequestServer base URL
-  // EDIT these to match your network.
-  const HANDLER_URL = {
-    "NS-5": "http://10.20.10.98:8080",
-    // "NS-3": "http://10.20.10.99:8080",
-    // "NS-4": "http://10.20.10.100:8080",
-    // "CHROMA": "http://10.20.10.101:8080",
-  };
+    const REFRESH_MS = 2000; // refresh interval
 
-  const REFRESH_MS = 2000;      // image refresh rate
-  const POKE_ON_LOAD = true;   // call /request once when page loads
-
-  function getHandlerFromQS() {
-    const qs = new URLSearchParams(location.search);
-    return (qs.get("handler") || "NS-5").toUpperCase();
-  }
-
-  function baseUrlFor(handler) {
-    return HANDLER_URL[handler] || HANDLER_URL["NS-5"];
-  }
-
-  async function pokeRequest(baseUrl) {
-    try {
-      await fetch(baseUrl + "/request", { method: "POST" });
-    } catch (_) {
-      // ignore (browser may block cross-origin/mixed content in some contexts)
+    function handlerFromQS() {
+      const p = new URLSearchParams(location.search);
+      return (p.get("handler") || "NS-5").toUpperCase();
     }
-  }
 
-  function refreshImage(baseUrl) {
-    const img = document.getElementById("img");
-    img.src = baseUrl + "/latest.png?ts=" + Date.now();
-  }
+    function baseUrl(handler) {
+      return MAP[handler] || MAP["NS-5"];
+    }
 
-  (async function main() {
-    const handler = getHandlerFromQS();
-    const baseUrl = baseUrlFor(handler);
+    function setImage() {
+      const h = handlerFromQS();
+      const base = baseUrl(h);
+      document.getElementById("img").src = base + "/latest.png?ts=" + Date.now();
+    }
 
-    if (POKE_ON_LOAD) await pokeRequest(baseUrl);
-
-    refreshImage(baseUrl);
-    setInterval(() => refreshImage(baseUrl), REFRESH_MS);
-  })();
-</script>
+    setImage();
+    setInterval(setImage, REFRESH_MS);
+  </script>
 </body>
 </html>
