@@ -28,7 +28,7 @@
       text-decoration: none;
     }
     a:hover { text-decoration: underline; }
-  
+
     /* ✅ Status links must inherit the status color (green/red/etc) */
     a.statusLink,
     a.statusLink:visited,
@@ -45,7 +45,7 @@
       font-weight: inherit;
       text-decoration: underline;   /* or none if you prefer */
     }
-    
+
     /* Debug line (hidden unless ?debug=1) */
     #dbg {
       width: 60%;
@@ -190,6 +190,20 @@
 
     // NEW: only these columns get STATUS links
     const HANDLER_SET = new Set(["CHROMA", "NS-3", "NS-4", "NS-5"]);
+
+    // NEW: handler -> IP (serve raw latest.png from handler Pi)
+    const HANDLER_IP = {
+      "NS-3": "10.20.10.187",
+      "NS-4": "10.20.10.238",
+      "NS-5": "10.20.10.98",
+      "CHROMA": "10.20.10.38",
+    };
+
+    function latestPngUrlFor(handlerName) {
+      const ip = HANDLER_IP[(handlerName || "").toUpperCase()];
+      if (!ip) return null;
+      return `http://${ip}:8080/latest.png?ts=${Date.now()}`;
+    }
 
     // Helper: given the header row and a column index, determine the column name
     function getColNameFromHeader(rows, colIndex) {
@@ -525,18 +539,6 @@
             if (showLinks && c === "S100_1") cellContent = `<a href="vnc://S100-1">S100_1</a>`;
             if (showLinks && c === "S100_2") cellContent = `<a href="vnc://S100-2">S100_2</a>`;
 
-            // ===== STATUS row: link to handler_view based on HANDLER row value for this column =====
-            if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
-              const handlerRow = rows.find(r => norm(r[0]) === "HANDLER") || [];
-              const handlerName = String(handlerRow[colIndex] || "").trim().toUpperCase(); // e.g. "NS-4"
-            
-              if (HANDLER_SET.has(handlerName)) {
-                const stTxt = (cell ?? "").toString().trim() || handlerName;
-                cellContent =
-                  `<a href="handler_view.html?handler=${encodeURIComponent(handlerName)}" target="_blank" rel="noopener">${stTxt}</a>`;
-              }
-            }
-            
             // LOADING COUNTS progress
             if (!isHeader && rowLabel === "LOADING COUNTS" && colIndex > 0) {
               const loading = toInt(cell);
@@ -588,22 +590,39 @@
               }
             }
 
-            // --- STATUS row: make each status cell clickable, but keep the status color ---
-            if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
-              // Column header name (AP-1, AP-2, S100_1, CHROMA, NS-3, NS-4, NS-5, etc.)
-              const headerName = ((rows[0] && rows[0][colIndex]) ? rows[0][colIndex] : "").toString().trim();
-            
-              // Only link handlers (edit this list if you want testers too)
-              const isHandler = ["CHROMA", "NS-3", "NS-4", "NS-5"].includes(headerName.toUpperCase());
-            
-              if (isHandler) {
-                // for now, link to the PNG in the repo (we can swap to “request+wait” later)
-                // const pngUrl = `./${encodeURIComponent(headerName)}.png?v=${Date.now()}`;
-                const pngUrl = `https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/${encodeURIComponent(headerName)}.png?v=${Date.now()}`;
-                cellContent = `<a class="statusLink" href="${pngUrl}" target="_blank" rel="noopener">${cellContent}</a>`;
+            // AUTO3 progress (if you want it; keep symmetric)
+            if (!isHeader && (rowLabel === "AUTO3" || rowLabel === "AUTO 3") && colIndex > 0) {
+              const auto3 = toInt(cell);
+              const total = toInt(totalRow[colIndex]);
+              if (auto3 !== null && total !== null && total > 0) {
+                let pct = (auto3 / total) * 100;
+                pct = Math.max(0, Math.min(100, pct));
+                cellContent = `
+                  <div class="lc-wrap">
+                    <div class="lc-num">${auto3.toLocaleString()}</div>
+                    <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                  </div>
+                `;
               }
             }
-            
+
+            // --- STATUS row: click opens the handler PI latest.png (raw PNG, cache-busted) ---
+            if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
+              const headerName = ((rows[0] && rows[0][colIndex]) ? rows[0][colIndex] : "").toString().trim().toUpperCase();
+              const isHandler = ["CHROMA", "NS-3", "NS-4", "NS-5"].includes(headerName);
+
+              if (isHandler) {
+                const url = latestPngUrlFor(headerName);
+                if (url) {
+                  // Refresh ts on click to avoid caching
+                  cellContent =
+                    `<a class="statusLink" href="${url}" target="_blank" rel="noopener" ` +
+                    `onclick="this.href='http://${HANDLER_IP[headerName]}:8080/latest.png?ts='+Date.now()">${cellContent}</a>`;
+                }
+              }
+            }
+
             const cellEl = document.createElement(isHeader ? "th" : "td");
             cellEl.innerHTML = cellContent;
 
@@ -624,7 +643,7 @@
 
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const st = (cell || "").toString().trim().toLowerCase();
-            
+
               if (st === "running") {
                 cellEl.style.color = "green";
                 cellEl.style.fontWeight = "bold";
@@ -647,7 +666,6 @@
               }
             }
 
-            
             // ===== Number checks =====
             if (!isHeader && colIndex > 0) {
               const autoSum = autoSumByCol[colIndex] || 0;
