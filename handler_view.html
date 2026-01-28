@@ -3,238 +3,65 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Handler Screenshot Viewer</title>
+  <title>Handler View</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 18px; }
-    .wrap { max-width: 980px; margin: 0 auto; }
-    h2 { margin: 0 0 10px 0; }
-    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 10px 0; }
-    select, input { padding: 10px 12px; font-size: 14px; }
-    button { padding: 10px 14px; font-weight: 700; cursor: pointer; }
-    .msg { margin-top: 10px; color: #222; white-space: pre-wrap; }
-    .err { color: #b00020; }
-    .ok { color: #0b6b2b; }
-    .hint { color: #666; font-size: 12px; }
-    img { width: 100%; max-width: 980px; border: 1px solid #ccc; border-radius: 10px; margin-top: 12px; }
-    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
-    .small { font-size: 12px; color: #666; }
-    .pill { display:inline-block; padding:2px 8px; border-radius:999px; background:#f2f2f2; font-size:12px; }
-    .right { margin-left:auto; }
+    html, body { margin:0; padding:0; background:#000; }
+    img {
+      display:block;
+      width:100vw;
+      height:100vh;
+      object-fit:contain;
+      background:#000;
+    }
   </style>
 </head>
 <body>
-<div class="wrap">
-  <h2>Handler Screenshot Viewer</h2>
-
-  <div class="row">
-    <label for="handlerSel"><b>Handler</b></label>
-    <select id="handlerSel"></select>
-
-    <label for="baseUrl"><b>Base URL</b></label>
-    <input id="baseUrl" style="min-width:320px" placeholder="http://10.20.10.98:8080" />
-
-    <span class="right pill" id="netBadge">idle</span>
-  </div>
-
-  <div class="row">
-    <button id="btnRequest">Request + Load Image</button>
-    <button id="btnLoad">Load Image Only</button>
-    <button id="btnStatus">Status</button>
-
-    <label class="row" style="margin:0">
-      <input type="checkbox" id="autoChk" />
-      <span><b>Auto refresh</b></span>
-    </label>
-
-    <label for="autoSec" class="small">every</label>
-    <input id="autoSec" type="number" min="2" value="10" style="width:80px" />
-    <span class="small">sec</span>
-  </div>
-
-  <div class="msg" id="msg"></div>
-
-  <img id="img" alt="handler screenshot will appear here" style="display:none" />
-
-  <div class="hint" style="margin-top:10px">
-    <div><b>How it works:</b> this page calls <code>/request</code> then loads <code>/latest.png?ts=...</code> from the handler Pi running <code>requestserver.py</code>.</div>
-    <div class="err" style="margin-top:6px">
-      <b>Important:</b> GitHub Pages is <code>https</code>. Browsers may block calls/images to a Pi over <code>http</code> as “mixed content”.
-      If you hit that, either (1) serve the Pi endpoint over <code>https</code> (Caddy/Nginx + cert) or (2) host this HTML on an internal <code>http</code> page instead of GitHub Pages.
-    </div>
-  </div>
-</div>
+  <img id="img" alt="handler screenshot" />
 
 <script>
-/**
- * EDIT THESE IPs/ports to match your handler Pis.
- * Each should run: requestserver.py --port 8080
- */
-const HANDLERS = [
-  { name: "NS-5 (ESSHANDLER01)", url: "http://10.20.10.98:8080" },
-  // { name: "NS-3 (ESSHANDLER02)", url: "http://10.20.10.99:8080" },
-  // { name: "NS-4 (ESSHANDLER03)", url: "http://10.20.10.100:8080" },
-  // { name: "CHROMA (ESSHANDLER04)", url: "http://10.20.10.101:8080" },
-];
+  // Map handler name -> RequestServer base URL
+  // EDIT these to match your network.
+  const HANDLER_URL = {
+    "NS-5": "http://10.20.10.98:8080",
+    // "NS-3": "http://10.20.10.99:8080",
+    // "NS-4": "http://10.20.10.100:8080",
+    // "CHROMA": "http://10.20.10.101:8080",
+  };
 
-const el = (id) => document.getElementById(id);
-const handlerSel = el("handlerSel");
-const baseUrlInp = el("baseUrl");
-const msg = el("msg");
-const img = el("img");
-const netBadge = el("netBadge");
+  const REFRESH_MS = 2000;      // image refresh rate
+  const POKE_ON_LOAD = true;   // call /request once when page loads
 
-let autoTimer = null;
-
-function setBadge(text, cls="") {
-  netBadge.textContent = text;
-  netBadge.className = "pill " + cls;
-}
-
-function setMsg(text, isErr=false) {
-  msg.textContent = text;
-  msg.className = "msg " + (isErr ? "err" : "ok");
-}
-
-function normBaseUrl(u) {
-  u = (u || "").trim();
-  if (!u) return "";
-  // remove trailing slash
-  return u.replace(/\/+$/, "");
-}
-
-async function fetchWithTimeout(url, opts={}, timeoutMs=8000) {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), timeoutMs);
-  try {
-    const res = await fetch(url, { ...opts, signal: ctrl.signal });
-    return res;
-  } finally {
-    clearTimeout(t);
+  function getHandlerFromQS() {
+    const qs = new URLSearchParams(location.search);
+    return (qs.get("handler") || "NS-5").toUpperCase();
   }
-}
 
-async function doStatus() {
-  const base = normBaseUrl(baseUrlInp.value);
-  if (!base) { setMsg("Base URL is empty.", true); return; }
-
-  setBadge("status…");
-  try {
-    const r = await fetchWithTimeout(base + "/status", { method: "GET" }, 8000);
-    const j = await r.json().catch(() => null);
-    if (!r.ok || !j) throw new Error("Status failed: HTTP " + r.status);
-
-    const lines = [];
-    lines.push("OK /status");
-    lines.push("requests_total: " + j.requests_total);
-    lines.push("last_request_at: " + (j.last_request_at || "n/a"));
-    lines.push("last_request_ip: " + (j.last_request_ip || "n/a"));
-    lines.push("latest_png_exists: " + j.latest_png_exists);
-    if (j.latest_png_path) lines.push("latest_png_path: " + j.latest_png_path);
-    setMsg(lines.join("\n"), false);
-    setBadge("ok", "ok");
-  } catch (e) {
-    setMsg(String(e), true);
-    setBadge("error", "err");
+  function baseUrlFor(handler) {
+    return HANDLER_URL[handler] || HANDLER_URL["NS-5"];
   }
-}
 
-async function doRequest() {
-  const base = normBaseUrl(baseUrlInp.value);
-  if (!base) { setMsg("Base URL is empty.", true); return; }
-
-  setBadge("request…");
-  try {
-    const r = await fetchWithTimeout(base + "/request", { method: "POST" }, 8000);
-    const j = await r.json().catch(() => null);
-    if (!r.ok || !j) throw new Error("Request failed: HTTP " + r.status);
-
-    const lines = [];
-    lines.push("OK /request");
-    lines.push("message: " + (j.message || ""));
-    lines.push("requests_total: " + j.requests_total);
-    lines.push("latest_png_exists: " + j.latest_png_exists);
-    setMsg(lines.join("\n"), false);
-    setBadge("ok", "ok");
-
-    // load image after request
-    await doLoadImage();
-  } catch (e) {
-    setMsg(String(e), true);
-    setBadge("error", "err");
+  async function pokeRequest(baseUrl) {
+    try {
+      await fetch(baseUrl + "/request", { method: "POST" });
+    } catch (_) {
+      // ignore (browser may block cross-origin/mixed content in some contexts)
+    }
   }
-}
 
-async function doLoadImage() {
-  const base = normBaseUrl(baseUrlInp.value);
-  if (!base) { setMsg("Base URL is empty.", true); return; }
-
-  setBadge("loading…");
-  try {
-    // Just set the img src; browser will request it.
-    const url = base + "/latest.png?ts=" + Date.now();
-    img.style.display = "block";
-    img.src = url;
-
-    // Best-effort: wait for load/error
-    await new Promise((resolve, reject) => {
-      const to = setTimeout(() => reject(new Error("Image load timeout")), 10000);
-      img.onload = () => { clearTimeout(to); resolve(); };
-      img.onerror = () => { clearTimeout(to); reject(new Error("Image load failed (blocked or not found)")); };
-    });
-
-    setBadge("ok", "ok");
-    // keep message as-is unless empty
-    if (!msg.textContent) setMsg("Loaded: " + url, false);
-  } catch (e) {
-    setMsg(String(e) + "\n\nTip: If this is a GitHub Pages (https) mixed-content block, you must use https on the Pi endpoint or host this page over http on your intranet.", true);
-    setBadge("error", "err");
+  function refreshImage(baseUrl) {
+    const img = document.getElementById("img");
+    img.src = baseUrl + "/latest.png?ts=" + Date.now();
   }
-}
 
-function startAuto() {
-  stopAuto();
-  const sec = Math.max(2, parseInt(el("autoSec").value || "10", 10));
-  autoTimer = setInterval(() => doRequest(), sec * 1000);
-}
+  (async function main() {
+    const handler = getHandlerFromQS();
+    const baseUrl = baseUrlFor(handler);
 
-function stopAuto() {
-  if (autoTimer) clearInterval(autoTimer);
-  autoTimer = null;
-}
+    if (POKE_ON_LOAD) await pokeRequest(baseUrl);
 
-function init() {
-  // populate dropdown
-  handlerSel.innerHTML = "";
-  HANDLERS.forEach((h, idx) => {
-    const opt = document.createElement("option");
-    opt.value = h.url;
-    opt.textContent = h.name;
-    handlerSel.appendChild(opt);
-    if (idx === 0) baseUrlInp.value = h.url;
-  });
-
-  handlerSel.addEventListener("change", () => {
-    baseUrlInp.value = handlerSel.value;
-    setMsg("", false);
-    img.style.display = "none";
-    setBadge("idle");
-  });
-
-  el("btnRequest").addEventListener("click", doRequest);
-  el("btnLoad").addEventListener("click", doLoadImage);
-  el("btnStatus").addEventListener("click", doStatus);
-
-  el("autoChk").addEventListener("change", (e) => {
-    if (e.target.checked) startAuto();
-    else stopAuto();
-  });
-
-  el("autoSec").addEventListener("change", () => {
-    if (el("autoChk").checked) startAuto();
-  });
-}
-
-init();
+    refreshImage(baseUrl);
+    setInterval(() => refreshImage(baseUrl), REFRESH_MS);
+  })();
 </script>
 </body>
 </html>
