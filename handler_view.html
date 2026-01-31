@@ -18,10 +18,39 @@
       padding:6px 10px;
       font:18px monospace;
     }
+
+    /* Error bar (shows why image is blank) */
+    #err{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      z-index:9999;
+      background:#b00020;
+      color:#fff;
+      padding:6px 10px;
+      font:14px monospace;
+      display:none;
+      white-space:pre-wrap;
+    }
+
+    /* Small hint bar (shows the image URL being loaded) */
+    #hint{
+      position:fixed;
+      left:0; right:0;
+      top:40px;
+      z-index:9998;
+      background:rgba(0,0,0,0.55);
+      color:#fff;
+      padding:6px 10px;
+      font:12px monospace;
+      display:none;
+      white-space:pre-wrap;
+    }
   </style>
 </head>
 <body>
   <div id="banner">Handler: …</div>
+  <div id="hint"></div>
+  <div id="err"></div>
   <img id="img" alt="handler screenshot" />
 
   <script>
@@ -35,16 +64,58 @@
 
     const REFRESH_MS = 2000;
 
-    function handler() {
-      return (new URLSearchParams(location.search).get("handler") || "NS-5").toUpperCase();
+    function qp(name) {
+      return new URLSearchParams(location.search).get(name);
     }
-    function baseUrl(h) { return MAP[h] || MAP["NS-5"]; }
+
+    function normHandlerName(s) {
+      return (s || "").toString().trim().toUpperCase().replace(/_/g, "-");
+    }
+
+    function handler() {
+      return normHandlerName(qp("handler") || "NS-5");
+    }
+
+    function baseUrl(h) {
+      return MAP[h] || MAP["NS-5"];
+    }
+
+    function buildImgUrl(h) {
+      return baseUrl(h) + "/latest.png?ts=" + Date.now();
+    }
+
+    const img = document.getElementById("img");
+    const banner = document.getElementById("banner");
+    const err = document.getElementById("err");
+    const hint = document.getElementById("hint");
+
+    // Show hint bar when ?debug=1
+    const debug = qp("debug") === "1";
+    if (debug) hint.style.display = "block";
+
+    img.onload = () => {
+      err.style.display = "none";
+    };
+
+    img.onerror = () => {
+      err.style.display = "block";
+      err.textContent =
+        "IMAGE LOAD FAILED.\n" +
+        "If you can open the URL directly but this page is blank, Chrome is blocking HTTP images inside an HTTPS page.\n" +
+        "Fix: Site settings for rlicasess.github.io → Insecure content → Allow.\n\n" +
+        "Tried:\n" + img.src;
+    };
 
     function refresh() {
       const h = handler();
       document.title = `Handler View - ${h}`;
-      document.getElementById("banner").textContent = `Handler: ${h}`;
-      document.getElementById("img").src = baseUrl(h) + "/latest.png?ts=" + Date.now();
+      banner.textContent = `Handler: ${h}`;
+
+      const url = buildImgUrl(h);
+      if (debug) hint.textContent = url;
+
+      // Force reload by changing query param
+      img.src = url;
     }
 
     refresh();
