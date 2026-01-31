@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>ESS PRODUCTION</title>
+  <title>ESS PRODUCTION STATUS</title>
   <style>
     table {
       border-collapse: collapse;
@@ -37,7 +37,7 @@
       color: inherit !important;     /* inherit td's color */
       font-weight: inherit !important;
       text-decoration: underline;     /* looks clickable */
-      cursor: pointer;                /* <-- makes hover show pointer */
+      cursor: pointer;                /* makes hover show pointer */
     }
 
     /* Debug line (hidden unless ?debug=1) */
@@ -70,7 +70,7 @@
 </head>
 
 <body>
-  <h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION - status<h2>
+  <h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION STATUS</h2>
   <div id="dbg"></div>
 
 <!-- LOT LOOKUP (Tags Sheet + compare vs LOT NUMBER row in table) -->
@@ -173,9 +173,12 @@
     if (debug) dbgEl.style.display = "block";
     function dbg(msg) { if (debug) dbgEl.textContent = msg; }
 
+    // Ensure tab title is always correct
+    document.title = "ESS PRODUCTION STATUS";
+
     if (showLinks) {
       document.getElementById("pageTitle").innerHTML =
-        `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION`;
+        `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION STATUS`;
     }
 
     // const CSV_URL = "./ESSProd.csv";
@@ -373,7 +376,7 @@
 
         showTagBox(shouldShowTagBoxFromTable(rows));
 
-        // ✅ NEW: map handler per column using the HANDLER row (NOT header row)
+        // ✅ handler per column from HANDLER row
         const handlerRow = rows.find(r => norm(r[0]) === "HANDLER") || [];
         function handlerAtCol(colIndex) {
           return (handlerRow[colIndex] || "").toString().trim().toUpperCase();
@@ -493,7 +496,7 @@
             let cellContent = (cell ?? "").toString();
             const c = cellContent.trim().toUpperCase();
 
-            // links.html behavior: TESTER header links in links mode
+            // links mode: TESTER header links
             if (isHeader && c === "TESTER") {
               cellContent = showLinks
                 ? `<a href="https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0" target="_blank">TESTER</a>`
@@ -598,17 +601,15 @@
               }
             }
 
-            // ✅ STATUS row links: use HANDLER row (NOT header row)
+            // ✅ STATUS row links: use HANDLER row mapping (works with your CSV)
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
-              const handlerName = handlerAtCol(colIndex);  // CHROMA / NS-3 / NS-4 / NS-5
-              const ip = HANDLER_IP[handlerName];
+              const hname = handlerAtCol(colIndex); // CHROMA / NS-3 / NS-4 / NS-5
+              const ip = HANDLER_IP[hname];
 
               if (ip) {
-                // Refresh ts on click to avoid caching
-                const url = `http://${ip}:8080/latest.png?ts=${Date.now()}`;
-                cellContent =
-                  `<a class="statusLink" href="${url}" target="_blank" rel="noopener" ` +
-                  `onclick="this.href='http://${ip}:8080/latest.png?ts='+Date.now()">${cellContent}</a>`;
+                // open handler_view (safer UX) instead of direct image
+                const hv = `handler_view.html?handler=${encodeURIComponent(hname)}`;
+                cellContent = `<a class="statusLink" href="${hv}" target="_blank" rel="noopener">${cellContent}</a>`;
               }
             }
 
@@ -636,22 +637,22 @@
               if (st === "running") {
                 cellEl.style.color = "green";
                 cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#dff6df"; // light green
+                cellEl.style.backgroundColor = "#dff6df";
               }
               if (st === "error") {
                 cellEl.style.color = "red";
                 cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#ffd6d6"; // light red
+                cellEl.style.backgroundColor = "#ffd6d6";
               }
               if (st === "stopped") {
                 cellEl.style.color = "goldenrod";
                 cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#fff3cd"; // light yellow
+                cellEl.style.backgroundColor = "#fff3cd";
               }
               if (st === "maint") {
                 cellEl.style.color = "blue";
                 cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#d6e6ff"; // light blue
+                cellEl.style.backgroundColor = "#d6e6ff";
               }
             }
 
