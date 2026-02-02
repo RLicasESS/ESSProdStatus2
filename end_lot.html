@@ -34,12 +34,25 @@
       line-height: 1.2;
     }
     #qrcode { display: inline-block; }
+
+    /* debug bar */
+    #dbg {
+      display:none;
+      background: rgba(255,255,255,0.92);
+      color:#111;
+      font: 12px monospace;
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin: 10px;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 
 <body>
   <div class="wrap">
     <div id="error" class="err" style="display:none;"></div>
+    <div id="dbg"></div>
 
     <!-- hidden image source -->
     <img id="handlerImg" alt="handler" />
@@ -72,6 +85,7 @@
     const params   = new URLSearchParams(location.search);
     const tester   = (params.get("tester") || "").trim();
     const nextStep = (params.get("next") || "").trim(); // optional passthrough
+    const debug    = params.get("debug") === "1";
 
     const $ = (id)=>document.getElementById(id);
 
@@ -79,17 +93,27 @@
       $("error").style.display = msg ? "" : "none";
       $("error").textContent = msg || "";
     }
+
+    function setDbg(msg){
+      if (!debug) return;
+      $("dbg").style.display = msg ? "" : "none";
+      $("dbg").textContent = msg || "";
+    }
+
     function norm(s){ return String(s ?? "").replace(/\r/g,"").trim().toUpperCase(); }
+
     function parseCSV(text){
       const lines = text.replace(/\r/g,"").trim().split(/\n/);
       if (!lines.length) return [];
       const delim = lines[0].includes("\t") ? "\t" : ",";
       return lines.map(l => l.split(delim));
     }
+
     function findRow(rows, label){
       const want = norm(label);
       return (rows || []).find(r => norm(r?.[0]) === want) || null;
     }
+
     function pickRow(rows, labels){
       for (const lb of labels){
         const r = findRow(rows, lb);
@@ -97,7 +121,9 @@
       }
       return null;
     }
+
     function safeCell(row, c){ return row && c < row.length ? String(row[c] ?? "").trim() : ""; }
+
     function findColByTester(rows, tester){
       const header = rows?.[0] || [];
       const want = norm(tester);
@@ -106,6 +132,7 @@
       }
       return -1;
     }
+
     function stamp(){
       const d = new Date();
       const p = n => String(n).padStart(2,"0");
@@ -137,15 +164,17 @@
     }
 
     function handlerPngUrl(handlerName){
+      // normalize handler names
       const h = norm(handlerName).replace(/_/g,"-");
       const ip = HANDLER_IP[h];
       if (!ip) return "";
-      // ✅ RequestServer exposes /latest.png (not .jpeg)
       return `http://${ip}:8080/latest.png?ts=${Date.now()}`;
     }
 
     async function loadAndRender(){
       setErr("");
+      setDbg("");
+
       if (!tester){
         setErr("Missing tester.\nExample:\nend_lot.html?tester=AP-1");
         return;
@@ -181,9 +210,16 @@
 
       if (!handler) throw new Error("HANDLER cell is blank for this tester.");
 
-      // Load handler PNG from the handler Pi RequestServer
+      // Load handler PNG from handler Pi
       const pngUrl = handlerPngUrl(handler);
       if (!pngUrl) throw new Error(`No HANDLER_IP mapping for handler '${handler}'`);
+
+      setDbg(
+        `tester=${tester}\n` +
+        `handler=${handler}\n` +
+        `img_url=${pngUrl}\n` +
+        `csv=${CSV_URL}`
+      );
 
       const img = $("handlerImg");
       img.src = pngUrl;
@@ -191,9 +227,9 @@
       await new Promise((resolve, reject)=>{
         img.onload = resolve;
         img.onerror = ()=>reject(new Error(
-          "Handler image failed to load.\n" +
-          "If this page is HTTPS, your browser may block HTTP images.\n" +
-          "Fix: site settings → Insecure content → Allow.\n\n" +
+          "Handler image failed to load.\n\n" +
+          "Most common cause: browser blocked HTTP images inside HTTPS GitHub Pages.\n" +
+          "Fix (Chrome/Edge): click the lock icon → Site settings → Insecure content → Allow.\n\n" +
           "URL:\n" + pngUrl
         ));
       });
@@ -205,8 +241,8 @@
         line2 = `${line2}-${temp.replace(/\s+/g,"")}`;
       }
 
-      // Example line3: "AP-2 / BIN-1/5 | Next RT1" (or without Next)
-      const donePart = `${tester} / ${step || "STEP"}`;
+      // ✅ include handler in label line3
+      const donePart = `${tester} / ${handler} / ${step || "STEP"}`;
       const line3 = nextStep ? `${donePart} | Next ${nextStep}` : donePart;
 
       // Render combined image
@@ -215,7 +251,7 @@
 
       const W = 1200;
       const pad = 40;
-      const labelH = 300;
+      const labelH = 320;     // a little taller to fit new line3
       const imgMaxH = 720;
 
       const scale = Math.min(W / img.naturalWidth, imgMaxH / img.naturalHeight);
@@ -251,7 +287,7 @@
       ctx.font = "bold 58px Arial";
       ctx.fillText(line2, W/2, boxY + 170);
 
-      ctx.font = "bold 52px Arial";
+      ctx.font = "bold 46px Arial";
       ctx.fillText(line3, W/2, boxY + 245);
 
       // timestamp
