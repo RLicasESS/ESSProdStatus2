@@ -35,16 +35,9 @@
     }
     #qrcode { display: inline-block; }
 
-    /* debug bar */
-    #dbg {
-      display:none;
-      background: rgba(255,255,255,0.92);
-      color:#111;
-      font: 12px monospace;
-      padding: 10px 12px;
-      border-radius: 12px;
-      margin: 10px;
-      white-space: pre-wrap;
+    /* ✅ Hide QR on phones */
+    @media (max-width: 900px) {
+      .qrBox { display: none !important; }
     }
   </style>
 </head>
@@ -52,7 +45,6 @@
 <body>
   <div class="wrap">
     <div id="error" class="err" style="display:none;"></div>
-    <div id="dbg"></div>
 
     <!-- hidden image source -->
     <img id="handlerImg" alt="handler" />
@@ -85,19 +77,12 @@
     const params   = new URLSearchParams(location.search);
     const tester   = (params.get("tester") || "").trim();
     const nextStep = (params.get("next") || "").trim(); // optional passthrough
-    const debug    = params.get("debug") === "1";
 
     const $ = (id)=>document.getElementById(id);
 
     function setErr(msg){
       $("error").style.display = msg ? "" : "none";
       $("error").textContent = msg || "";
-    }
-
-    function setDbg(msg){
-      if (!debug) return;
-      $("dbg").style.display = msg ? "" : "none";
-      $("dbg").textContent = msg || "";
     }
 
     function norm(s){ return String(s ?? "").replace(/\r/g,"").trim().toUpperCase(); }
@@ -122,7 +107,9 @@
       return null;
     }
 
-    function safeCell(row, c){ return row && c < row.length ? String(row[c] ?? "").trim() : ""; }
+    function safeCell(row, c){
+      return row && c < row.length ? String(row[c] ?? "").trim() : "";
+    }
 
     function findColByTester(rows, tester){
       const header = rows?.[0] || [];
@@ -139,6 +126,11 @@
       return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
     }
 
+    function isPhoneLike(){
+      return window.matchMedia("(max-width: 900px)").matches
+          || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
     function buildShareUrl(){
       // same folder as end_lot.html on GitHub Pages
       const base = location.origin + location.pathname.replace(/[^\/]+$/, "end_lot_share.html");
@@ -150,8 +142,9 @@
 
     function renderQR(){
       if (!tester) return;
-      const url = buildShareUrl();
+      if (isPhoneLike()) { $("qrWrap").style.display = "none"; return; }
 
+      const url = buildShareUrl();
       $("qrcode").innerHTML = "";
       new QRCode($("qrcode"), {
         text: url,
@@ -159,12 +152,10 @@
         height: 160,
         correctLevel: QRCode.CorrectLevel.M
       });
-
       $("qrWrap").style.display = "";
     }
 
     function handlerPngUrl(handlerName){
-      // normalize handler names
       const h = norm(handlerName).replace(/_/g,"-");
       const ip = HANDLER_IP[h];
       if (!ip) return "";
@@ -173,14 +164,13 @@
 
     async function loadAndRender(){
       setErr("");
-      setDbg("");
 
       if (!tester){
         setErr("Missing tester.\nExample:\nend_lot.html?tester=AP-1");
         return;
       }
 
-      // Show QR immediately (even if data fetch fails)
+      // Show QR immediately (desktop only)
       renderQR();
 
       // Load CSV
@@ -210,16 +200,9 @@
 
       if (!handler) throw new Error("HANDLER cell is blank for this tester.");
 
-      // Load handler PNG from handler Pi
+      // Load handler PNG from the handler Pi RequestServer
       const pngUrl = handlerPngUrl(handler);
       if (!pngUrl) throw new Error(`No HANDLER_IP mapping for handler '${handler}'`);
-
-      setDbg(
-        `tester=${tester}\n` +
-        `handler=${handler}\n` +
-        `img_url=${pngUrl}\n` +
-        `csv=${CSV_URL}`
-      );
 
       const img = $("handlerImg");
       img.src = pngUrl;
@@ -227,31 +210,32 @@
       await new Promise((resolve, reject)=>{
         img.onload = resolve;
         img.onerror = ()=>reject(new Error(
-          "Handler image failed to load.\n\n" +
-          "Most common cause: browser blocked HTTP images inside HTTPS GitHub Pages.\n" +
-          "Fix (Chrome/Edge): click the lock icon → Site settings → Insecure content → Allow.\n\n" +
+          "Handler image failed to load.\n" +
+          "If this page is HTTPS, your browser may block HTTP images.\n" +
+          "Fix: Browser site settings → Insecure content → Allow.\n\n" +
           "URL:\n" + pngUrl
         ));
       });
 
-      // Label lines
+      // Labels
       const line1 = product || "(PRODUCT)";
       let line2 = lot || "(LOT)";
       if (temp && line2 && !/-(\d+(\.\d+)?)C$/i.test(line2) && /C$/i.test(temp)){
         line2 = `${line2}-${temp.replace(/\s+/g,"")}`;
       }
 
-      // ✅ include handler in label line3
-      const donePart = `${tester} / ${handler} / ${step || "STEP"}`;
+      // ✅ include handler in the label (new)
+      // Example: "AP-2 / BIN-1/5 / NS-4 | Next RT1"
+      const donePart = `${tester} / ${step || "STEP"} / ${handler}`;
       const line3 = nextStep ? `${donePart} | Next ${nextStep}` : donePart;
 
-      // Render combined image
+      // Render combined
       const canvas = $("outCanvas");
       const ctx = canvas.getContext("2d");
 
       const W = 1200;
       const pad = 40;
-      const labelH = 320;     // a little taller to fit new line3
+      const labelH = 300;
       const imgMaxH = 720;
 
       const scale = Math.min(W / img.naturalWidth, imgMaxH / img.naturalHeight);
@@ -287,7 +271,7 @@
       ctx.font = "bold 58px Arial";
       ctx.fillText(line2, W/2, boxY + 170);
 
-      ctx.font = "bold 46px Arial";
+      ctx.font = "bold 52px Arial";
       ctx.fillText(line3, W/2, boxY + 245);
 
       // timestamp
