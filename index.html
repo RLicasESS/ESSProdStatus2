@@ -524,12 +524,12 @@
             }
 
             // ✅ STATUS row links:
-            // Link goes to: http://<IP>/latest.jpeg (with ts cache-bust)
+            // Link goes to: http://<IP>/latest.png (with ts cache-bust)
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const hname = handlerAtCol(colIndex); // CHROMA / NS-3 / NS-4 / NS-5
               const ip = HANDLER_IP[hname];
               if (ip) {
-                const url = `http://${ip}:8080/latest.jpeg?ts=${Date.now()}`;
+                const url = `http://${ip}:8080/latest.png?ts=${Date.now()}`;
                 cellContent = `<a class="statusLink" href="${url}" target="_blank" rel="noopener">${cellContent}</a>`;
               }
             }
