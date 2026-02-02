@@ -21,21 +21,13 @@
 <body>
   <div class="wrap">
     <div id="error" class="err" style="display:none;"></div>
-
     <img id="handlerImg" alt="handler" />
     <canvas id="outCanvas"></canvas>
   </div>
 
   <script>
-    // =========================
-    // CONFIG (EDIT IF NEEDED)
-    // =========================
     const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
 
-    // repo fallback (only used when src=repo OR handler fetch fails and fallback=1)
-    const REPO_PNG_BASE = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/";
-
-    // Handler IP map (RequestServer on :8080 serves /latest.png)
     const HANDLER_IP = {
       "NS-3":   "10.20.10.187",
       "NS-4":   "10.20.10.238",
@@ -43,14 +35,9 @@
       "CHROMA": "10.20.10.38",
     };
 
-    // =========================
-    // PARAMS
-    // =========================
     const params   = new URLSearchParams(location.search);
     const tester   = (params.get("tester") || "").trim();
     const nextStep = (params.get("next") || "").trim();
-    const srcMode  = (params.get("src") || "handler").toLowerCase(); // handler | repo
-    const fallback = (params.get("fallback") || "1") === "1";
     const debug    = (params.get("debug") || "0") === "1";
 
     const $ = (id)=>document.getElementById(id);
@@ -94,18 +81,11 @@
       return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
     }
 
-    // =========================
-    // IMAGE URLS
-    // =========================
     function handlerLatestUrl(handlerName){
       const h = norm(handlerName).replace(/_/g,"-");
       const ip = HANDLER_IP[h];
       if (!ip) return "";
       return `http://${ip}:8080/latest.png?ts=${Date.now()}`;
-    }
-    function repoPngUrl(handlerName){
-      const h = norm(handlerName).replace(/_/g,"-");
-      return `${REPO_PNG_BASE}${encodeURIComponent(h)}.png?v=${Date.now()}`;
     }
 
     async function loadImage(imgEl, url){
@@ -116,39 +96,6 @@
       });
     }
 
-    async function loadHandlerImage(imgEl, handler){
-      const tryUrls = [];
-
-      if (srcMode === "repo") {
-        tryUrls.push(repoPngUrl(handler));
-      } else {
-        const u1 = handlerLatestUrl(handler);
-        if (u1) tryUrls.push(u1);
-        if (fallback) tryUrls.push(repoPngUrl(handler));
-      }
-
-      let lastErr = null;
-      for (const u of tryUrls){
-        try{
-          logDebug("Trying image: " + u);
-          await loadImage(imgEl, u);
-          return u;
-        }catch(e){
-          lastErr = e;
-        }
-      }
-      throw new Error(
-        "Handler image failed to load.\n" +
-        "Tried:\n" + tryUrls.join("\n") + "\n\n" +
-        "Notes:\n" +
-        "- Phones often block HTTP images inside an HTTPS page.\n" +
-        "- Use the ESSTESTER01 local web URL (http://10.20.10.219:8000/...) for best results.\n"
-      );
-    }
-
-    // =========================
-    // MAIN RENDER
-    // =========================
     async function loadAndRender(){
       setErr("");
       if (!tester){
@@ -182,22 +129,32 @@
 
       if (!handler) throw new Error("HANDLER cell is blank for this tester.");
 
-      // Load handler image
-      const img = $("handlerImg");
-      const usedUrl = await loadHandlerImage(img, handler);
-      logDebug("Loaded image OK: " + usedUrl);
+      const pngUrl = handlerLatestUrl(handler);
+      if (!pngUrl) throw new Error(`No HANDLER_IP mapping for handler '${handler}'`);
 
-      // Labels
+      const img = $("handlerImg");
+      try{
+        logDebug("Loading image: " + pngUrl);
+        await loadImage(img, pngUrl);
+      }catch{
+        throw new Error(
+          "Handler image failed to load.\n\n" +
+          "Because you opened this from ESSTESTER01 over HTTP, this should usually work.\n" +
+          "If it still fails, check:\n" +
+          "1) RequestServer is running on the handler (:8080)\n" +
+          "2) Phone can reach that handler IP on Wi-Fi\n\n" +
+          "URL:\n" + pngUrl
+        );
+      }
+
       const line1 = product || "(PRODUCT)";
       let line2 = lot || "(LOT)";
       if (temp && line2 && !/-(\d+(\.\d+)?)C$/i.test(line2) && /C$/i.test(temp)){
         line2 = `${line2}-${temp.replace(/\s+/g,"")}`;
       }
-
       const donePart = `${tester} / ${step || "STEP"} (${handler})`;
       const line3 = nextStep ? `${donePart} | Next ${nextStep}` : donePart;
 
-      // Render
       const canvas = $("outCanvas");
       const ctx = canvas.getContext("2d");
 
