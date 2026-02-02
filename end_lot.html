@@ -34,11 +34,6 @@
       line-height: 1.2;
     }
     #qrcode { display: inline-block; }
-
-    /* ✅ Hide QR on phones */
-    @media (max-width: 900px) {
-      .qrBox { display: none !important; }
-    }
   </style>
 </head>
 
@@ -63,10 +58,15 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
   <script>
-    // ✅ ESSProdStatus2 CSV
+    // =========================
+    // CONFIG (EDIT IF NEEDED)
+    // =========================
     const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
 
-    // ✅ Handler IP map (RequestServer on :8080 serves /latest.png)
+    // repo fallback (only used when src=repo OR handler fetch fails and fallback=1)
+    const REPO_PNG_BASE = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/";
+
+    // Handler IP map (RequestServer on :8080 serves /latest.png)
     const HANDLER_IP = {
       "NS-3":   "10.20.10.187",
       "NS-4":   "10.20.10.238",
@@ -74,9 +74,20 @@
       "CHROMA": "10.20.10.38",
     };
 
+    // ESSTESTER01 web server (for QR)
+    const SERVER_IP = "10.20.10.219";
+    const SERVER_PORT = "8000";
+
+    // =========================
+    // PARAMS
+    // =========================
     const params   = new URLSearchParams(location.search);
     const tester   = (params.get("tester") || "").trim();
     const nextStep = (params.get("next") || "").trim(); // optional passthrough
+    const srcMode  = (params.get("src") || "handler").toLowerCase(); // handler | repo
+    const fallback = (params.get("fallback") || "1") === "1";        // if handler fails, try repo
+    const noqr     = (params.get("noqr") || "0") === "1";            // force hide QR
+    const debug    = (params.get("debug") || "0") === "1";
 
     const $ = (id)=>document.getElementById(id);
 
@@ -84,21 +95,19 @@
       $("error").style.display = msg ? "" : "none";
       $("error").textContent = msg || "";
     }
+    function logDebug(msg){ if (debug) console.log("[end_lot]", msg); }
 
     function norm(s){ return String(s ?? "").replace(/\r/g,"").trim().toUpperCase(); }
-
     function parseCSV(text){
       const lines = text.replace(/\r/g,"").trim().split(/\n/);
       if (!lines.length) return [];
       const delim = lines[0].includes("\t") ? "\t" : ",";
       return lines.map(l => l.split(delim));
     }
-
     function findRow(rows, label){
       const want = norm(label);
       return (rows || []).find(r => norm(r?.[0]) === want) || null;
     }
-
     function pickRow(rows, labels){
       for (const lb of labels){
         const r = findRow(rows, lb);
@@ -106,11 +115,7 @@
       }
       return null;
     }
-
-    function safeCell(row, c){
-      return row && c < row.length ? String(row[c] ?? "").trim() : "";
-    }
-
+    function safeCell(row, c){ return row && c < row.length ? String(row[c] ?? "").trim() : ""; }
     function findColByTester(rows, tester){
       const header = rows?.[0] || [];
       const want = norm(tester);
@@ -119,30 +124,31 @@
       }
       return -1;
     }
-
     function stamp(){
       const d = new Date();
       const p = n => String(n).padStart(2,"0");
       return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
     }
 
-    function isPhoneLike(){
-      return window.matchMedia("(max-width: 900px)").matches
-          || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    }
-
+    // =========================
+    // QR (DESKTOP ONLY)
+    // =========================
     function buildShareUrl(){
-      // same folder as end_lot.html on GitHub Pages
-      const base = location.origin + location.pathname.replace(/[^\/]+$/, "end_lot_share.html");
       const qp = new URLSearchParams();
       qp.set("tester", tester);
       if (nextStep) qp.set("next", nextStep);
-      return base + "?" + qp.toString();
+
+      // carry image source options to phone
+      qp.set("src", srcMode);
+      qp.set("fallback", fallback ? "1" : "0");
+
+      // point to ESSTESTER01 web server
+      return `http://${SERVER_IP}:${SERVER_PORT}/end_lot_share.html?` + qp.toString();
     }
 
     function renderQR(){
+      if (noqr) return;
       if (!tester) return;
-      if (isPhoneLike()) { $("qrWrap").style.display = "none"; return; }
 
       const url = buildShareUrl();
       $("qrcode").innerHTML = "";
@@ -155,22 +161,70 @@
       $("qrWrap").style.display = "";
     }
 
-    function handlerPngUrl(handlerName){
+    // =========================
+    // IMAGE URLS
+    // =========================
+    function handlerLatestUrl(handlerName){
       const h = norm(handlerName).replace(/_/g,"-");
       const ip = HANDLER_IP[h];
       if (!ip) return "";
       return `http://${ip}:8080/latest.png?ts=${Date.now()}`;
     }
+    function repoPngUrl(handlerName){
+      const h = norm(handlerName).replace(/_/g,"-");
+      return `${REPO_PNG_BASE}${encodeURIComponent(h)}.png?v=${Date.now()}`;
+    }
 
+    async function loadImage(imgEl, url){
+      imgEl.src = url;
+      await new Promise((resolve, reject)=>{
+        imgEl.onload = resolve;
+        imgEl.onerror = reject;
+      });
+    }
+
+    async function loadHandlerImage(imgEl, handler){
+      const tryUrls = [];
+
+      if (srcMode === "repo") {
+        tryUrls.push(repoPngUrl(handler));
+      } else {
+        // default handler mode
+        const u1 = handlerLatestUrl(handler);
+        if (u1) tryUrls.push(u1);
+        if (fallback) tryUrls.push(repoPngUrl(handler));
+      }
+
+      let lastErr = null;
+      for (const u of tryUrls){
+        try{
+          logDebug("Trying image: " + u);
+          await loadImage(imgEl, u);
+          return u;
+        }catch(e){
+          lastErr = e;
+        }
+      }
+      throw new Error(
+        "Handler image failed to load.\n" +
+        "Tried:\n" + tryUrls.join("\n") + "\n\n" +
+        "Notes:\n" +
+        "- If this page is HTTPS, phones/browsers may block HTTP images unless you allow insecure content.\n" +
+        "- If you're using src=handler, ensure RequestServer is running on the handler (:8080 /latest.png).\n"
+      );
+    }
+
+    // =========================
+    // MAIN RENDER
+    // =========================
     async function loadAndRender(){
       setErr("");
-
       if (!tester){
         setErr("Missing tester.\nExample:\nend_lot.html?tester=AP-1");
         return;
       }
 
-      // Show QR immediately (desktop only)
+      // Show QR immediately (even if data fetch fails)
       renderQR();
 
       // Load CSV
@@ -200,42 +254,30 @@
 
       if (!handler) throw new Error("HANDLER cell is blank for this tester.");
 
-      // Load handler PNG from the handler Pi RequestServer
-      const pngUrl = handlerPngUrl(handler);
-      if (!pngUrl) throw new Error(`No HANDLER_IP mapping for handler '${handler}'`);
-
+      // Load handler image
       const img = $("handlerImg");
-      img.src = pngUrl;
+      const usedUrl = await loadHandlerImage(img, handler);
+      logDebug("Loaded image OK: " + usedUrl);
 
-      await new Promise((resolve, reject)=>{
-        img.onload = resolve;
-        img.onerror = ()=>reject(new Error(
-          "Handler image failed to load.\n" +
-          "If this page is HTTPS, your browser may block HTTP images.\n" +
-          "Fix: Browser site settings → Insecure content → Allow.\n\n" +
-          "URL:\n" + pngUrl
-        ));
-      });
-
-      // Labels
+      // Label lines
       const line1 = product || "(PRODUCT)";
       let line2 = lot || "(LOT)";
       if (temp && line2 && !/-(\d+(\.\d+)?)C$/i.test(line2) && /C$/i.test(temp)){
         line2 = `${line2}-${temp.replace(/\s+/g,"")}`;
       }
 
-      // ✅ include handler in the label (new)
-      // Example: "AP-2 / BIN-1/5 / NS-4 | Next RT1"
-      const donePart = `${tester} / ${step || "STEP"} / ${handler}`;
+      // line3: include handler
+      // Example: "AP-1 / BIN-1/5 (NS-4) | Next RT1"
+      const donePart = `${tester} / ${step || "STEP"} (${handler})`;
       const line3 = nextStep ? `${donePart} | Next ${nextStep}` : donePart;
 
-      // Render combined
+      // Render combined image
       const canvas = $("outCanvas");
       const ctx = canvas.getContext("2d");
 
       const W = 1200;
       const pad = 40;
-      const labelH = 300;
+      const labelH = 320;   // slightly taller
       const imgMaxH = 720;
 
       const scale = Math.min(W / img.naturalWidth, imgMaxH / img.naturalHeight);
@@ -271,8 +313,8 @@
       ctx.font = "bold 58px Arial";
       ctx.fillText(line2, W/2, boxY + 170);
 
-      ctx.font = "bold 52px Arial";
-      ctx.fillText(line3, W/2, boxY + 245);
+      ctx.font = "bold 46px Arial";
+      ctx.fillText(line3, W/2, boxY + 240);
 
       // timestamp
       ctx.font = "bold 26px Arial";
