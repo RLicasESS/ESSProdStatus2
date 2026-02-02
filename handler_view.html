@@ -68,8 +68,14 @@
       return new URLSearchParams(location.search).get(name);
     }
 
+    // Normalize handler input:
+    // - uppercases
+    // - converts "_" to "-"
+    // - strips any accidental ".png/.jpg/.jpeg" suffix
     function normHandlerName(s) {
-      return (s || "").toString().trim().toUpperCase().replace(/_/g, "-");
+      let x = (s || "").toString().trim().toUpperCase().replace(/_/g, "-");
+      x = x.replace(/\.(PNG|JPG|JPEG)$/i, "");   // <-- safety: strip extension
+      return x;
     }
 
     function handler() {
@@ -80,6 +86,7 @@
       return MAP[h] || MAP["NS-5"];
     }
 
+    // ✅ Always request latest.png (never .jpg/.jpeg)
     function buildImgUrl(h) {
       return baseUrl(h) + "/latest.png?ts=" + Date.now();
     }
@@ -108,8 +115,12 @@
 
     function refresh() {
       const h = handler();
+      const base = baseUrl(h);
+
       document.title = `Handler View - ${h}`;
-      banner.textContent = `Handler: ${h}`;
+
+      // Banner shows handler; in debug it also shows the base URL/IP
+      banner.textContent = debug ? `Handler: ${h} | ${base}` : `Handler: ${h}`;
 
       const url = buildImgUrl(h);
       if (debug) hint.textContent = url;
