@@ -58,16 +58,11 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
   <script>
-    // ✅ ESSProdStatus2 CSV
-    const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
-
-    // ✅ Handler IP map (RequestServer on :8080 serves /latest.png)
-    const HANDLER_IP = {
-      "NS-3":   "10.20.10.187",
-      "NS-4":   "10.20.10.238",
-      "NS-5":   "10.20.10.98",
-      "CHROMA": "10.20.10.38",
-    };
+    // ===== REPO URLs (ESSProdStatus2) =====
+    const CSV_URL  = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
+    const LOTS_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSlots.csv";
+    // NOTE: handler images are still repo PNGs in this End Lot page:
+    const PNG_BASE = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/";
 
     const params   = new URLSearchParams(location.search);
     const tester   = (params.get("tester") || "").trim();
@@ -112,6 +107,43 @@
       return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
     }
 
+    // ===== ESSlots helpers =====
+    async function fetchCsvRows(url) {
+      const resp = await fetch(
+        url + (url.includes("?") ? "&" : "?") + "v=" + Date.now(),
+        { cache: "no-store" }
+      );
+      if (!resp.ok) throw new Error(`CSV fetch failed: ${resp.status} ${resp.statusText}\n${url}`);
+      const text = await resp.text();
+      return parseCSV(text);
+    }
+
+    function findCol(headerRow, nameCandidates) {
+      const header = headerRow || [];
+      const wants = nameCandidates.map(norm);
+      for (let i = 0; i < header.length; i++) {
+        const h = norm(header[i]);
+        if (wants.includes(h)) return i;
+      }
+      return -1;
+    }
+
+    function findLotRowInLots(lotsRows, lotId) {
+      if (!lotsRows || lotsRows.length < 2) return null;
+      const header = lotsRows[0];
+
+      // try common column names for LOT
+      let lotCol = findCol(header, ["LOT", "LOT NUMBER", "LOT_ID", "LOTID"]);
+      if (lotCol < 0) lotCol = 0; // fallback first column
+
+      const want = norm(lotId);
+      for (let r = 1; r < lotsRows.length; r++) {
+        if (norm(lotsRows[r]?.[lotCol]) === want) return lotsRows[r];
+      }
+      return null;
+    }
+
+    // ===== QR =====
     function buildShareUrl(){
       // same folder as end_lot.html on GitHub Pages
       const base = location.origin + location.pathname.replace(/[^\/]+$/, "end_lot_share.html");
@@ -136,14 +168,6 @@
       $("qrWrap").style.display = "";
     }
 
-    function handlerPngUrl(handlerName){
-      const h = norm(handlerName).replace(/_/g,"-");
-      const ip = HANDLER_IP[h];
-      if (!ip) return "";
-      // ✅ RequestServer exposes /latest.png (not .jpeg)
-      return `http://${ip}:8080/latest.png?ts=${Date.now()}`;
-    }
-
     async function loadAndRender(){
       setErr("");
       if (!tester){
@@ -154,15 +178,16 @@
       // Show QR immediately (even if data fetch fails)
       renderQR();
 
-      // Load CSV
-      const resp = await fetch(
-        CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "v=" + Date.now(),
-        { cache: "no-store" }
-      );
-      if (!resp.ok) throw new Error(`CSV fetch failed: ${resp.status} ${resp.statusText}`);
+      // Load ESSProd + ESSlots in parallel (lots is optional)
+      const [rows, lotsRows] = await Promise.all([
+        fetchCsvRows(CSV_URL),
+        fetchCsvRows(LOTS_URL).catch(e => {
+          console.warn("ESSlots fetch failed:", e);
+          return [];
+        })
+      ]);
 
-      const rows = parseCSV(await resp.text());
-      if (!rows.length) throw new Error("CSV parsed empty");
+      if (!rows.length) throw new Error("ESSProd.csv parsed empty");
 
       const col = findColByTester(rows, tester);
       if (col < 0) throw new Error(`Tester '${tester}' not found in ESSProd.csv header`);
@@ -181,32 +206,48 @@
 
       if (!handler) throw new Error("HANDLER cell is blank for this tester.");
 
-      // Load handler PNG from the handler Pi RequestServer
-      const pngUrl = handlerPngUrl(handler);
-      if (!pngUrl) throw new Error(`No HANDLER_IP mapping for handler '${handler}'`);
+      // Optional: enrich from ESSlots.csv
+      let lotExtra = "";
+      if (lot && lotsRows.length) {
+        const header = lotsRows[0] || [];
+        const lotRow2 = findLotRowInLots(lotsRows, lot);
 
+        if (lotRow2) {
+          // choose columns if present (safe if missing)
+          const qtyCol  = findCol(header, ["LOT QTY", "QTY", "IN QTY", "INPUT QTY"]);
+          const devCol  = findCol(header, ["DEVICE", "DEVICE NAME", "PART", "PART NUMBER", "PART_NO"]);
+          const custCol = findCol(header, ["CUSTOMER", "CUST"]);
+
+          const parts = [];
+          if (qtyCol  >= 0) parts.push(`QTY ${String(lotRow2[qtyCol] || "").trim()}`);
+          if (devCol  >= 0) parts.push(String(lotRow2[devCol] || "").trim());
+          if (custCol >= 0) parts.push(String(lotRow2[custCol] || "").trim());
+
+          lotExtra = parts.filter(Boolean).join(" | ");
+        }
+      }
+
+      // Load handler PNG (repo)
+      const pngUrl = `${PNG_BASE}${encodeURIComponent(handler)}.png?v=${Date.now()}`;
       const img = $("handlerImg");
       img.src = pngUrl;
 
       await new Promise((resolve, reject)=>{
         img.onload = resolve;
-        img.onerror = ()=>reject(new Error(
-          "Handler image failed to load.\n" +
-          "If this page is HTTPS, your browser may block HTTP images.\n" +
-          "Fix: site settings → Insecure content → Allow.\n\n" +
-          "URL:\n" + pngUrl
-        ));
+        img.onerror = ()=>reject(new Error("Handler image failed to load: " + pngUrl));
       });
 
       // Label lines
       const line1 = product || "(PRODUCT)";
+
       let line2 = lot || "(LOT)";
       if (temp && line2 && !/-(\d+(\.\d+)?)C$/i.test(line2) && /C$/i.test(temp)){
         line2 = `${line2}-${temp.replace(/\s+/g,"")}`;
       }
+      if (lotExtra) line2 = `${line2}  |  ${lotExtra}`;
 
-      // Example line3: "AP-2 / BIN-1/5 | Next RT1" (or without Next)
-      const donePart = `${tester} / ${step || "STEP"}`;
+      // DONE line includes handler now
+      const donePart = `${tester} / ${step || "STEP"} | Handler ${handler}`;
       const line3 = nextStep ? `${donePart} | Next ${nextStep}` : donePart;
 
       // Render combined image
