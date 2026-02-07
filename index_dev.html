@@ -1,14 +1,36 @@
-<!-- MARKER: INDEX_DEV_YIELD_V20260207_SMOOTH_GLITCHFILTER -->
+<!-- MARKER: INDEX_DEV_YIELD_V20260207_1205 -->
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
   <title>ESS PRODUCTION STATUS (DEV)</title>
   <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    h2 { margin: 14px 0 6px 0; text-align:center; }
+
+    /* Top controls */
+    #ctl {
+      width: 60%;
+      margin: 0 auto 10px auto;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: #333;
+    }
+    #ctl label { display:flex; gap:6px; align-items:center; }
+    #ctl select, #ctl input[type="number"] {
+      font-size: 13px;
+      padding: 2px 6px;
+    }
+    #ctl .hint { color:#666; font-size:12px; }
+
     table {
       border-collapse: collapse;
       width: 60%;
-      margin: 20px auto;
+      margin: 10px auto 20px auto;
       font-family: Arial, sans-serif;
     }
     th, td {
@@ -36,16 +58,17 @@
       cursor: pointer;
     }
 
+    /* Debug line (hidden unless ?debug=1) */
     #dbg {
       width: 60%;
       margin: 6px auto 0 auto;
-      font-family: Arial, sans-serif;
       font-size: 13px;
       color: #555;
       display: none;
       white-space: pre-wrap;
     }
 
+    /* Progress bars */
     .lc-wrap { display: flex; flex-direction: column; gap: 6px; }
     .lc-num  { font-weight: 600; }
     .prog {
@@ -59,7 +82,11 @@
     .lc-pct { font-size: 12px; color: #444; }
 
     /* ===== Yield hover mini chart ===== */
-    .yieldHover { position: relative; display: inline-block; cursor: help; }
+    .yieldHover {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
     .yieldHover:hover .yieldTip { display: block; }
 
     .yieldTip {
@@ -67,8 +94,8 @@
       position: absolute;
       left: 0;
       top: 110%;
-      min-width: 280px;
-      max-width: 340px;
+      min-width: 260px;
+      max-width: 280px;
       background: #fff;
       border: 1px solid #aaa;
       border-radius: 10px;
@@ -92,7 +119,7 @@
     }
     .yieldCanvas {
       width: 240px;
-      height: 78px;
+      height: 70px;
       border: 1px solid #ddd;
       border-radius: 8px;
       display: block;
@@ -111,47 +138,56 @@
       color: #777;
       white-space: pre-wrap;
     }
-    .yieldRaw {
-      margin-top: 6px;
-      padding: 6px 8px;
-      border: 1px dashed #ccc;
-      border-radius: 8px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 11px;
-      color: #333;
-      max-height: 140px;
-      overflow: auto;
-      display: none;
-      background: #fcfcfc;
-    }
   </style>
 </head>
 
 <body>
-  <h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION STATUS (DEV)</h2>
+  <h2 id="pageTitle">ESS PRODUCTION STATUS (DEV)</h2>
+
+  <!-- Controls (persisted in localStorage) -->
+  <div id="ctl">
+    <label>Yield:
+      <select id="modeSel">
+        <option value="real">Real</option>
+        <option value="mock">Mock</option>
+      </select>
+    </label>
+
+    <label>Smooth:
+      <select id="smoothSel">
+        <option value="off">Off</option>
+        <option value="ema3">EMA (fast)</option>
+        <option value="ema6">EMA (slow)</option>
+        <option value="med3">Median(3)</option>
+      </select>
+    </label>
+
+    <label>Y-axis:
+      <select id="ySel">
+        <option value="full">Full (0–100)</option>
+        <option value="auto">Auto zoom</option>
+        <option value="tight5">Tight ±5%</option>
+      </select>
+    </label>
+
+    <label title="Show last N raw points in tooltip">
+      <input id="rawChk" type="checkbox" />
+      Raw
+    </label>
+
+    <label title="How many raw points to show">
+      N <input id="rawN" type="number" min="3" max="60" value="10" style="width:56px;" />
+    </label>
+
+    <span class="hint" id="ctlHint"></span>
+  </div>
+
   <div id="dbg"></div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const showLinks = params.get("links") === "1";
     const debug = params.get("debug") === "1";
-
-    // yield:
-    //   ?yield=real  -> fetch yield_live.json
-    //   ?yield=mock  -> mock (table-derived)
-    // default: real (fallback to mock if fetch fails)
-    const yieldMode = (params.get("yield") || "real").toLowerCase();
-
-    // smoothing:
-    //   smooth=off        -> raw
-    //   smooth=ma5        -> moving average window 5
-    //   smooth=ema0.25    -> EMA alpha 0.25
-    //   smooth=auto       -> glitch-filter + ma5
-    const smoothMode = (params.get("smooth") || "off").toLowerCase();
-
-    // show raw samples in tooltip (last N)
-    const showRaw = params.get("yraw") === "1";
-    const rawN = Math.max(3, Math.min(25, parseInt(params.get("yrawn") || "10", 10) || 10));
 
     document.title = "ESS PRODUCTION STATUS (DEV)";
 
@@ -167,8 +203,7 @@
     const CSV_URL   = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
     const YIELD_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
 
-    const showTagIfPresent = params.get("tag") === "1";
-
+    // handler -> IP (used by STATUS row link)
     const HANDLER_IP = {
       "NS-3": "10.20.10.187",
       "NS-4": "10.20.10.238",
@@ -176,21 +211,103 @@
       "CHROMA": "10.20.10.38",
     };
 
-    function norm(s) { return (s || "").toString().replace(/\r/g, "").trim().toUpperCase(); }
+    // ---------- UI (persisted) ----------
+    const ui = {
+      mode: (params.get("yield") || "real").toLowerCase(),   // real/mock
+      smooth: (params.get("smooth") || "off").toLowerCase(), // off/ema3/ema6/med3
+      yScale: (params.get("y") || "auto").toLowerCase(),     // full/auto/tight5
+      showRaw: (params.get("raw") === "1"),
+      rawN: Math.max(3, Math.min(60, parseInt(params.get("rawN") || "10", 10) || 10)),
+    };
 
+    const LS_KEY = "index_dev_yield_ui_v1";
+
+    function loadUiFromLS() {
+      try {
+        const j = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
+        if (typeof j.mode === "string") ui.mode = j.mode;
+        if (typeof j.smooth === "string") ui.smooth = j.smooth;
+        if (typeof j.yScale === "string") ui.yScale = j.yScale;
+        if (typeof j.showRaw === "boolean") ui.showRaw = j.showRaw;
+        if (typeof j.rawN === "number") ui.rawN = Math.max(3, Math.min(60, j.rawN));
+      } catch {}
+    }
+    function saveUiToLS() {
+      try { localStorage.setItem(LS_KEY, JSON.stringify(ui)); } catch {}
+    }
+
+    // Allow URL params to override LS (so you can share links)
+    loadUiFromLS();
+
+    const modeSel  = document.getElementById("modeSel");
+    const smoothSel= document.getElementById("smoothSel");
+    const ySel     = document.getElementById("ySel");
+    const rawChk   = document.getElementById("rawChk");
+    const rawNInp  = document.getElementById("rawN");
+    const ctlHint  = document.getElementById("ctlHint");
+
+    function syncUiToControls() {
+      modeSel.value = (ui.mode === "mock") ? "mock" : "real";
+      smoothSel.value = ["off","ema3","ema6","med3"].includes(ui.smooth) ? ui.smooth : "off";
+      ySel.value = ["full","auto","tight5"].includes(ui.yScale) ? ui.yScale : "auto";
+      rawChk.checked = !!ui.showRaw;
+      rawNInp.value = ui.rawN;
+      ctlHint.textContent = `mode=${modeSel.value} smooth=${smoothSel.value} y=${ySel.value}`;
+    }
+
+    function clearYieldDrawCache() {
+      // force all tooltips to redraw next hover
+      document.querySelectorAll(".yieldHover").forEach(el => {
+        el.dataset.loaded = "0";
+      });
+    }
+
+    function onUiChanged() {
+      ui.mode = modeSel.value;
+      ui.smooth = smoothSel.value;
+      ui.yScale = ySel.value;
+      ui.showRaw = rawChk.checked;
+      ui.rawN = Math.max(3, Math.min(60, parseInt(rawNInp.value || "10", 10) || 10));
+
+      saveUiToLS();
+      yieldCache = null;
+      yieldCacheMode = null;
+      clearYieldDrawCache();
+      syncUiToControls();
+      loadCSV(); // re-render now
+    }
+
+    modeSel.addEventListener("change", onUiChanged);
+    smoothSel.addEventListener("change", onUiChanged);
+    ySel.addEventListener("change", onUiChanged);
+    rawChk.addEventListener("change", onUiChanged);
+    rawNInp.addEventListener("change", onUiChanged);
+
+    syncUiToControls();
+
+    // ---------- utils ----------
+    function norm(s) { return (s || "").toString().replace(/\r/g, "").trim().toUpperCase(); }
+    function escHtml(s) {
+      return String(s ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+    function clamp01(x) {
+      const v = Number(x);
+      if (!Number.isFinite(v)) return 0;
+      return Math.max(0, Math.min(1, v));
+    }
     function toInt(x) {
       const v = parseInt((x || "").toString().replace(/,/g, "").trim(), 10);
       return Number.isNaN(v) ? null : v;
     }
-
-    function parseCSV(text) {
-      const lines = text.replace(/\r/g, "").trim().split(/\n/);
-      if (!lines.length) return [];
-      const first = lines[0];
-      const delim = first.includes("\t") ? "\t" : ",";
-      return lines.map(line => line.split(delim));
+    function pad2(n) { return String(n).padStart(2, "0"); }
+    function fmtDateTime(d) {
+      return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
     }
-
     function parseDateTimeLocal(s) {
       const raw = (s || "").toString().trim();
       if (!raw) return null;
@@ -199,9 +316,13 @@
       const d = new Date(x);
       return Number.isNaN(d.getTime()) ? null : d;
     }
-    function pad2(n) { return String(n).padStart(2, "0"); }
-    function fmtDateTime(d) {
-      return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+
+    function parseCSV(text) {
+      const lines = text.replace(/\r/g, "").trim().split(/\n/);
+      if (!lines.length) return [];
+      const first = lines[0];
+      const delim = first.includes("\t") ? "\t" : ",";
+      return lines.map(line => line.split(delim));
     }
 
     function equalizeLastColumn(table) {
@@ -229,23 +350,10 @@
       }
     }
 
-    function showTagBox(on) {
-      const el = document.getElementById("lotBox");
-      if (el) el.style.display = on ? "" : "none";
-    }
-
-    function shouldShowTagBoxFromTable(rows) {
-      if (!showTagIfPresent) return false;
-      if (!rows) return false;
-      const lotRow = (rows || []).find(r => norm(r?.[0]) === "LOT NUMBER");
-      if (!lotRow) return false;
-
-      for (let c = 1; c < lotRow.length; c++) {
-        const v = String(lotRow[c] ?? "").trim();
-        if (v && v.toUpperCase() !== "NA") return true;
-      }
-      return false;
-    }
+    window.addEventListener("resize", () => {
+      const t = document.querySelector("table");
+      if (t) requestAnimationFrame(() => equalizeLastColumn(t));
+    });
 
     function findRowByLabel(rows, label) {
       const want = norm(label);
@@ -254,12 +362,13 @@
 
     function getStepForCol(rows, colIndex) {
       const stepRow = findRowByLabel(rows, "TEST STEP");
-      return stepRow ? (stepRow[colIndex] || "").toString().trim() : "";
+      if (!stepRow) return "";
+      return (stepRow[colIndex] || "").toString().trim();
     }
-
     function getLotForCol(rows, colIndex) {
       const lotRow = findRowByLabel(rows, "LOT NUMBER");
-      return lotRow ? (lotRow[colIndex] || "").toString().trim() : "";
+      if (!lotRow) return "";
+      return (lotRow[colIndex] || "").toString().trim();
     }
 
     function sumAutosForCol(rows, colIndex) {
@@ -269,22 +378,12 @@
       return (toInt(a1[colIndex]) || 0) + (toInt(a2[colIndex]) || 0) + (toInt(a3[colIndex]) || 0);
     }
 
-    // =========================
-    // Yield hover HTML
-    // =========================
-    function escHtml(s) {
-      return String(s ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
-
+    // ---------- Yield hover HTML ----------
     function yieldHoverHtml(labelText, lot, step, which) {
       const lot2 = (lot || "").trim();
       const step2 = (step || "").trim();
-      const which2 = (which || "").trim();
+      const which2 = (which || "").trim().toUpperCase();
+
       return `
         <span class="yieldHover"
               data-lot="${escHtml(lot2)}"
@@ -294,26 +393,17 @@
           <div class="yieldTip">
             <div class="yieldTipTitle">${escHtml(which2)} yield history</div>
             <div class="yieldTipSub">${escHtml(lot2)} / ${escHtml(step2)}</div>
-            <canvas class="yieldCanvas" width="240" height="78"></canvas>
+            <canvas class="yieldCanvas" width="240" height="70"></canvas>
             <div class="yieldLegend"><span>old</span><span>new</span></div>
             <div class="yieldNote" data-note>Loading…</div>
-            <div class="yieldRaw" data-raw></div>
           </div>
         </span>
       `;
     }
 
-    // =========================
-    // Yield cache + fetch
-    // =========================
+    // ---------- Yield cache ----------
     let yieldCache = null;
     let yieldCacheMode = null;
-
-    function nowIsoNoMs() {
-      const d = new Date();
-      const pad = n => String(n).padStart(2,"0");
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-    }
 
     async function fetchJson(url) {
       const res = await fetch(url + (url.includes("?") ? "&" : "?") + "v=" + Date.now(), { cache: "no-store" });
@@ -322,16 +412,13 @@
       return JSON.parse(txt);
     }
 
+    function nowIsoNoMs() {
+      const d = new Date();
+      return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+    }
+
     function makeMockYieldJsonFromRows(rows) {
-      const out = {
-        meta: {
-          updated: nowIsoNoMs(),
-          denom: "TOTAL",
-          mode: "mock",
-          note: "Mock series derived from current table (not persisted).",
-        },
-        data: {}
-      };
+      const out = { meta:{ updated: nowIsoNoMs(), mode:"mock" }, data:{} };
 
       const lotRow   = findRowByLabel(rows, "LOT NUMBER") || [];
       const stepRow  = findRowByLabel(rows, "TEST STEP") || [];
@@ -342,7 +429,7 @@
       const maxCols = Math.max(lotRow.length, stepRow.length, totalRow.length, auto1Row.length, auto2Row.length);
       for (let c = 1; c < maxCols; c++) {
         const lot = (lotRow[c] || "").toString().trim();
-        const step = (stepRow[c] || "").toString().trim();
+        const step= (stepRow[c] || "").toString().trim();
         if (!lot || lot.toUpperCase() === "NA") continue;
         if (!step || step.toUpperCase() === "NA") continue;
 
@@ -350,37 +437,31 @@
         const a1 = toInt(auto1Row[c]) || 0;
         const a2 = toInt(auto2Row[c]) || 0;
 
-        const y1 = total > 0 ? (a1 / total) : 0;
-        const y2 = total > 0 ? (a2 / total) : 0;
+        const y1 = total > 0 ? a1/total : 0;
+        const y2 = total > 0 ? a2/total : 0;
 
-        function mkSamples(y, testerName) {
+        function mkObjects(y, tester) {
           const pts = [];
           let base = clamp01(y);
           let v = clamp01(base - 0.03);
-          for (let i = 0; i < 11; i++) {
-            v = clamp01(v + (base - v) * 0.25);
-            pts.push({
-              t: nowIsoNoMs(),
-              tester: testerName || "",
-              good: Math.round(v * 1000),
-              total: 1000,
-              yield: v
-            });
+          for (let i=0;i<11;i++) {
+            v = clamp01(v + (base - v)*0.25 + (Math.random()-0.5)*0.02);
+            pts.push({ t: nowIsoNoMs(), tester: tester || "DEV", good: Math.round(v*10000), total: 10000, yield: v });
           }
-          pts.push({ t: nowIsoNoMs(), tester: testerName || "", good: Math.round(base * 1000), total: 1000, yield: base });
+          pts.push({ t: nowIsoNoMs(), tester: tester || "DEV", good: Math.round(base*10000), total: 10000, yield: base });
           return pts;
         }
 
-        out.data[`${lot}|${step}|AUTO1`] = mkSamples(y1, "");
-        out.data[`${lot}|${step}|AUTO2`] = mkSamples(y2, "");
+        out.data[`${lot}|${step}|AUTO1`] = mkObjects(y1, "DEV");
+        out.data[`${lot}|${step}|AUTO2`] = mkObjects(y2, "DEV");
       }
       return out;
     }
 
     async function loadYieldCache(rowsForMock) {
-      if (yieldCache && yieldCacheMode === yieldMode) return yieldCache;
+      if (yieldCache && yieldCacheMode === ui.mode) return yieldCache;
 
-      if (yieldMode === "mock") {
+      if (ui.mode === "mock") {
         yieldCache = makeMockYieldJsonFromRows(rowsForMock || []);
         yieldCacheMode = "mock";
         return yieldCache;
@@ -398,273 +479,185 @@
       }
     }
 
-    // =========================
-    // Yield parsing (REAL FILE)
-    // Your yield_live.json: yj.data["LOT|STEP|AUTO1"] = [{t, tester, good, total, yield}, ...]
-    // =========================
-    function clamp01(v) {
-      v = Number(v);
-      if (!Number.isFinite(v)) return 0;
-      return Math.max(0, Math.min(1, v));
-    }
+    // IMPORTANT: your yield_live.json keys look like:
+    //   LOT|STEP|AUTO1  and value is an array of objects: {t, tester, good, total, yield}
+    function getYieldPoints(yj, lot, step, which) {
+      const lot2 = (lot || "").trim();
+      const step2 = (step || "").trim();
+      const which2 = (which || "").trim().toUpperCase();
+      const key = `${lot2}|${step2}|${which2}`;
 
-    function normStepForKey(step) {
-      // keep underscores/hyphens, just normalize whitespace
-      return (step || "").toString().trim().replace(/\s+/g, "_");
-    }
-
-    function buildKeyCandidates(lot, step, which) {
-      const lot2 = (lot || "").toString().trim();
-      const step2 = (step || "").toString().trim();
-      const which2 = (which || "").toString().trim().toUpperCase();
-
-      const sA = step2;
-      const sB = normStepForKey(step2);
-      const sC = sB.replace(/_+/g, "_");
-
-      const keys = [
-        `${lot2}|${sA}|${which2}`,
-        `${lot2}|${sB}|${which2}`,
-        `${lot2}|${sC}|${which2}`,
-      ];
-
-      // de-dupe
-      return Array.from(new Set(keys.filter(k => k.length > 2)));
-    }
-
-    function getYieldSamples(yj, lot, step, which) {
-      if (!yj) throw new Error("no yield json");
-
-      // shape expected: { meta, data: { key: [samples...] } }
-      const data = yj.data || yj.lots || yj || null;
-      if (!data) throw new Error("missing data");
-
-      const candidates = buildKeyCandidates(lot, step, which);
       let arr = null;
 
-      if (yj.data) {
-        for (const k of candidates) {
-          if (Array.isArray(yj.data[k])) { arr = yj.data[k]; break; }
+      if (yj && yj.data && yj.data[key]) arr = yj.data[key];
+      if (!arr && yj && yj[key]) arr = yj[key]; // fallback if top-level keyed
+      if (!Array.isArray(arr) || arr.length < 2) throw new Error("missing lot history");
+
+      // normalize to [{t, y}]
+      const pts = arr.map(o => {
+        if (o && typeof o === "object") {
+          const y = (o.yield != null) ? Number(o.yield)
+                  : (o.good != null && o.total) ? (Number(o.good)/Number(o.total))
+                  : Number(o);
+          return { t: (o.t || ""), y: clamp01(y), good: o.good, total: o.total, tester: o.tester };
         }
-      }
-
-      // fallback: sometimes stored flat as root[key]
-      if (!arr) {
-        for (const k of candidates) {
-          if (Array.isArray(yj[k])) { arr = yj[k]; break; }
-        }
-      }
-
-      if (!Array.isArray(arr) || arr.length === 0) throw new Error("missing lot history");
-      return arr;
-    }
-
-    function samplesToPoints(samples) {
-      // convert to {t:Date, y:number, good, total}
-      const pts = [];
-      for (const s of samples) {
-        const t = (s && s.t) ? new Date(String(s.t)) : null;
-        const good = Number(s?.good);
-        const total = Number(s?.total);
-        let y = s?.yield;
-
-        if (!Number.isFinite(y)) {
-          if (Number.isFinite(good) && Number.isFinite(total) && total > 0) y = good / total;
-          else y = 0;
-        }
-        pts.push({
-          t: (t && !Number.isNaN(t.getTime())) ? t : null,
-          y: clamp01(y),
-          good: Number.isFinite(good) ? good : null,
-          total: Number.isFinite(total) ? total : null,
-          raw: s
-        });
-      }
+        return { t: "", y: clamp01(o) };
+      });
 
       // sort by time if parseable
       pts.sort((a,b) => {
-        const ta = a.t ? a.t.getTime() : 0;
-        const tb = b.t ? b.t.getTime() : 0;
+        const ta = Date.parse(a.t || "") || 0;
+        const tb = Date.parse(b.t || "") || 0;
         return ta - tb;
       });
 
       return pts;
     }
 
-    // Drop obvious OCR/glitch resets:
-    // - total decreasing
-    // - good decreasing drastically (reset) while total continues
-    // - good > total
-    function filterGlitchPoints(points) {
-      if (!points || points.length < 2) return points || [];
-      const out = [];
-      let prevGood = null;
-      let prevTotal = null;
+    // ---------- Smoothing ----------
+    function smoothPoints(points) {
+      const pts = points.slice();
+      if (ui.smooth === "off") return pts;
 
-      let dropped = 0;
-
-      for (const p of points) {
-        const good = p.good;
-        const total = p.total;
-
-        // if we don't have counters, keep (chart still uses yield)
-        if (!Number.isFinite(good) || !Number.isFinite(total) || total <= 0) {
-          out.push(p);
-          continue;
+      if (ui.smooth === "med3") {
+        // median of last 3 (simple spike suppressor)
+        const out = [];
+        for (let i=0;i<pts.length;i++) {
+          const a = pts[Math.max(0,i-2)].y;
+          const b = pts[Math.max(0,i-1)].y;
+          const c = pts[i].y;
+          const s = [a,b,c].sort((x,y)=>x-y);
+          out.push({ ...pts[i], y: s[1] });
         }
+        return out;
+      }
 
-        // impossible
-        if (good < 0 || total < 0 || good > total) { dropped++; continue; }
-
-        if (prevTotal != null && total < prevTotal) { dropped++; continue; }
-
-        if (prevGood != null) {
-          // big reset: good collapses while total doesn't reset
-          if (good < prevGood * 0.20 && total >= prevTotal) {
-            dropped++;
-            continue;
-          }
-          // also catch micro-good with large total (typical OCR "16" vs "7800")
-          if (good <= 100 && prevGood >= 1000 && total >= prevTotal) {
-            dropped++;
-            continue;
-          }
+      if (ui.smooth === "ema3" || ui.smooth === "ema6") {
+        const alpha = (ui.smooth === "ema3") ? 0.55 : 0.30;
+        const out = [];
+        let ema = pts[0].y;
+        out.push({ ...pts[0], y: ema });
+        for (let i=1;i<pts.length;i++) {
+          ema = alpha*pts[i].y + (1-alpha)*ema;
+          out.push({ ...pts[i], y: ema });
         }
-
-        out.push(p);
-        prevGood = good;
-        prevTotal = total;
+        return out;
       }
 
-      out.__dropped = dropped;
-      return out;
+      return pts;
     }
 
-    // =========================
-    // Optional smoothing
-    // =========================
-    function parseSmoothMode(s) {
-      const x = (s || "off").toLowerCase().trim();
-      if (x === "off" || x === "raw") return { type: "off" };
-      if (x === "auto") return { type: "auto" };
-      if (x.startsWith("ma")) {
-        const n = parseInt(x.slice(2), 10);
-        return { type: "ma", n: Number.isFinite(n) && n >= 2 ? n : 5 };
-      }
-      if (x.startsWith("ema")) {
-        const a = parseFloat(x.slice(3));
-        const alpha = Number.isFinite(a) ? Math.max(0.01, Math.min(0.99, a)) : 0.25;
-        return { type: "ema", alpha };
-      }
-      return { type: "off" };
-    }
-
-    function movingAverage(points, windowN) {
-      const n = Math.max(2, windowN | 0);
-      const out = [];
-      let sum = 0;
-      const q = [];
-      for (const p of points) {
-        const y = clamp01(p.y);
-        q.push(y);
-        sum += y;
-        if (q.length > n) sum -= q.shift();
-        out.push({ ...p, y: sum / q.length });
-      }
-      return out;
-    }
-
-    function ema(points, alpha) {
-      const a = Math.max(0.01, Math.min(0.99, alpha));
-      const out = [];
-      let prev = null;
-      for (const p of points) {
-        const y = clamp01(p.y);
-        prev = (prev == null) ? y : (a * y + (1 - a) * prev);
-        out.push({ ...p, y: prev });
-      }
-      return out;
-    }
-
-    function applySmoothing(points, modeStr) {
-      const mode = parseSmoothMode(modeStr);
-      if (!points || points.length < 3) return points || [];
-      if (mode.type === "auto") return movingAverage(points, 5);
-      if (mode.type === "ma") return movingAverage(points, mode.n);
-      if (mode.type === "ema") return ema(points, mode.alpha);
-      return points;
-    }
-
-    // =========================
-    // Drawing
-    // =========================
+    // ---------- Draw mini chart with Y zoom ----------
     function drawMiniChart(canvas, points) {
       const ctx = canvas.getContext("2d");
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
+      const n = points.length;
+      if (n < 2) return;
+
+      const ys = points.map(p => clamp01(p.y));
+      let yMin = 0, yMax = 1;
+
+      if (ui.yScale === "auto") {
+        let mn = Math.min(...ys);
+        let mx = Math.max(...ys);
+
+        let pad = (mx - mn) * 0.15;
+        if (!Number.isFinite(pad) || pad <= 0) pad = 0.02;
+
+        mn -= pad; mx += pad;
+
+        const minSpan = 0.05; // 5% minimum window
+        if ((mx - mn) < minSpan) {
+          const mid = (mx + mn) / 2;
+          mn = mid - minSpan/2;
+          mx = mid + minSpan/2;
+        }
+        yMin = Math.max(0, mn);
+        yMax = Math.min(1, mx);
+      }
+
+      if (ui.yScale === "tight5") {
+        const last = ys[ys.length - 1];
+        const span = 0.10; // ±5%
+        yMin = Math.max(0, last - span/2);
+        yMax = Math.min(1, last + span/2);
+        if (yMax - yMin < span) {
+          if (yMin === 0) yMax = Math.min(1, yMin + span);
+          if (yMax === 1) yMin = Math.max(0, yMax - span);
+        }
+      }
+
+      if (ui.yScale === "full") {
+        yMin = 0; yMax = 1;
+      }
+
+      if (yMax <= yMin + 1e-6) { yMin = 0; yMax = 1; }
+
+      const yToPix = (v, top, bot) => {
+        const t = (clamp01(v) - yMin) / (yMax - yMin);
+        const tt = Math.max(0, Math.min(1, t));
+        return bot - tt * (bot - top);
+      };
+
       // grid
       ctx.lineWidth = 1;
       ctx.strokeStyle = "#e6e6e6";
       for (let i = 1; i <= 3; i++) {
-        const y = (h * i) / 4;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
-        ctx.stroke();
+        const yy = (h * i) / 4;
+        ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(w, yy); ctx.stroke();
       }
 
-      // labels
+      // axis labels
       ctx.fillStyle = "#666";
       ctx.font = "11px Arial";
-      ctx.fillText("100%", 6, 12);
-      ctx.fillText("0%", 10, h - 6);
+      const topPct = Math.round(yMax * 100);
+      const botPct = Math.round(yMin * 100);
+      ctx.fillText(topPct + "%", 6, 12);
+      ctx.fillText(botPct + "%", 10, h - 6);
 
-      const n = points.length;
-      if (n < 2) return;
-
-      const padL = 40, padR = 6, padT = 6, padB = 16;
+      // plot
+      const padL = 44, padR = 6, padT = 6, padB = 16;
       const x0 = padL, x1 = w - padR;
       const y0 = padT, y1 = h - padB;
 
       ctx.strokeStyle = "#111";
       ctx.lineWidth = 2;
       ctx.beginPath();
-      for (let i = 0; i < n; i++) {
-        const t = i / (n - 1);
-        const x = x0 + t * (x1 - x0);
-        const v = clamp01(points[i].y);
-        const y = y1 - v * (y1 - y0);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+      for (let i=0;i<n;i++) {
+        const t = i/(n-1);
+        const x = x0 + t*(x1-x0);
+        const y = yToPix(points[i].y, y0, y1);
+        if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
       }
       ctx.stroke();
 
-      // last dot + last pct
-      const lastV = clamp01(points[n - 1].y);
+      // last dot + label
+      const lastV = clamp01(points[n-1].y);
       const lastX = x1;
-      const lastY = y1 - lastV * (y1 - y0);
-
+      const lastY = yToPix(lastV, y0, y1);
       ctx.fillStyle = "#111";
-      ctx.beginPath();
-      ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(lastX, lastY, 3, 0, Math.PI*2); ctx.fill();
 
       ctx.fillStyle = "#111";
       ctx.font = "12px Arial";
-      const pct = Math.round(lastV * 100);
-      ctx.fillText(pct + "%", x0, h - 2);
+      ctx.fillText(Math.round(lastV*100) + "%", x0, h - 2);
     }
 
-    function fmtSampleLine(s) {
-      const t = String(s?.t ?? "");
-      const good = (s?.good ?? "");
-      const total = (s?.total ?? "");
-      const y = Number.isFinite(s?.yield) ? (s.yield * 100).toFixed(2) + "%" : "";
-      return `${t}  good=${good} total=${total}  y=${y}`;
+    function formatRaw(points) {
+      const take = Math.max(3, Math.min(60, ui.rawN|0));
+      const last = points.slice(-take);
+      return last.map(p => {
+        const t = (p.t || "").replace("T"," ").replace(/(\.\d+)?Z?$/,"");
+        const y = Math.round(clamp01(p.y)*1000)/10;
+        const gt = (p.good != null && p.total != null) ? `  (${p.good}/${p.total})` : "";
+        const te = p.tester ? ` ${p.tester}` : "";
+        return `${t}  ${y}%${gt}${te}`.trim();
+      }).join("\n");
     }
 
-    // delegated hover (works after re-render)
+    // Bind ONE delegated handler for hover draw
     function bindYieldHoverDelegation(rowsForMock) {
       if (window.__yieldDelegationBound) return;
       window.__yieldDelegationBound = true;
@@ -673,12 +666,12 @@
         const el = ev.target.closest && ev.target.closest(".yieldHover");
         if (!el) return;
 
+        // re-draw if loaded==0 or missing
         if (el.dataset.loaded === "1") return;
         el.dataset.loaded = "1";
 
         const canvas = el.querySelector("canvas.yieldCanvas");
         const note = el.querySelector("[data-note]");
-        const rawBox = el.querySelector("[data-raw]");
 
         try {
           note.textContent = "Loading…";
@@ -688,79 +681,58 @@
           const which = el.getAttribute("data-which") || "";
 
           const yj = await loadYieldCache(rowsForMock || []);
+          let pts = getYieldPoints(yj, lot, step, which);
 
-          const samples = getYieldSamples(yj, lot, step, which);
-          const pts0 = samplesToPoints(samples);
+          // apply smoothing (visual only)
+          const sm = smoothPoints(pts);
 
-          const ptsFiltered = filterGlitchPoints(pts0);
-          const dropped = ptsFiltered.__dropped || 0;
+          drawMiniChart(canvas, sm);
 
-          const ptsDisplay = applySmoothing(ptsFiltered, smoothMode);
-          drawMiniChart(canvas, ptsDisplay);
-
-          const modeShown = (yieldCacheMode || yieldMode);
-          const smoothShown = (smoothMode === "off" ? "raw" : smoothMode);
-
+          const modeShown = (yieldCacheMode || ui.mode);
+          const last = sm[sm.length - 1];
+          const extra = ui.showRaw ? ("\n\nRAW:\n" + formatRaw(pts)) : "";
           note.textContent =
-            (modeShown.startsWith("mock") ? "Mock data" : "Real data") +
-            ` • ${smoothShown}` +
-            (dropped ? ` • dropped ${dropped} glitch sample(s)` : "");
-
-          if (showRaw && rawBox) {
-            rawBox.style.display = "block";
-            const tail = samples.slice(-rawN);
-            rawBox.textContent = tail.map(fmtSampleLine).join("\n");
-          }
+            `${modeShown} • smooth=${ui.smooth} • y=${ui.yScale}\nlast=${Math.round(last.y*1000)/10}% • points=${pts.length}${extra}`;
         } catch (e) {
           const ctx = canvas.getContext("2d");
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.fillStyle = "#b00020";
           ctx.font = "12px Arial";
           ctx.fillText("missing lot history", 10, 22);
-          note.textContent = "Missing lot history";
+          note.textContent = `Missing lot history\n(${String(e && e.message ? e.message : e)})`;
         }
       });
     }
 
-    // =========================
-    // CSV render + freeze logic
-    // =========================
+    // ---------- freeze logic ----------
     let prevRowsByLabel = null;
-    let lastCSVRows = null;
 
-    window.addEventListener("resize", () => {
-      const t = document.querySelector("table");
-      if (t) requestAnimationFrame(() => equalizeLastColumn(t));
-    });
-
+    // ---------- main ----------
     async function loadCSV() {
       try {
-        dbg(`Loading CSV…\nYield mode: ${yieldMode}\nSmooth: ${smoothMode}\nYield URL: ${YIELD_URL}`);
+        dbg(`Loading CSV…
+Yield mode: ${ui.mode}
+Yield URL: ${YIELD_URL}
+Smooth: ${ui.smooth}
+Y scale: ${ui.yScale}`);
 
-        const resp = await fetch(
-          CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "v=" + Date.now(),
-          { cache: "no-store" }
-        );
-
+        const resp = await fetch(CSV_URL + "?v=" + Date.now(), { cache: "no-store" });
         if (!resp.ok) { dbg(`CSV fetch failed: ${resp.status} ${resp.statusText}`); return; }
 
         const text = await resp.text();
         const rows = parseCSV(text);
-        if (!rows.length) { dbg("CSV parsed but rows is empty."); return; }
+        if (!rows.length) { dbg("CSV parsed but rows empty."); return; }
 
-        showTagBox(shouldShowTagBoxFromTable(rows));
-
+        // handler row for STATUS link
         const handlerRow = rows.find(r => norm(r[0]) === "HANDLER") || [];
-        function handlerAtCol(colIndex) {
-          return (handlerRow[colIndex] || "").toString().trim().toUpperCase();
-        }
+        function handlerAtCol(colIndex) { return (handlerRow[colIndex] || "").toString().trim().toUpperCase(); }
 
+        // STATUS per column
         const statusRow = rows.find(r => norm(r[0]) === "STATUS") || [];
         const statusByCol = {};
-        for (let c = 1; c < statusRow.length; c++) {
-          statusByCol[c] = (statusRow[c] || "").toString().trim().toLowerCase();
-        }
+        for (let c = 1; c < statusRow.length; c++) statusByCol[c] = (statusRow[c] || "").toString().trim().toLowerCase();
 
+        // TOTAL IN per column
         const totalInRow = rows.find(r => norm(r[0]) === "TOTAL IN") || [];
         const totalInByCol = {};
         for (let c = 1; c < totalInRow.length; c++) {
@@ -768,6 +740,7 @@
           if (v !== null) totalInByCol[c] = v;
         }
 
+        // TOTAL row
         const totalRow = rows.find(r => norm(r[0]) === "TOTAL") || [];
 
         // Freeze numeric values when STATUS=error
@@ -789,13 +762,9 @@
           }
         }
 
-        lastCSVRows = rows;
-
         function findLastRow(rows, label) {
           const want = norm(label);
-          for (let i = rows.length - 1; i >= 0; i--) {
-            if (norm(rows[i]?.[0]) === want) return rows[i];
-          }
+          for (let i = rows.length - 1; i >= 0; i--) if (norm(rows[i]?.[0]) === want) return rows[i];
           return null;
         }
 
@@ -803,9 +772,9 @@
         const lastUpdRow = findLastRow(rows, "LAST UPDATE") || [];
         const loadingRow = rows.find(r => norm(r[0]) === "LOADING COUNTS") || [];
 
+        // ESTIMATED FINISH row
         const estFinishRow = [];
         estFinishRow[0] = "ESTIMATED FINISH";
-
         const maxColsEF = Math.max(...rows.map(r => r.length));
         for (let c = 1; c < maxColsEF; c++) {
           const startDt = parseDateTimeLocal(startRow[c]);
@@ -813,10 +782,7 @@
           const loading = toInt(loadingRow[c]);
           const totalIn = totalInByCol[c];
 
-          if (!startDt || !updDt || loading === null || !totalIn || totalIn <= 0) {
-            estFinishRow[c] = "";
-            continue;
-          }
+          if (!startDt || !updDt || loading === null || !totalIn || totalIn <= 0) { estFinishRow[c] = ""; continue; }
 
           const elapsedMs = updDt.getTime() - startDt.getTime();
           const progress = loading / totalIn;
@@ -825,7 +791,6 @@
           const p = Math.min(1, Math.max(0.000001, progress));
           const estTotalMs = elapsedMs / p;
           const finishDt = new Date(startDt.getTime() + estTotalMs);
-
           estFinishRow[c] = fmtDateTime(finishDt);
         }
 
@@ -833,10 +798,12 @@
         const insertAt = idxTotalIn >= 0 ? idxTotalIn + 1 : rows.length;
         rows.splice(insertAt, 0, estFinishRow);
 
+        // Precompute autoSum
         const autoSumByCol = {};
         const maxCols = Math.max(...rows.map(r => r.length));
         for (let c = 1; c < maxCols; c++) autoSumByCol[c] = sumAutosForCol(rows, c);
 
+        // Build table
         const table = document.createElement("table");
 
         rows.forEach((row, rowIndex) => {
@@ -857,10 +824,11 @@
 
             if (isHeader && c === "TESTER") {
               cellContent = showLinks
-                ? `<a href="https://connect.raspberrypi.com/devices" target="_blank">TESTER</a>`
+                ? `<a href="https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0" target="_blank">TESTER</a>`
                 : "TESTER";
             }
 
+            // Handler links (non-header only)
             if (!isHeader) {
               if (c === "CHROMA") cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e" target="_blank">CHROMA</a>` : "CHROMA";
               if (c === "NS-3")   cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46" target="_blank">NS-3</a>`   : "NS-3";
@@ -868,6 +836,7 @@
               if (c === "NS-5")   cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/468fc957-7879-440e-b1ea-b7e7dfef37f6" target="_blank">NS-5</a>`   : "NS-5";
             }
 
+            // VNC links
             if (showLinks && c === "AP-1")   cellContent = `<a href="vnc://AP-1">AP-1</a>`;
             if (showLinks && c === "AP-2")   cellContent = `<a href="vnc://AP-2">AP-2</a>`;
             if (showLinks && c === "S100_1") cellContent = `<a href="vnc://S100-1">S100_1</a>`;
@@ -890,8 +859,8 @@
               }
             }
 
-            // AUTO1 progress + hover
-            if (!isHeader && rowLabel === "AUTO1" && colIndex > 0) {
+            // AUTO1 progress + hover mini chart
+            if (!isHeader && (rowLabel === "AUTO1" || rowLabel === "AUTO 1") && colIndex > 0) {
               const auto1 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
               if (auto1 !== null && total !== null && total > 0) {
@@ -909,8 +878,8 @@
               }
             }
 
-            // AUTO2 progress + hover
-            if (!isHeader && rowLabel === "AUTO2" && colIndex > 0) {
+            // AUTO2 progress + hover mini chart
+            if (!isHeader && (rowLabel === "AUTO2" || rowLabel === "AUTO 2") && colIndex > 0) {
               const auto2 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
               if (auto2 !== null && total !== null && total > 0) {
@@ -928,8 +897,8 @@
               }
             }
 
-            // AUTO3 progress
-            if (!isHeader && rowLabel === "AUTO3" && colIndex > 0) {
+            // AUTO3 progress (no hover)
+            if (!isHeader && (rowLabel === "AUTO3" || rowLabel === "AUTO 3") && colIndex > 0) {
               const auto3 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
               if (auto3 !== null && total !== null && total > 0) {
@@ -945,7 +914,7 @@
               }
             }
 
-            // STATUS link to handler latest.png
+            // STATUS row links to handler latest.png
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const hname = handlerAtCol(colIndex);
               const ip = HANDLER_IP[hname];
@@ -958,22 +927,45 @@
             const cellEl = document.createElement(isHeader ? "th" : "td");
             cellEl.innerHTML = cellContent;
 
+            // First column styling
             if (colIndex === 0) {
               cellEl.style.backgroundColor = isHeader ? "#2c3e50" : "#dff0d8";
-              if (isHeader) { cellEl.style.color = "white"; cellEl.style.fontWeight = "bold"; }
+              if (isHeader) {
+                cellEl.style.color = "white";
+                cellEl.style.fontWeight = "bold";
+              }
             }
 
+            // Tester/Handler row highlight
             if (isTesterOrHandlerRow && !isHeader) {
               cellEl.style.backgroundColor = "#fef2d0";
               cellEl.style.fontWeight = "bold";
             }
 
+            // STATUS cell coloring
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const st = (cell || "").toString().trim().toLowerCase();
-              if (st === "running") { cellEl.style.color = "green"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#dff6df"; }
-              if (st === "error")   { cellEl.style.color = "red"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#ffd6d6"; }
-              if (st === "stopped") { cellEl.style.color = "goldenrod"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#fff3cd"; }
-              if (st === "maint")   { cellEl.style.color = "blue"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#d6e6ff"; }
+
+              if (st === "running") {
+                cellEl.style.color = "green";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#dff6df";
+              }
+              if (st === "error") {
+                cellEl.style.color = "red";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#ffd6d6";
+              }
+              if (st === "stopped") {
+                cellEl.style.color = "goldenrod";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#fff3cd";
+              }
+              if (st === "maint") {
+                cellEl.style.color = "blue";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#d6e6ff";
+              }
             }
 
             // Number checks
@@ -1020,7 +1012,7 @@
         document.body.appendChild(table);
         requestAnimationFrame(() => equalizeLastColumn(table));
 
-        // bind hover (delegated)
+        // yield hover draw
         bindYieldHoverDelegation(rows);
 
         // update prev snapshot
@@ -1039,6 +1031,7 @@
     }
 
     window.addEventListener("load", () => {
+      syncUiToControls();
       loadCSV();
       setInterval(loadCSV, 30000);
     });
