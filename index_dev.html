@@ -1,4 +1,4 @@
-<!-- MARKER: INDEX_DEV_YIELD_V20260207_1125 -->
+<!-- MARKER: INDEX_DEV_YIELD_V20260207_0740 -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,15 +23,9 @@
       font-weight: bold;
     }
 
-    /* Default links */
-    a {
-      color: #007bff;
-      font-weight: bold;
-      text-decoration: none;
-    }
+    a { color: #007bff; font-weight: bold; text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* Status links inherit status color + show pointer */
     a.statusLink,
     a.statusLink:visited,
     a.statusLink:hover,
@@ -42,7 +36,6 @@
       cursor: pointer;
     }
 
-    /* Debug line (hidden unless ?debug=1) */
     #dbg {
       width: 60%;
       margin: 6px auto 0 auto;
@@ -53,7 +46,6 @@
       white-space: pre-wrap;
     }
 
-    /* Progress bars */
     .lc-wrap { display: flex; flex-direction: column; gap: 6px; }
     .lc-num  { font-weight: 600; }
     .prog {
@@ -63,22 +55,12 @@
       background: #f2f2f2;
       overflow: hidden;
     }
-    .prog > .bar {
-      height: 100%;
-      width: 0%;
-      background: #2e7d32;
-    }
+    .prog > .bar { height: 100%; width: 0%; background: #2e7d32; }
     .lc-pct { font-size: 12px; color: #444; }
 
-    /* ===== Yield hover mini chart (small picture) ===== */
-    .yieldHover {
-      position: relative;
-      display: inline-block;
-      cursor: help;
-    }
-    /* CSS-only popup so it always “pops up” even if JS fails */
+    /* ===== Yield hover mini chart ===== */
+    .yieldHover { position: relative; display: inline-block; cursor: help; }
     .yieldHover:hover .yieldTip { display: block; }
-
     .yieldTip {
       display: none;
       position: absolute;
@@ -93,40 +75,20 @@
       padding: 10px 10px 8px 10px;
       z-index: 9999;
     }
-    .yieldTipTitle {
-      font-weight: 700;
-      font-size: 13px;
-      margin-bottom: 4px;
-      color: #222;
-    }
+    .yieldTipTitle { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #222; }
     .yieldTipSub {
-      font-size: 12px;
-      color: #555;
-      margin-bottom: 8px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      font-size: 12px; color: #555; margin-bottom: 8px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .yieldCanvas {
-      width: 220px;
-      height: 70px;
+      width: 220px; height: 70px;
       border: 1px solid #ddd;
       border-radius: 8px;
       display: block;
       background: #fafafa;
     }
-    .yieldLegend {
-      margin-top: 6px;
-      font-size: 11px;
-      color: #666;
-      display: flex;
-      justify-content: space-between;
-    }
-    .yieldNote {
-      margin-top: 6px;
-      font-size: 11px;
-      color: #777;
-    }
+    .yieldLegend { margin-top: 6px; font-size: 11px; color: #666; display: flex; justify-content: space-between; }
+    .yieldNote { margin-top: 6px; font-size: 11px; color: #777; }
   </style>
 </head>
 
@@ -142,10 +104,9 @@
     // yield source toggle:
     //   ?yield=real  -> fetch yield_live.json from GitHub
     //   ?yield=mock  -> mock series only
-    // default: real (but auto-fallback to mock if fetch fails)
+    // default: real (auto-fallback to mock if fetch fails)
     const yieldMode = (params.get("yield") || "real").toLowerCase();
 
-    // Force title always
     document.title = "ESS PRODUCTION STATUS (DEV)";
 
     const dbgEl = document.getElementById("dbg");
@@ -157,11 +118,10 @@
         `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION STATUS (DEV)`;
     }
 
-    const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
+    const CSV_URL   = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
     const YIELD_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
     const showTagIfPresent = params.get("tag") === "1";
 
-    // handler -> IP (used by STATUS row link)
     const HANDLER_IP = {
       "NS-3": "10.20.10.187",
       "NS-4": "10.20.10.238",
@@ -171,24 +131,18 @@
 
     function equalizeLastColumn(table) {
       if (!table) return;
-
       const headerRow = table.querySelector("tr");
       if (!headerRow) return;
-
       const heads = Array.from(headerRow.children);
       if (heads.length < 3) return;
-
       const lastIdx = heads.length - 1;
-
       const widths = [];
       for (let i = 1; i <= lastIdx - 1; i++) {
         const w = heads[i].getBoundingClientRect().width;
         if (w > 0) widths.push(w);
       }
       if (!widths.length) return;
-
       const avg = widths.reduce((a, b) => a + b, 0) / widths.length;
-
       for (const row of Array.from(table.rows)) {
         const cell = row.cells[lastIdx];
         if (cell) {
@@ -206,10 +160,8 @@
     function shouldShowTagBoxFromTable(rows) {
       if (!showTagIfPresent) return false;
       if (!rows) return false;
-
       const lotRow = (rows || []).find(r => norm(r?.[0]) === "LOT NUMBER");
       if (!lotRow) return false;
-
       for (let c = 1; c < lotRow.length; c++) {
         const v = String(lotRow[c] ?? "").trim();
         if (v && v.toUpperCase() !== "NA") return true;
@@ -217,16 +169,10 @@
       return false;
     }
 
-    function norm(s) {
-      return (s || "").toString().replace(/\r/g, "").trim().toUpperCase();
-    }
+    function norm(s) { return (s || "").toString().replace(/\r/g, "").trim().toUpperCase(); }
     function toInt(x) {
       const v = parseInt((x || "").toString().replace(/,/g, "").trim(), 10);
       return Number.isNaN(v) ? null : v;
-    }
-    function toInt0(x) {
-      const n = parseInt(String(x ?? "").replace(/[^\d-]/g, ""), 10);
-      return Number.isFinite(n) ? n : 0;
     }
 
     function sumAutosForCol(rows, colIndex) {
@@ -247,7 +193,6 @@
     function parseDateTimeLocal(s) {
       const raw = (s || "").toString().trim();
       if (!raw) return null;
-
       let x = raw.replace(" ", "T");
       x = x.replace(/\.(\d{3})\d+/, ".$1");
       const d = new Date(x);
@@ -267,20 +212,50 @@
       const want = norm(label);
       return (rows || []).find(r => norm(r[0]) === want) || null;
     }
-
     function getStepForCol(rows, colIndex) {
       const stepRow = findRowByLabel(rows, "TEST STEP");
-      if (!stepRow) return "";
-      return (stepRow[colIndex] || "").toString().trim();
+      return stepRow ? (stepRow[colIndex] || "").toString().trim() : "";
     }
-
     function getLotForCol(rows, colIndex) {
       const lotRow = findRowByLabel(rows, "LOT NUMBER");
-      if (!lotRow) return "";
-      return (lotRow[colIndex] || "").toString().trim();
+      return lotRow ? (lotRow[colIndex] || "").toString().trim() : "";
     }
 
-    // ====== Yield hover HTML (AUTO1/AUTO2 only) ======
+    // ====== NEW: detect bad TOTAL and pick denom ======
+    function isSaneTotal(total, loading, totalIn) {
+      if (!Number.isFinite(total) || total <= 0) return false;
+
+      // if TOTAL IN exists, total shouldn't exceed it
+      if (Number.isFinite(totalIn) && totalIn > 0) {
+        if (total > totalIn * 1.02) return false;
+      }
+
+      // if LOADING exists, total should be same order of magnitude (loose band)
+      if (Number.isFinite(loading) && loading > 0) {
+        if (total > loading * 1.5) return false;
+        if (total < loading * 0.5) return false;
+      }
+
+      return true;
+    }
+
+    function pickDenom(total, loading, totalIn) {
+      if (isSaneTotal(total, loading, totalIn)) return { denom: total, reason: "TOTAL" };
+      if (Number.isFinite(loading) && loading > 0) return { denom: loading, reason: "LOADING" };
+      if (Number.isFinite(totalIn) && totalIn > 0) return { denom: totalIn, reason: "TOTAL IN" };
+      return { denom: null, reason: "NONE" };
+    }
+
+    function denomWarn(reason, total, loading, totalIn) {
+      if (reason === "TOTAL") return "";
+      const t = Number.isFinite(total) ? total.toLocaleString() : "NA";
+      const l = Number.isFinite(loading) ? loading.toLocaleString() : "NA";
+      const i = Number.isFinite(totalIn) ? totalIn.toLocaleString() : "NA";
+      const tip = `TOTAL looks wrong (TOTAL=${t}, LOADING=${l}, TOTAL IN=${i}) → using ${reason}`;
+      return ` <span title="${tip.replace(/"/g,'&quot;')}">⚠</span>`;
+    }
+
+    // ====== Yield hover HTML ======
     function escHtml(s) {
       return String(s ?? "")
         .replace(/&/g, "&amp;")
@@ -294,7 +269,6 @@
       const lot2 = (lot || "").trim();
       const step2 = (step || "").trim();
       const which2 = (which || "").trim();
-      // tooltip exists even if data missing; JS will draw "missing lot history"
       return `
         <span class="yieldHover"
               data-lot="${escHtml(lot2)}"
@@ -312,7 +286,7 @@
       `;
     }
 
-    // ====== Yield data loader (real or mock) ======
+    // ====== Yield data loader ======
     let yieldCache = null;
     let yieldCacheMode = null;
 
@@ -330,23 +304,18 @@
     }
 
     function makeMockYieldJsonFromRows(rows) {
-      // Build a mock-ish structure keyed by LOT||STEP
-      const out = {
-        meta: {
-          updated: nowIsoNoMs(),
-          mode: "mock",
-          note: "Mock series derived from current table (not persisted).",
-        },
-        data: {}
-      };
+      const out = { meta: { updated: nowIsoNoMs(), mode: "mock" }, data: {} };
 
       const lotRow = findRowByLabel(rows, "LOT NUMBER") || [];
       const stepRow = findRowByLabel(rows, "TEST STEP") || [];
       const totalRow = findRowByLabel(rows, "TOTAL") || [];
+      const loadingRow = findRowByLabel(rows, "LOADING COUNTS") || [];
+      const totalInRow = findRowByLabel(rows, "TOTAL IN") || [];
       const auto1Row = findRowByLabel(rows, "AUTO1") || [];
       const auto2Row = findRowByLabel(rows, "AUTO2") || [];
 
-      const maxCols = Math.max(lotRow.length, stepRow.length, totalRow.length, auto1Row.length, auto2Row.length);
+      const maxCols = Math.max(lotRow.length, stepRow.length, totalRow.length, auto1Row.length, auto2Row.length, loadingRow.length, totalInRow.length);
+
       for (let c = 1; c < maxCols; c++) {
         const lot = (lotRow[c] || "").toString().trim();
         const step = (stepRow[c] || "").toString().trim();
@@ -354,11 +323,17 @@
         if (!step || step.toUpperCase() === "NA") continue;
 
         const total = toInt(totalRow[c]) || 0;
+        const loading = toInt(loadingRow[c]) || 0;
+        const totalIn = toInt(totalInRow[c]) || 0;
+
         const a1 = toInt(auto1Row[c]) || 0;
         const a2 = toInt(auto2Row[c]) || 0;
 
-        const y1 = total > 0 ? (a1 / total) : 0;
-        const y2 = total > 0 ? (a2 / total) : 0;
+        const { denom } = pickDenom(total, loading, totalIn);
+        const d = denom || 0;
+
+        const y1 = d > 0 ? (a1 / d) : 0;
+        const y2 = d > 0 ? (a2 / d) : 0;
 
         const key = `${lot}||${step}`;
         function mkSeries(y) {
@@ -373,10 +348,8 @@
           pts.push(base);
           return pts;
         }
-
         out.data[key] = { lot, step, AUTO1: mkSeries(y1), AUTO2: mkSeries(y2) };
       }
-
       return out;
     }
 
@@ -389,7 +362,6 @@
         return yieldCache;
       }
 
-      // real mode (fetch), but fallback to mock on error
       try {
         const j = await fetchJson(YIELD_URL);
         yieldCache = j;
@@ -402,45 +374,33 @@
       }
     }
 
-    // ✅ FIXED: supports your real yield_live.json shape:
-    //   yj.data["LOT|STEP|AUTO1"] = [{t, tester, good, total, yield}, ...]
-    // plus your mock shape:
-    //   yj.data["LOT||STEP"] = {AUTO1:[0..1], AUTO2:[0..1]}
     function getYieldSeries(yj, lot, step, which) {
       const lot2 = (lot || "").trim();
       const step2 = (step || "").trim();
       const which2 = (which || "").trim().toUpperCase();
+      const key = `${lot2}||${step2}`;
 
-      // --- REAL FORMAT ---
+      // yield_live.json in your repo is: data: { "<lot>|<step>|AUTO1": [ {t,tester,good,total,yield}, ... ] }
       const keyPipe = `${lot2}|${step2}|${which2}`;
-      if (yj && yj.data && Array.isArray(yj.data[keyPipe])) {
-        const arr = yj.data[keyPipe]
-          .map(p => Number(p && p.yield))
-          .filter(v => Number.isFinite(v))
-          .map(v => Math.max(0, Math.min(1, v)));
-        if (arr.length) return arr.length === 1 ? [arr[0], arr[0]] : arr;
+
+      let series = null;
+
+      // preferred (pipe keys) -> map objects to .yield
+      if (yj && yj.data && yj.data[keyPipe] && Array.isArray(yj.data[keyPipe])) {
+        series = yj.data[keyPipe].map(p => Number(p?.yield));
       }
 
-      // --- MOCK FORMAT ---
-      const keyMock = `${lot2}||${step2}`;
-      if (yj && yj.data && yj.data[keyMock] && Array.isArray(yj.data[keyMock][which2])) {
-        const arr = yj.data[keyMock][which2]
-          .map(x => Number(x))
-          .filter(v => Number.isFinite(v))
-          .map(v => Math.max(0, Math.min(1, v)));
-        if (arr.length) return arr.length === 1 ? [arr[0], arr[0]] : arr;
-      }
+      // fallback shapes
+      if (!series && yj && yj.data && yj.data[key] && yj.data[key][which2]) series = yj.data[key][which2];
+      if (!series && yj && yj.lots && yj.lots[lot2] && yj.lots[lot2][step2] && yj.lots[lot2][step2][which2]) series = yj.lots[lot2][step2][which2];
+      if (!series && yj && yj[key] && yj[key][which2]) series = yj[key][which2];
 
-      // --- legacy shapes (optional) ---
-      if (yj && yj.lots && yj.lots[lot2] && yj.lots[lot2][step2] && Array.isArray(yj.lots[lot2][step2][which2])) {
-        const arr = yj.lots[lot2][step2][which2]
-          .map(x => Number(x))
-          .filter(v => Number.isFinite(v))
-          .map(v => Math.max(0, Math.min(1, v)));
-        if (arr.length) return arr.length === 1 ? [arr[0], arr[0]] : arr;
-      }
-
-      throw new Error("missing lot history");
+      if (!Array.isArray(series) || !series.length) throw new Error("missing lot history");
+      return series.map(x => {
+        const v = Number(x);
+        if (!Number.isFinite(v)) return 0;
+        return Math.max(0, Math.min(1, v));
+      });
     }
 
     function drawMiniChart(canvas, series) {
@@ -448,31 +408,20 @@
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
-      // background grid
       ctx.lineWidth = 1;
       ctx.strokeStyle = "#e6e6e6";
       for (let i = 1; i <= 3; i++) {
         const y = (h * i) / 4;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
       }
 
-      // axis labels 0% / 100%
       ctx.fillStyle = "#666";
       ctx.font = "11px Arial";
       ctx.fillText("100%", 6, 12);
       ctx.fillText("0%", 10, h - 6);
 
-      // plot series
       const n = series.length;
-      if (n < 2) {
-        ctx.fillStyle = "#b00020";
-        ctx.font = "12px Arial";
-        ctx.fillText("missing lot history", 10, 22);
-        return;
-      }
+      if (n < 2) return;
 
       const padL = 36, padR = 6, padT = 6, padB = 14;
       const x0 = padL, x1 = w - padR;
@@ -484,14 +433,13 @@
       for (let i = 0; i < n; i++) {
         const t = i / (n - 1);
         const x = x0 + t * (x1 - x0);
-        const v = series[i]; // 0..1
+        const v = series[i];
         const y = y1 - v * (y1 - y0);
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
       ctx.stroke();
 
-      // last point dot
       const lastV = series[n - 1];
       const lastX = x1;
       const lastY = y1 - lastV * (y1 - y0);
@@ -500,14 +448,12 @@
       ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
       ctx.fill();
 
-      // label last %
       ctx.fillStyle = "#111";
       ctx.font = "12px Arial";
       const pct = Math.round(lastV * 100);
       ctx.fillText(pct + "%", x0, h - 2);
     }
 
-    // Bind ONE delegated handler so hover always works even after re-render
     function bindYieldHoverDelegation(rowsForMock) {
       if (window.__yieldDelegationBound) return;
       window.__yieldDelegationBound = true;
@@ -515,8 +461,6 @@
       document.addEventListener("mouseover", async (ev) => {
         const el = ev.target.closest && ev.target.closest(".yieldHover");
         if (!el) return;
-
-        // only draw once per element
         if (el.dataset.loaded === "1") return;
         el.dataset.loaded = "1";
 
@@ -542,12 +486,11 @@
           ctx.font = "12px Arial";
           ctx.fillText("missing lot history", 10, 22);
           note.textContent = "Missing lot history";
-          if (debug) console.log("YIELD MISS", e);
         }
       });
     }
 
-    // ===== existing freeze logic state =====
+    // ===== existing freeze logic =====
     let prevRowsByLabel = null;
     let lastCSVRows = null;
 
@@ -560,35 +503,25 @@
           { cache: "no-store" }
         );
 
-        if (!resp.ok) {
-          dbg(`CSV fetch failed: ${resp.status} ${resp.statusText}`);
-          return;
-        }
+        if (!resp.ok) { dbg(`CSV fetch failed: ${resp.status} ${resp.statusText}`); return; }
 
         const text = await resp.text();
         const rows = parseCSV(text);
-
-        if (!rows.length) {
-          dbg("CSV parsed but rows is empty.");
-          return;
-        }
+        if (!rows.length) { dbg("CSV parsed but rows empty."); return; }
 
         showTagBox(shouldShowTagBoxFromTable(rows));
 
-        // ✅ HANDLER row tells us which handler belongs to each tester column
         const handlerRow = rows.find(r => norm(r[0]) === "HANDLER") || [];
         function handlerAtCol(colIndex) {
           return (handlerRow[colIndex] || "").toString().trim().toUpperCase();
         }
 
-        // STATUS per column
         const statusRow = rows.find(r => norm(r[0]) === "STATUS") || [];
         const statusByCol = {};
         for (let c = 1; c < statusRow.length; c++) {
           statusByCol[c] = (statusRow[c] || "").toString().trim().toLowerCase();
         }
 
-        // TOTAL IN per column
         const totalInRow = rows.find(r => norm(r[0]) === "TOTAL IN") || [];
         const totalInByCol = {};
         for (let c = 1; c < totalInRow.length; c++) {
@@ -596,25 +529,19 @@
           if (v !== null) totalInByCol[c] = v;
         }
 
-        // TOTAL row
         const totalRow = rows.find(r => norm(r[0]) === "TOTAL") || [];
 
-        // Freeze numeric values when STATUS=error for that column
         const freezeLabels = new Set(["TOTAL IN", "LOADING COUNTS", "TOTAL", "AUTO1", "AUTO2", "AUTO3"]);
         if (prevRowsByLabel) {
           for (const r of rows) {
             const label = norm(r[0]);
             if (!freezeLabels.has(label)) continue;
-
             const prevRow = prevRowsByLabel[label];
             if (!prevRow) continue;
-
             for (let c = 1; c < r.length; c++) {
               if ((statusByCol[c] || "") === "error") {
                 const prevVal = prevRow[c];
-                if (prevVal !== undefined && String(prevVal).trim() !== "") {
-                  r[c] = prevVal;
-                }
+                if (prevVal !== undefined && String(prevVal).trim() !== "") r[c] = prevVal;
               }
             }
           }
@@ -624,9 +551,7 @@
 
         function findLastRow(rows, label) {
           const want = norm(label);
-          for (let i = rows.length - 1; i >= 0; i--) {
-            if (norm(rows[i]?.[0]) === want) return rows[i];
-          }
+          for (let i = rows.length - 1; i >= 0; i--) if (norm(rows[i]?.[0]) === want) return rows[i];
           return null;
         }
 
@@ -641,27 +566,18 @@
         for (let c = 1; c < maxColsEF; c++) {
           const startDt = parseDateTimeLocal(startRow[c]);
           const updDt   = parseDateTimeLocal(lastUpdRow[c]);
-
           const loading = toInt(loadingRow[c]);
           const totalIn = totalInByCol[c];
 
-          if (!startDt || !updDt || loading === null || !totalIn || totalIn <= 0) {
-            estFinishRow[c] = "";
-            continue;
-          }
+          if (!startDt || !updDt || loading === null || !totalIn || totalIn <= 0) { estFinishRow[c] = ""; continue; }
 
           const elapsedMs = updDt.getTime() - startDt.getTime();
           const progress = loading / totalIn;
-
-          if (elapsedMs <= 0 || progress <= 0) {
-            estFinishRow[c] = "";
-            continue;
-          }
+          if (elapsedMs <= 0 || progress <= 0) { estFinishRow[c] = ""; continue; }
 
           const p = Math.min(1, Math.max(0.000001, progress));
           const estTotalMs = elapsedMs / p;
           const finishDt = new Date(startDt.getTime() + estTotalMs);
-
           estFinishRow[c] = fmtDateTime(finishDt);
         }
 
@@ -669,14 +585,10 @@
         const insertAt = idxTotalIn >= 0 ? idxTotalIn + 1 : rows.length;
         rows.splice(insertAt, 0, estFinishRow);
 
-        // Precompute autoSum
         const autoSumByCol = {};
         const maxCols = Math.max(...rows.map(r => r.length));
-        for (let c = 1; c < maxCols; c++) {
-          autoSumByCol[c] = sumAutosForCol(rows, c);
-        }
+        for (let c = 1; c < maxCols; c++) autoSumByCol[c] = sumAutosForCol(rows, c);
 
-        // Build table
         const table = document.createElement("table");
 
         rows.forEach((row, rowIndex) => {
@@ -695,14 +607,12 @@
             let cellContent = (cell ?? "").toString();
             const c = cellContent.trim().toUpperCase();
 
-            // links mode: TESTER header links
             if (isHeader && c === "TESTER") {
               cellContent = showLinks
-                ? `<a href="https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0" target="_blank">TESTER</a>`
+                ? `<a href="https://connect.raspberrypi.com/devices" target="_blank">TESTER</a>`
                 : "TESTER";
             }
 
-            // Handler links (non-header only)
             if (!isHeader) {
               if (c === "CHROMA") cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e" target="_blank">CHROMA</a>` : "CHROMA";
               if (c === "NS-3")   cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46" target="_blank">NS-3</a>`   : "NS-3";
@@ -710,7 +620,6 @@
               if (c === "NS-5")   cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/468fc957-7879-440e-b1ea-b7e7dfef37f6" target="_blank">NS-5</a>`   : "NS-5";
             }
 
-            // VNC links
             if (showLinks && c === "AP-1")   cellContent = `<a href="vnc://AP-1">AP-1</a>`;
             if (showLinks && c === "AP-2")   cellContent = `<a href="vnc://AP-2">AP-2</a>`;
             if (showLinks && c === "S100_1") cellContent = `<a href="vnc://S100-1">S100_1</a>`;
@@ -733,62 +642,77 @@
               }
             }
 
-            // AUTO1 progress + hover mini chart
+            // AUTO1 progress + hover + denom fix
             if (!isHeader && (rowLabel === "AUTO1" || rowLabel === "AUTO 1") && colIndex > 0) {
               const auto1 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
-              if (auto1 !== null && total !== null && total > 0) {
+              const loading = toInt(loadingRow[colIndex]);
+              const totalIn = totalInByCol[colIndex];
+
+              const pick = pickDenom(total, loading, totalIn);
+              if (auto1 !== null && pick.denom !== null && pick.denom > 0) {
                 const lot = getLotForCol(rows, colIndex);
                 const step = getStepForCol(rows, colIndex);
-                let pct = (auto1 / total) * 100;
+                let pct = (auto1 / pick.denom) * 100;
                 pct = Math.max(0, Math.min(100, pct));
+                const warn = denomWarn(pick.reason, total, loading, totalIn);
                 cellContent = `
                   <div class="lc-wrap">
                     <div class="lc-num">${yieldHoverHtml(auto1.toLocaleString(), lot, step, "AUTO1")}</div>
                     <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
-                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                    <div class="lc-pct">${pct.toFixed(1)}%${warn}</div>
                   </div>
                 `;
               }
             }
 
-            // AUTO2 progress + hover mini chart
+            // AUTO2 progress + hover + denom fix
             if (!isHeader && (rowLabel === "AUTO2" || rowLabel === "AUTO 2") && colIndex > 0) {
               const auto2 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
-              if (auto2 !== null && total !== null && total > 0) {
+              const loading = toInt(loadingRow[colIndex]);
+              const totalIn = totalInByCol[colIndex];
+
+              const pick = pickDenom(total, loading, totalIn);
+              if (auto2 !== null && pick.denom !== null && pick.denom > 0) {
                 const lot = getLotForCol(rows, colIndex);
                 const step = getStepForCol(rows, colIndex);
-                let pct = (auto2 / total) * 100;
+                let pct = (auto2 / pick.denom) * 100;
                 pct = Math.max(0, Math.min(100, pct));
+                const warn = denomWarn(pick.reason, total, loading, totalIn);
                 cellContent = `
                   <div class="lc-wrap">
                     <div class="lc-num">${yieldHoverHtml(auto2.toLocaleString(), lot, step, "AUTO2")}</div>
                     <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
-                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                    <div class="lc-pct">${pct.toFixed(1)}%${warn}</div>
                   </div>
                 `;
               }
             }
 
-            // AUTO3 progress (no hover)
+            // AUTO3 progress (no hover) + denom fix
             if (!isHeader && (rowLabel === "AUTO3" || rowLabel === "AUTO 3") && colIndex > 0) {
               const auto3 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
-              if (auto3 !== null && total !== null && total > 0) {
-                let pct = (auto3 / total) * 100;
+              const loading = toInt(loadingRow[colIndex]);
+              const totalIn = totalInByCol[colIndex];
+
+              const pick = pickDenom(total, loading, totalIn);
+              if (auto3 !== null && pick.denom !== null && pick.denom > 0) {
+                let pct = (auto3 / pick.denom) * 100;
                 pct = Math.max(0, Math.min(100, pct));
+                const warn = denomWarn(pick.reason, total, loading, totalIn);
                 cellContent = `
                   <div class="lc-wrap">
                     <div class="lc-num">${auto3.toLocaleString()}</div>
                     <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
-                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                    <div class="lc-pct">${pct.toFixed(1)}%${warn}</div>
                   </div>
                 `;
               }
             }
 
-            // ✅ STATUS row links to handler latest.png
+            // STATUS row link to handler latest.png
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const hname = handlerAtCol(colIndex);
               const ip = HANDLER_IP[hname];
@@ -801,48 +725,26 @@
             const cellEl = document.createElement(isHeader ? "th" : "td");
             cellEl.innerHTML = cellContent;
 
-            // First column styling
             if (colIndex === 0) {
               cellEl.style.backgroundColor = isHeader ? "#2c3e50" : "#dff0d8";
-              if (isHeader) {
-                cellEl.style.color = "white";
-                cellEl.style.fontWeight = "bold";
-              }
+              if (isHeader) { cellEl.style.color = "white"; cellEl.style.fontWeight = "bold"; }
             }
 
-            // Tester/Handler row highlight
             if (isTesterOrHandlerRow && !isHeader) {
               cellEl.style.backgroundColor = "#fef2d0";
               cellEl.style.fontWeight = "bold";
             }
 
-            // STATUS cell coloring
+            // STATUS coloring
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const st = (cell || "").toString().trim().toLowerCase();
-
-              if (st === "running") {
-                cellEl.style.color = "green";
-                cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#dff6df";
-              }
-              if (st === "error") {
-                cellEl.style.color = "red";
-                cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#ffd6d6";
-              }
-              if (st === "stopped") {
-                cellEl.style.color = "goldenrod";
-                cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#fff3cd";
-              }
-              if (st === "maint") {
-                cellEl.style.color = "blue";
-                cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#d6e6ff";
-              }
+              if (st === "running") { cellEl.style.color = "green"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#dff6df"; }
+              if (st === "error")   { cellEl.style.color = "red";   cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#ffd6d6"; }
+              if (st === "stopped") { cellEl.style.color = "goldenrod"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#fff3cd"; }
+              if (st === "maint")   { cellEl.style.color = "blue";  cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#d6e6ff"; }
             }
 
-            // ===== Number checks =====
+            // Number checks
             if (!isHeader && colIndex > 0) {
               const autoSum = autoSumByCol[colIndex] || 0;
 
@@ -857,10 +759,22 @@
 
               if (rowLabel === "TOTAL") {
                 const total = toInt(cell);
+                const loading = toInt(loadingRow[colIndex]);
+                const totalIn = totalInByCol[colIndex];
+
+                // existing: TOTAL < autoSum
                 if (total !== null && total < autoSum) {
                   cellEl.style.backgroundColor = "#ffd6d6";
                   cellEl.style.fontWeight = "bold";
                   cellEl.style.color = "red";
+                }
+
+                // NEW: highlight insane TOTAL
+                if (total !== null && !isSaneTotal(total, loading, totalIn)) {
+                  cellEl.style.backgroundColor = "#ffd6d6";
+                  cellEl.style.fontWeight = "bold";
+                  cellEl.style.color = "red";
+                  cellEl.title = `TOTAL looks wrong (TOTAL=${total}, LOADING=${loading}, TOTAL IN=${totalIn})`;
                 }
               }
 
@@ -886,10 +800,8 @@
         document.body.appendChild(table);
         requestAnimationFrame(() => equalizeLastColumn(table));
 
-        // Bind yield hover drawing (delegated, works across re-renders)
         bindYieldHoverDelegation(rows);
 
-        // Update prev snapshot
         const newPrev = {};
         for (const r of rows) {
           const label = norm(r[0]);
