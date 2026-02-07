@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ESS PRODUCTION STATUS (DEV)</title>
+
+  <style>
+    html, body { margin:0; padding:0; background:#000; color:#ddd; font-family: Arial, Helvetica, sans-serif; }
+    .wrap { padding: 14px; }
+    h1 { margin: 0 0 12px 0; font-size: 18px; color:#fff; }
+    .note { font-size: 12px; color:#aaa; margin-bottom: 12px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid rgba(255,255,255,0.10); padding: 8px 10px; font-size: 12px; }
+    th { text-align: left; color:#fff; position: sticky; top: 0; background: #090909; z-index: 1; }
+    tr:hover td { background: rgba(255,255,255,0.03); }
+    .lotLink { cursor: help; text-decoration: underline; text-underline-offset: 2px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+    /* Hover popover container */
+    #yieldPopover {
+      position: fixed;
+      z-index: 9999;
+      display: none;
+      pointer-events: none; /* don't steal mouse */
+      background: rgba(20,20,20,0.95);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 10px 10px 8px 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      color: #ddd;
+      max-width: 260px;
+      white-space: pre-line; /* allow \n in meta */
+    }
+    #yieldPopover .title {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #yieldPopover .meta {
+      font-size: 11px;
+      color: #bbb;
+      margin-top: 6px;
+      line-height: 1.25;
+      white-space: pre-line;
+    }
+    #yieldPopover canvas {
+      display: block;
+      width: 240px;  /* CSS size */
+      height: 60px;  /* CSS size */
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>ESS PRODUCTION STATUS (DEV)</h1>
+    <div class="note">
+      Hover a LOT to see a small historical yield chart popover.
+      Requires <span class="mono">yield_history.json</span> in the same folder as this page.
+    </div>
+
+    <!-- SAMPLE TABLE (replace with your real table renderer) -->
+    <table>
+      <thead>
+        <tr>
+          <th>TESTER</th>
+          <th>PRODUCT</th>
+          <th>LOT</th>
+          <th>STEP</th>
+          <th>STATUS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>S100_1</td>
+          <td>ES9291Q</td>
+          <td><span class="lotLink" data-lot="TGWDS13A84">TGWDS13A84</span></td>
+          <td>B34_25C_FT1-RT1</td>
+          <td>running</td>
+        </tr>
+        <tr>
+          <td>S100_2</td>
+          <td>ES9820Q</td>
+          <td><span class="lotLink" data-lot="TGWBS00R31">TGWBS00R31</span></td>
+          <td>FT1</td>
+          <td>running</td>
+        </tr>
+        <tr>
+          <td>AP-2</td>
+          <td>ES9842</td>
+          <td><span class="lotLink" data-lot="TGWBS02G30">TGWBS02G30</span></td>
+          <td>25C_BIN2_65C_RT-2</td>
+          <td>error</td>
+        </tr>
+        <tr>
+          <td>AP-1</td>
+          <td>ES9821</td>
+          <td><span class="lotLink" data-lot="TGWDSXX959">TGWDSXX959</span></td>
+          <td>25C_BIN1_25C_FT-1</td>
+          <td>error</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Hover popover -->
+  <div id="yieldPopover">
+    <div class="title" id="ypTitle">Yield</div>
+    <canvas id="ypCanvas" width="240" height="60"></canvas>
+    <div class="meta" id="ypMeta"></div>
+  </div>
+
+  <script>
+    // =========================
+    // Hover popover sparkline
+    // =========================
+    let yieldCache = null;
+
+    async function loadYieldHistory() {
+      if (yieldCache) return yieldCache;
+      const res = await fetch('yield_history.json', { cache: 'no-store' });
+      if (!res.ok) throw new Error('Missing yield_history.json (HTTP ' + res.status + ')');
+      yieldCache = await res.json();
+      return yieldCache;
+    }
+
+    function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+    function drawSparkline(canvas, yieldsPct) {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+
+      // subtle baseline
+      ctx.globalAlpha = 0.25;
+      ctx.beginPath();
+      ctx.moveTo(0, h-1);
+      ctx.lineTo(w, h-1);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      if (!yieldsPct || yieldsPct.length < 2) {
+        ctx.beginPath();
+        ctx.moveTo(6, h/2);
+        ctx.lineTo(w-6, h/2);
+        ctx.stroke();
+        return;
+      }
+
+      // local min/max, clamped to a sane band
+      let minY = Math.min(...yieldsPct);
+      let maxY = Math.max(...yieldsPct);
+      minY = clamp(minY, 80, 100);
+      maxY = clamp(maxY, 80, 100);
+      if (maxY - minY < 0.2) { maxY = minY + 0.2; }
+
+      const pad = 6;
+      const n = yieldsPct.length;
+      const x = i => pad + (i * (w - pad*2) / (n-1));
+      const y = v => {
+        const t = (v - minY) / (maxY - minY);
+        return (h - pad) - t * (h - pad*2);
+      };
+
+      ctx.beginPath();
+      ctx.moveTo(x(0), y(yieldsPct[0]));
+      for (let i=1; i<n; i++) ctx.lineTo(x(i), y(yieldsPct[i]));
+      ctx.stroke();
+
+      const lx = x(n-1), ly = y(yieldsPct[n-1]);
+      ctx.beginPath();
+      ctx.arc(lx, ly, 2.5, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    function positionPopoverNearMouse(pop, ev) {
+      const pad = 14;
+      const vw = window.innerWidth, vh = window.innerHeight;
+
+      pop.style.display = 'block';
+      const w = pop.offsetWidth;
+      const h = pop.offsetHeight;
+
+      let left = ev.clientX + pad;
+      let top  = ev.clientY + pad;
+
+      if (left + w > vw - 6) left = ev.clientX - w - pad;
+      if (top + h > vh - 6) top  = ev.clientY - h - pad;
+
+      pop.style.left = left + 'px';
+      pop.style.top  = top + 'px';
+    }
+
+    async function showYieldPopoverForLot(lot, ev) {
+      const pop = document.getElementById('yieldPopover');
+      const title = document.getElementById('ypTitle');
+      const meta = document.getElementById('ypMeta');
+      const canvas = document.getElementById('ypCanvas');
+
+      title.textContent = `Yield — ${lot}`;
+      meta.textContent = 'Loading...';
+
+      try {
+        const hist = await loadYieldHistory();
+        const rows = (hist && hist[lot]) ? hist[lot] : [];
+
+        const yieldsPct = rows.map(r => Math.round((r.yield || 0) * 10000) / 100);
+        drawSparkline(canvas, yieldsPct);
+
+        if (rows.length) {
+          const last = rows[rows.length - 1];
+          const y = Math.round((last.yield || 0) * 10000) / 100;
+          meta.textContent =
+            `Last: ${last.t || ''}\n` +
+            `Yield: ${y}%  (${last.good}/${last.total})\n` +
+            `${last.tester || ''}  ${last.step || ''}`;
+        } else {
+          meta.textContent = 'No history for this lot.';
+        }
+      } catch (e) {
+        // If yield_history.json is missing, show a readable message.
+        meta.textContent = String(e);
+        // Draw "no data" dash
+        drawSparkline(canvas, []);
+      }
+
+      positionPopoverNearMouse(pop, ev);
+    }
+
+    function hideYieldPopover() {
+      document.getElementById('yieldPopover').style.display = 'none';
+    }
+
+    // keep popover near cursor while visible
+    document.addEventListener('mousemove', (ev) => {
+      const pop = document.getElementById('yieldPopover');
+      if (pop.style.display === 'block') positionPopoverNearMouse(pop, ev);
+    });
+
+    let hoverTimer = null;
+
+    document.addEventListener('mouseover', (ev) => {
+      const el = ev.target.closest('.lotLink');
+      if (!el) return;
+
+      const lot = el.getAttribute('data-lot') || el.textContent.trim();
+      if (!lot) return;
+
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(() => showYieldPopoverForLot(lot, ev), 120);
+    });
+
+    document.addEventListener('mouseout', (ev) => {
+      const el = ev.target.closest('.lotLink');
+      if (!el) return;
+      clearTimeout(hoverTimer);
+      hideYieldPopover();
+    });
+  </script>
+</body>
+</html>
