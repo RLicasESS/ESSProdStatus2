@@ -1,25 +1,85 @@
-<!doctype html>
-<html lang="en">
+<!-- MARKER: INDEX_DEV_YIELDHOVER_V20260207_0555 -->
+<!DOCTYPE html>
+<html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ESS PRODUCTION STATUS (DEV)</title>
-
+  <title>ESS PRODUCTION STATUS</title>
   <style>
-    html, body { margin:0; padding:0; background:#000; color:#ddd; font-family: Arial, Helvetica, sans-serif; }
-    .wrap { padding: 14px; }
-    h1 { margin: 0 0 10px 0; font-size: 18px; color:#fff; }
-    .note { font-size: 12px; color:#aaa; margin-bottom: 12px; line-height:1.35; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    table {
+      border-collapse: collapse;
+      width: 60%;
+      margin: 20px auto;
+      font-family: Arial, sans-serif;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #2c3e50;
+      color: white;
+      font-weight: bold;
+    }
 
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border-bottom: 1px solid rgba(255,255,255,0.10); padding: 8px 10px; font-size: 12px; }
-    th { text-align: left; color:#fff; position: sticky; top: 0; background: #090909; z-index: 1; }
-    tr:hover td { background: rgba(255,255,255,0.03); }
+    /* Default links */
+    a {
+      color: #007bff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
 
-    .lotLink { cursor: help; text-decoration: underline; text-underline-offset: 2px; }
+    /* Status links inherit status color + show pointer */
+    a.statusLink,
+    a.statusLink:visited,
+    a.statusLink:hover,
+    a.statusLink:active {
+      color: inherit !important;
+      font-weight: inherit !important;
+      text-decoration: underline;
+      cursor: pointer;
+    }
 
-    /* Hover popover */
+    /* Debug line (hidden unless ?debug=1) */
+    #dbg {
+      width: 60%;
+      margin: 6px auto 0 auto;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      color: #555;
+      display: none;
+    }
+
+    /* Progress bars */
+    .lc-wrap { display: flex; flex-direction: column; gap: 6px; }
+    .lc-num  { font-weight: 600; }
+    .prog {
+      height: 12px;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+      background: #f2f2f2;
+      overflow: hidden;
+    }
+    .prog > .bar {
+      height: 100%;
+      width: 0%;
+      background: #2e7d32;
+    }
+    .lc-pct { font-size: 12px; color: #444; }
+
+    /* =========================
+       Yield hover popover (Option 2)
+       ========================= */
+    .lotLink {
+      cursor: help;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 700;
+      color: #0b5ed7;
+    }
+    .lotLink:hover { opacity: 0.85; }
+
     #yieldPopover {
       position: fixed;
       z-index: 9999;
@@ -31,7 +91,7 @@
       padding: 10px 10px 8px 10px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.45);
       color: #ddd;
-      max-width: 270px;
+      max-width: 290px;
     }
     #yieldPopover .title {
       font-size: 12px;
@@ -41,6 +101,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      max-width: 270px;
     }
     #yieldPopover .meta {
       font-size: 11px;
@@ -58,59 +119,10 @@
 </head>
 
 <body>
-  <div class="wrap">
-    <h1>ESS PRODUCTION STATUS (DEV)</h1>
-    <div class="note">
-      Hover a LOT to see a tiny yield history popover.
-      This dev page tries to load <span class="mono">yield_history.json</span> from the same folder.
-      If missing (or the lot isn’t found), it shows <b>MOCK DATA</b>.
-    </div>
+  <h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION STATUS</h2>
+  <div id="dbg"></div>
 
-    <!-- SAMPLE TABLE ONLY (replace with your real table code) -->
-    <table>
-      <thead>
-        <tr>
-          <th>TESTER</th>
-          <th>PRODUCT</th>
-          <th>LOT</th>
-          <th>STEP</th>
-          <th>STATUS</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>S100_1</td>
-          <td>ES9291Q</td>
-          <td><span class="lotLink" data-lot="TGWDS13A84">TGWDS13A84</span></td>
-          <td>B34_25C_FT1-RT1</td>
-          <td>running</td>
-        </tr>
-        <tr>
-          <td>S100_2</td>
-          <td>ES9820Q</td>
-          <td><span class="lotLink" data-lot="TGWBS00R31">TGWBS00R31</span></td>
-          <td>FT1</td>
-          <td>running</td>
-        </tr>
-        <tr>
-          <td>AP-2</td>
-          <td>ES9842</td>
-          <td><span class="lotLink" data-lot="TGWBS02G30">TGWBS02G30</span></td>
-          <td>25C_BIN2_65C_RT-2</td>
-          <td>error</td>
-        </tr>
-        <tr>
-          <td>AP-1</td>
-          <td>ES9821</td>
-          <td><span class="lotLink" data-lot="TGWDSXX959">TGWDSXX959</span></td>
-          <td>25C_BIN1_25C_FT-1</td>
-          <td>error</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Hover popover -->
+  <!-- Yield hover popover -->
   <div id="yieldPopover">
     <div class="title" id="ypTitle">Yield</div>
     <canvas id="ypCanvas" width="240" height="60"></canvas>
@@ -118,9 +130,230 @@
   </div>
 
   <script>
-    // =========================
-    // Yield history loader + MOCK fallback
-    // =========================
+    const params = new URLSearchParams(window.location.search);
+    const showLinks = params.get("links") === "1";
+    const debug = params.get("debug") === "1";
+
+    // Force title always (so runtime JS can't regress it)
+    document.title = "ESS PRODUCTION STATUS";
+
+    const dbgEl = document.getElementById("dbg");
+    if (debug) dbgEl.style.display = "block";
+    function dbg(msg) { if (debug) dbgEl.textContent = msg; }
+
+    if (showLinks) {
+      document.getElementById("pageTitle").innerHTML =
+        `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION STATUS`;
+    }
+
+    const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
+    const showTagIfPresent = params.get("tag") === "1";
+
+    // Yield history (OPTIONAL). If missing or key missing => MOCK DATA.
+    // Use relative file in same repo folder as this HTML.
+    const YIELD_HISTORY_URL = "yield_history.json";
+
+    // handler -> IP (used by STATUS row link)
+    const HANDLER_IP = {
+      "NS-3": "10.20.10.187",
+      "NS-4": "10.20.10.238",
+      "NS-5": "10.20.10.98",
+      "CHROMA": "10.20.10.38",
+    };
+
+    function equalizeLastColumn(table) {
+      if (!table) return;
+
+      const headerRow = table.querySelector("tr");
+      if (!headerRow) return;
+
+      const heads = Array.from(headerRow.children);
+      if (heads.length < 3) return;
+
+      const lastIdx = heads.length - 1;
+
+      const widths = [];
+      for (let i = 1; i <= lastIdx - 1; i++) {
+        const w = heads[i].getBoundingClientRect().width;
+        if (w > 0) widths.push(w);
+      }
+      if (!widths.length) return;
+
+      const avg = widths.reduce((a, b) => a + b, 0) / widths.length;
+
+      for (const row of Array.from(table.rows)) {
+        const cell = row.cells[lastIdx];
+        if (cell) {
+          cell.style.width = avg.toFixed(1) + "px";
+          cell.style.maxWidth = avg.toFixed(1) + "px";
+        }
+      }
+    }
+
+    function showTagBox(on) {
+      const el = document.getElementById("lotBox");
+      if (el) el.style.display = on ? "" : "none";
+    }
+
+    function shouldShowTagBoxFromTable(rows) {
+      if (!showTagIfPresent) return false;
+      if (!rows) return false;
+
+      const lotRow = (rows || []).find(r => norm(r?.[0]) === "LOT NUMBER");
+      if (!lotRow) return false;
+
+      for (let c = 1; c < lotRow.length; c++) {
+        const v = String(lotRow[c] ?? "").trim();
+        if (v && v.toUpperCase() !== "NA") return true;
+      }
+      return false;
+    }
+
+    // ===== TAGS API (Apps Script Web App) =====
+    const TAGS_API_URL =
+      "https://script.google.com/macros/s/AKfycbytwPIElO5czOhnY5wmDUnQMCltrxApfADq_C2131TjY7uo8iFbVUafTAHJAIJTYjEjSw/exec";
+
+    function $(id){ return document.getElementById(id); }
+
+    let lastCSVRows = null;
+    let lotLookupCtx = null;
+    let prevRowsByLabel = null;
+
+    function norm(s) {
+      return (s || "").toString().replace(/\r/g, "").trim().toUpperCase();
+    }
+    function toInt(x) {
+      const v = parseInt((x || "").toString().replace(/,/g, "").trim(), 10);
+      return Number.isNaN(v) ? null : v;
+    }
+    function toInt0(x) {
+      const n = parseInt(String(x ?? "").replace(/[^\d-]/g, ""), 10);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function sumAutosForCol(rows, colIndex) {
+      const a1 = rows.find(r => norm(r[0]) === "AUTO1") || [];
+      const a2 = rows.find(r => norm(r[0]) === "AUTO2") || [];
+      const a3 = rows.find(r => norm(r[0]) === "AUTO3") || [];
+      return (toInt(a1[colIndex]) || 0) + (toInt(a2[colIndex]) || 0) + (toInt(a3[colIndex]) || 0);
+    }
+
+    function parseCSV(text) {
+      const lines = text.replace(/\r/g, "").trim().split(/\n/);
+      if (!lines.length) return [];
+      const first = lines[0];
+      const delim = first.includes("\t") ? "\t" : ",";
+      return lines.map(line => line.split(delim));
+    }
+
+    function cleanUrl_(s) {
+      return String(s || "")
+        .replace(/[\s\u200B-\u200D\uFEFF]/g, "")
+        .trim();
+    }
+
+    async function tagsApiGet(action, params = {}) {
+      const base = cleanUrl_(TAGS_API_URL);
+      if (!base.startsWith("http")) throw new Error("TAGS_API_URL missing/invalid: " + base);
+
+      const qp = new URLSearchParams({ action, ...params }).toString();
+      const url = base + (base.includes("?") ? "&" : "?") + qp;
+
+      const res = await fetch(url, { cache: "no-store" });
+      const text = await res.text();
+
+      let json;
+      try { json = JSON.parse(text); }
+      catch { throw new Error(`Non-JSON response. First 200 chars:\n${text.slice(0, 200)}`); }
+
+      if (!json.ok) throw new Error(json.error || "Tags API error");
+      return json;
+    }
+
+    async function tagsApiPost(payload) {
+      const base = cleanUrl_(TAGS_API_URL);
+      if (!base.startsWith("http")) throw new Error("TAGS_API_URL missing/invalid: " + base);
+
+      const res = await fetch(base, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+        cache: "no-store",
+      });
+
+      const text = await res.text();
+
+      let json;
+      try { json = JSON.parse(text); }
+      catch { throw new Error(`Non-JSON response. First 200 chars:\n${text.slice(0, 200)}`); }
+
+      if (!json.ok) throw new Error(json.error || "Tags API error");
+      return json;
+    }
+
+    function parseDateTimeLocal(s) {
+      const raw = (s || "").toString().trim();
+      if (!raw) return null;
+
+      let x = raw.replace(" ", "T");
+      x = x.replace(/\.(\d{3})\d+/, ".$1");
+      const d = new Date(x);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+    function pad2(n) { return String(n).padStart(2, "0"); }
+    function fmtDateTime(d) {
+      return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    }
+
+    window.addEventListener("resize", () => {
+      const t = document.querySelector("table");
+      if (t) requestAnimationFrame(() => equalizeLastColumn(t));
+    });
+
+    function findRowByLabel(rows, label) {
+      const want = norm(label);
+      return (rows || []).find(r => norm(r[0]) === want) || null;
+    }
+
+    function getCellIntByLabel(rows, label, colIndex) {
+      const r = findRowByLabel(rows, label);
+      if (!r) return 0;
+      return toInt0(r[colIndex]);
+    }
+
+    function findMatchingColsForLot(rows, lotId) {
+      const lotRow = findRowByLabel(rows, "LOT NUMBER");
+      if (!lotRow) return [];
+
+      const want = norm(lotId);
+      const cols = [];
+      for (let c = 1; c < lotRow.length; c++) {
+        if (norm(lotRow[c]) === want) cols.push(c);
+      }
+      return cols;
+    }
+
+    function getStepForCol(rows, colIndex) {
+      const stepRow = findRowByLabel(rows, "TEST STEP");
+      if (!stepRow) return "";
+      return (stepRow[colIndex] || "").toString().trim();
+    }
+
+    function showLotStatus(msg, danger=false) {
+      const el = $("lotStatus");
+      el.style.color = danger ? "#b00020" : "#555";
+      el.textContent = msg;
+    }
+
+    function hideLotPanels() {
+      $("lotActions").style.display = "none";
+      $("lotEditPanel").style.display = "none";
+      $("lotEndPanel").style.display = "none";
+    }
+
+    /* =========================================================
+       Yield hover popover (LOT NUMBER + TEST STEP key)
+       ========================================================= */
     let yieldCache = null;
 
     function hash32(s) {
@@ -133,8 +366,12 @@
       return h >>> 0;
     }
 
-    function genMockLotSeries(lot, n = 18) {
-      const h = hash32(lot);
+    function yieldKey(lot, step) {
+      return String(lot || "").trim() + "|" + String(step || "").trim();
+    }
+
+    function genMockLotSeries(seedKey, n = 18) {
+      const h = hash32(seedKey);
       const testerPool = ["AP-1", "AP-2", "S100_1", "S100_2"];
       const stepPool = ["FT1", "RT-1", "RT-2", "25C_BIN1_25C_FT-1", "25C_BIN2_65C_FT-1"];
 
@@ -161,7 +398,7 @@
       if (yieldCache) return yieldCache;
 
       try {
-        const res = await fetch("yield_history.json", { cache: "no-store" });
+        const res = await fetch(YIELD_HISTORY_URL + (YIELD_HISTORY_URL.includes("?") ? "&" : "?") + "v=" + Date.now(), { cache: "no-store" });
         if (res.ok) {
           yieldCache = await res.json();
           yieldCache.__mock = false;
@@ -175,9 +412,6 @@
       return yieldCache;
     }
 
-    // =========================
-    // Popover sparkline drawing (VISIBLE ON DARK BG)
-    // =========================
     function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
 
     function drawSparkline(canvas, yieldsPct) {
@@ -186,12 +420,12 @@
 
       ctx.clearRect(0,0,w,h);
 
-      // make the line visible on dark background
+      // visible on dark background
       ctx.strokeStyle = "rgba(255,255,255,0.85)";
       ctx.fillStyle   = "rgba(255,255,255,0.85)";
       ctx.lineWidth   = 2;
 
-      // subtle baseline
+      // baseline
       ctx.save();
       ctx.globalAlpha = 0.18;
       ctx.beginPath();
@@ -222,13 +456,11 @@
         return (h - pad) - t * (h - pad*2);
       };
 
-      // line
       ctx.beginPath();
       ctx.moveTo(x(0), y(yieldsPct[0]));
       for (let i=1; i<n; i++) ctx.lineTo(x(i), y(yieldsPct[i]));
       ctx.stroke();
 
-      // last dot
       const lx = x(n-1), ly = y(yieldsPct[n-1]);
       ctx.beginPath();
       ctx.arc(lx, ly, 3.0, 0, Math.PI*2);
@@ -253,23 +485,29 @@
       pop.style.top  = top + 'px';
     }
 
-    async function showYieldPopoverForLot(lot, ev) {
+    function hideYieldPopover() {
+      const pop = document.getElementById('yieldPopover');
+      pop.style.display = 'none';
+    }
+
+    async function showYieldPopoverForLotStep(lot, step, ev) {
       const pop = document.getElementById('yieldPopover');
       const title = document.getElementById('ypTitle');
       const meta = document.getElementById('ypMeta');
       const canvas = document.getElementById('ypCanvas');
 
-      title.textContent = `Yield — ${lot}`;
-      meta.textContent = 'Loading...';
-
       const hist = await loadYieldHistory();
       const isMock = !!hist.__mock;
 
-      let rows = (hist && hist[lot]) ? hist[lot] : [];
+      const key = yieldKey(lot, step);
+
+      let rows = (hist && hist[key]) ? hist[key] : [];
       if (!rows.length) {
-        rows = genMockLotSeries(lot, 18);
-        hist[lot] = rows; // cache mock per-lot
+        rows = genMockLotSeries(key, 18);
+        hist[key] = rows;
       }
+
+      title.textContent = `Yield — ${lot} / ${step}`;
 
       const yieldsPct = rows.map(r => Math.round((r.yield || 0) * 10000) / 100);
       drawSparkline(canvas, yieldsPct);
@@ -282,40 +520,410 @@
           prefix +
           `Last: ${last.t || ''}\n` +
           `Yield: ${y}%  (${last.good}/${last.total})\n` +
-          `${last.tester || ''}  ${last.step || ''}`;
+          `${last.tester || ''}  ${(last.step || step)}`;
       } else {
-        meta.textContent = (isMock ? "MOCK DATA\n" : "") + "No history for this lot.";
+        meta.textContent = (isMock ? "MOCK DATA\n" : "") + "No history for this lot/step.";
       }
 
       positionPopoverNearMouse(pop, ev);
     }
 
-    function hideYieldPopover() {
-      document.getElementById('yieldPopover').style.display = 'none';
-    }
-
-    // keep popover near cursor while visible
+    // follow mouse while visible
     document.addEventListener('mousemove', (ev) => {
       const pop = document.getElementById('yieldPopover');
-      if (pop.style.display === 'block') positionPopoverNearMouse(pop, ev);
+      if (pop && pop.style.display === 'block') positionPopoverNearMouse(pop, ev);
     });
 
     let hoverTimer = null;
-
     document.addEventListener('mouseover', (ev) => {
       const el = ev.target.closest('.lotLink');
       if (!el) return;
-      const lot = el.getAttribute('data-lot') || el.textContent.trim();
-      if (!lot) return;
-      clearTimeout(hoverTimer);
-      hoverTimer = setTimeout(() => showYieldPopoverForLot(lot, ev), 120);
-    });
 
+      const lot = (el.getAttribute('data-lot') || el.textContent || "").trim();
+      const step = (el.getAttribute('data-step') || "").trim();
+      if (!lot || !step) return; // require pair
+
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(() => showYieldPopoverForLotStep(lot, step, ev), 120);
+    });
     document.addEventListener('mouseout', (ev) => {
       const el = ev.target.closest('.lotLink');
       if (!el) return;
       clearTimeout(hoverTimer);
       hideYieldPopover();
+    });
+
+    /* ========================================================= */
+
+    async function loadCSV() {
+      try {
+        dbg("Loading CSV…");
+
+        const resp = await fetch(
+          CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "v=" + Date.now(),
+          { cache: "no-store" }
+        );
+
+        if (!resp.ok) {
+          dbg(`CSV fetch failed: ${resp.status} ${resp.statusText}`);
+          return;
+        }
+
+        const text = await resp.text();
+        const rows = parseCSV(text);
+
+        if (!rows.length) {
+          dbg("CSV parsed but rows is empty.");
+          return;
+        }
+
+        showTagBox(shouldShowTagBoxFromTable(rows));
+
+        // ✅ HANDLER row tells us which handler belongs to each tester column
+        const handlerRow = rows.find(r => norm(r[0]) === "HANDLER") || [];
+        function handlerAtCol(colIndex) {
+          return (handlerRow[colIndex] || "").toString().trim().toUpperCase();
+        }
+
+        // STATUS per column
+        const statusRow = rows.find(r => norm(r[0]) === "STATUS") || [];
+        const statusByCol = {};
+        for (let c = 1; c < statusRow.length; c++) {
+          statusByCol[c] = (statusRow[c] || "").toString().trim().toLowerCase();
+        }
+
+        // TOTAL IN per column
+        const totalInRow = rows.find(r => norm(r[0]) === "TOTAL IN") || [];
+        const totalInByCol = {};
+        for (let c = 1; c < totalInRow.length; c++) {
+          const v = toInt(totalInRow[c]);
+          if (v !== null) totalInByCol[c] = v;
+        }
+
+        // TOTAL row
+        const totalRow = rows.find(r => norm(r[0]) === "TOTAL") || [];
+
+        // Freeze numeric values when STATUS=error for that column
+        const freezeLabels = new Set(["TOTAL IN", "LOADING COUNTS", "TOTAL", "AUTO1", "AUTO2", "AUTO3"]);
+        if (prevRowsByLabel) {
+          for (const r of rows) {
+            const label = norm(r[0]);
+            if (!freezeLabels.has(label)) continue;
+
+            const prevRow = prevRowsByLabel[label];
+            if (!prevRow) continue;
+
+            for (let c = 1; c < r.length; c++) {
+              if ((statusByCol[c] || "") === "error") {
+                const prevVal = prevRow[c];
+                if (prevVal !== undefined && String(prevVal).trim() !== "") {
+                  r[c] = prevVal;
+                }
+              }
+            }
+          }
+        }
+
+        lastCSVRows = rows;
+
+        function findLastRow(rows, label) {
+          const want = norm(label);
+          for (let i = rows.length - 1; i >= 0; i--) {
+            if (norm(rows[i]?.[0]) === want) return rows[i];
+          }
+          return null;
+        }
+
+        const startRow   = rows.find(r => norm(r[0]) === "DATE LOT STARTED") || [];
+        const lastUpdRow = findLastRow(rows, "LAST UPDATE") || [];
+        const loadingRow = rows.find(r => norm(r[0]) === "LOADING COUNTS") || [];
+
+        const estFinishRow = [];
+        estFinishRow[0] = "ESTIMATED FINISH";
+
+        const maxColsEF = Math.max(...rows.map(r => r.length));
+        for (let c = 1; c < maxColsEF; c++) {
+          const startDt = parseDateTimeLocal(startRow[c]);
+          const updDt   = parseDateTimeLocal(lastUpdRow[c]);
+
+          const loading = toInt(loadingRow[c]);
+          const totalIn = totalInByCol[c];
+
+          if (!startDt || !updDt || loading === null || !totalIn || totalIn <= 0) {
+            estFinishRow[c] = "";
+            continue;
+          }
+
+          const elapsedMs = updDt.getTime() - startDt.getTime();
+          const progress = loading / totalIn;
+
+          if (elapsedMs <= 0 || progress <= 0) {
+            estFinishRow[c] = "";
+            continue;
+          }
+
+          const p = Math.min(1, Math.max(0.000001, progress));
+          const estTotalMs = elapsedMs / p;
+          const finishDt = new Date(startDt.getTime() + estTotalMs);
+
+          estFinishRow[c] = fmtDateTime(finishDt);
+        }
+
+        const idxTotalIn = rows.findIndex(r => norm(r[0]) === "TOTAL IN");
+        const insertAt = idxTotalIn >= 0 ? idxTotalIn + 1 : rows.length;
+        rows.splice(insertAt, 0, estFinishRow);
+
+        // Precompute autoSum
+        const autoSumByCol = {};
+        const maxCols = Math.max(...rows.map(r => r.length));
+        for (let c = 1; c < maxCols; c++) {
+          autoSumByCol[c] = sumAutosForCol(rows, c);
+        }
+
+        // Build table
+        const table = document.createElement("table");
+
+        rows.forEach((row, rowIndex) => {
+          const nonEmptyCount = row.filter(cell => {
+            const cc = norm(cell);
+            return cc !== "" && cc !== "NA";
+          }).length;
+          if (nonEmptyCount === 0) return;
+
+          const tr = document.createElement("tr");
+          const isHeader = rowIndex === 0;
+          const rowLabel = norm(row[0]);
+          const isTesterOrHandlerRow = !isHeader && row.some(cell => /tester|handler/i.test((cell || "").toString()));
+
+          row.forEach((cell, colIndex) => {
+            let cellContent = (cell ?? "").toString();
+            const c = cellContent.trim().toUpperCase();
+
+            // links mode: TESTER header links
+            if (isHeader && c === "TESTER") {
+              cellContent = showLinks
+                ? `<a href="https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0" target="_blank">TESTER</a>`
+                : "TESTER";
+            }
+
+            // Handler links (non-header only) - your existing behavior
+            if (!isHeader) {
+              if (c === "CHROMA") cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e" target="_blank">CHROMA</a>` : "CHROMA";
+              if (c === "NS-3")   cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46" target="_blank">NS-3</a>`   : "NS-3";
+              if (c === "NS-4")   cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/66fa4727-e6b5-4a1a-855d-1f266270b950" target="_blank">NS-4</a>`   : "NS-4";
+              if (c === "NS-5")   cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/468fc957-7879-440e-b1ea-b7e7dfef37f6" target="_blank">NS-5</a>`   : "NS-5";
+            }
+
+            // VNC links
+            if (showLinks && c === "AP-1")   cellContent = `<a href="vnc://AP-1">AP-1</a>`;
+            if (showLinks && c === "AP-2")   cellContent = `<a href="vnc://AP-2">AP-2</a>`;
+            if (showLinks && c === "S100_1") cellContent = `<a href="vnc://S100-1">S100_1</a>`;
+            if (showLinks && c === "S100_2") cellContent = `<a href="vnc://S100-2">S100_2</a>`;
+
+            // LOADING COUNTS progress
+            if (!isHeader && rowLabel === "LOADING COUNTS" && colIndex > 0) {
+              const loading = toInt(cell);
+              const totalIn = totalInByCol[colIndex];
+              if (loading !== null && totalIn && totalIn > 0) {
+                let pct = (loading / totalIn) * 100;
+                pct = Math.max(0, Math.min(100, pct));
+                cellContent = `
+                  <div class="lc-wrap">
+                    <div class="lc-num">${loading.toLocaleString()}</div>
+                    <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                  </div>
+                `;
+              }
+            }
+
+            // AUTO1/2/3 progress (same pattern)
+            if (!isHeader && (rowLabel === "AUTO1" || rowLabel === "AUTO 1") && colIndex > 0) {
+              const auto1 = toInt(cell);
+              const total = toInt(totalRow[colIndex]);
+              if (auto1 !== null && total !== null && total > 0) {
+                let pct = (auto1 / total) * 100;
+                pct = Math.max(0, Math.min(100, pct));
+                cellContent = `
+                  <div class="lc-wrap">
+                    <div class="lc-num">${auto1.toLocaleString()}</div>
+                    <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                  </div>
+                `;
+              }
+            }
+
+            if (!isHeader && (rowLabel === "AUTO2" || rowLabel === "AUTO 2") && colIndex > 0) {
+              const auto2 = toInt(cell);
+              const total = toInt(totalRow[colIndex]);
+              if (auto2 !== null && total !== null && total > 0) {
+                let pct = (auto2 / total) * 100;
+                pct = Math.max(0, Math.min(100, pct));
+                cellContent = `
+                  <div class="lc-wrap">
+                    <div class="lc-num">${auto2.toLocaleString()}</div>
+                    <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                  </div>
+                `;
+              }
+            }
+
+            if (!isHeader && (rowLabel === "AUTO3" || rowLabel === "AUTO 3") && colIndex > 0) {
+              const auto3 = toInt(cell);
+              const total = toInt(totalRow[colIndex]);
+              if (auto3 !== null && total !== null && total > 0) {
+                let pct = (auto3 / total) * 100;
+                pct = Math.max(0, Math.min(100, pct));
+                cellContent = `
+                  <div class="lc-wrap">
+                    <div class="lc-num">${auto3.toLocaleString()}</div>
+                    <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                  </div>
+                `;
+              }
+            }
+
+            // ✅ STATUS row links:
+            // Link goes to: http://<IP>/latest.png (with ts cache-bust)
+            if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
+              const hname = handlerAtCol(colIndex); // CHROMA / NS-3 / NS-4 / NS-5
+              const ip = HANDLER_IP[hname];
+              if (ip) {
+                const url = `http://${ip}:8080/latest.png?ts=${Date.now()}`;
+                cellContent = `<a class="statusLink" href="${url}" target="_blank" rel="noopener">${cellContent}</a>`;
+              }
+            }
+
+            // ✅ LOT NUMBER cells become hover targets for Yield (requires step too)
+            // Key is (LOT NUMBER, TEST STEP) for that same tester column.
+            if (!isHeader && rowLabel === "LOT NUMBER" && colIndex > 0) {
+              const lot = (cell ?? "").toString().trim();
+              const step = getStepForCol(rows, colIndex);
+              const lotUpper = lot.toUpperCase();
+
+              if (lot && lotUpper !== "NA" && step) {
+                // keep display text same, but add data-lot + data-step
+                cellContent = `<span class="lotLink" data-lot="${lot.replace(/"/g, "&quot;")}" data-step="${step.replace(/"/g, "&quot;")}">${lot}</span>`;
+              } else {
+                // if no step, show plain text
+                cellContent = lot;
+              }
+            }
+
+            const cellEl = document.createElement(isHeader ? "th" : "td");
+            cellEl.innerHTML = cellContent;
+
+            // First column styling
+            if (colIndex === 0) {
+              cellEl.style.backgroundColor = isHeader ? "#2c3e50" : "#dff0d8";
+              if (isHeader) {
+                cellEl.style.color = "white";
+                cellEl.style.fontWeight = "bold";
+              }
+            }
+
+            // Tester/Handler row highlight
+            if (isTesterOrHandlerRow && !isHeader) {
+              cellEl.style.backgroundColor = "#fef2d0";
+              cellEl.style.fontWeight = "bold";
+            }
+
+            // STATUS cell coloring
+            if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
+              const st = (cell || "").toString().trim().toLowerCase();
+
+              if (st === "running") {
+                cellEl.style.color = "green";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#dff6df";
+              }
+              if (st === "error") {
+                cellEl.style.color = "red";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#ffd6d6";
+              }
+              if (st === "stopped") {
+                cellEl.style.color = "goldenrod";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#fff3cd";
+              }
+              if (st === "maint") {
+                cellEl.style.color = "blue";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#d6e6ff";
+              }
+            }
+
+            // ===== Number checks =====
+            if (!isHeader && colIndex > 0) {
+              const autoSum = autoSumByCol[colIndex] || 0;
+
+              if (rowLabel === "LOADING COUNTS") {
+                const loading = toInt(cell);
+                if (loading !== null && loading < autoSum) {
+                  cellEl.style.backgroundColor = "#ffd6d6";
+                  cellEl.style.fontWeight = "bold";
+                  cellEl.style.color = "red";
+                }
+              }
+
+              if (rowLabel === "TOTAL") {
+                const total = toInt(cell);
+                if (total !== null && total < autoSum) {
+                  cellEl.style.backgroundColor = "#ffd6d6";
+                  cellEl.style.fontWeight = "bold";
+                  cellEl.style.color = "red";
+                }
+              }
+
+              if (rowLabel === "TOTAL IN") {
+                const totalIn = toInt(cell);
+                const loading = toInt(loadingRow[colIndex]);
+                if (totalIn !== null && loading !== null && totalIn < loading) {
+                  cellEl.style.backgroundColor = "#ffd6d6";
+                  cellEl.style.fontWeight = "bold";
+                  cellEl.style.color = "red";
+                }
+              }
+            }
+
+            tr.appendChild(cellEl);
+          });
+
+          table.appendChild(tr);
+        });
+
+        const old = document.querySelector("table");
+        if (old) old.remove();
+
+        // Insert table before popover so popover stays last in DOM
+        const pop = document.getElementById("yieldPopover");
+        if (pop) document.body.insertBefore(table, pop);
+        else document.body.appendChild(table);
+
+        requestAnimationFrame(() => equalizeLastColumn(table));
+
+        // Update prev snapshot
+        const newPrev = {};
+        for (const r of rows) {
+          const label = norm(r[0]);
+          if (label) newPrev[label] = r.slice();
+        }
+        prevRowsByLabel = newPrev;
+
+        dbg("Rendered OK.");
+      } catch (e) {
+        console.error(e);
+        dbg("JS error. Open console.");
+      }
+    }
+
+    window.addEventListener("load", () => {
+      loadCSV();
+      setInterval(loadCSV, 30000);
     });
   </script>
 </body>
