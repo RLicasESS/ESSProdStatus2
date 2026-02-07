@@ -5,32 +5,10 @@
   <meta charset="utf-8" />
   <title>ESS PRODUCTION STATUS (DEV)</title>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; }
-    h2 { margin: 14px 0 6px 0; text-align:center; }
-
-    /* Top controls */
-    #ctl {
-      width: 60%;
-      margin: 0 auto 10px auto;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      font-size: 13px;
-      color: #333;
-    }
-    #ctl label { display:flex; gap:6px; align-items:center; }
-    #ctl select, #ctl input[type="number"] {
-      font-size: 13px;
-      padding: 2px 6px;
-    }
-    #ctl .hint { color:#666; font-size:12px; }
-
     table {
       border-collapse: collapse;
       width: 60%;
-      margin: 10px auto 20px auto;
+      margin: 20px auto;
       font-family: Arial, sans-serif;
     }
     th, td {
@@ -58,17 +36,16 @@
       cursor: pointer;
     }
 
-    /* Debug line (hidden unless ?debug=1) */
     #dbg {
       width: 60%;
       margin: 6px auto 0 auto;
+      font-family: Arial, sans-serif;
       font-size: 13px;
       color: #555;
       display: none;
       white-space: pre-wrap;
     }
 
-    /* Progress bars */
     .lc-wrap { display: flex; flex-direction: column; gap: 6px; }
     .lc-num  { font-weight: 600; }
     .prog {
@@ -78,15 +55,15 @@
       background: #f2f2f2;
       overflow: hidden;
     }
-    .prog > .bar { height: 100%; width: 0%; background: #2e7d32; }
+    .prog > .bar {
+      height: 100%;
+      width: 0%;
+      background: #2e7d32;
+    }
     .lc-pct { font-size: 12px; color: #444; }
 
-    /* ===== Yield hover mini chart ===== */
-    .yieldHover {
-      position: relative;
-      display: inline-block;
-      cursor: help;
-    }
+    /* ===== Yield hover mini chart (CSS-only popup) ===== */
+    .yieldHover { position: relative; display: inline-block; cursor: help; }
     .yieldHover:hover .yieldTip { display: block; }
 
     .yieldTip {
@@ -95,7 +72,7 @@
       left: 0;
       top: 110%;
       min-width: 260px;
-      max-width: 280px;
+      max-width: 300px;
       background: #fff;
       border: 1px solid #aaa;
       border-radius: 10px;
@@ -119,7 +96,7 @@
     }
     .yieldCanvas {
       width: 240px;
-      height: 70px;
+      height: 80px;
       border: 1px solid #ddd;
       border-radius: 8px;
       display: block;
@@ -136,58 +113,54 @@
       margin-top: 6px;
       font-size: 11px;
       color: #777;
-      white-space: pre-wrap;
+    }
+    .yieldRaw {
+      margin-top: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 10px;
+      color: #444;
+      background: #f7f7f7;
+      border: 1px solid #e4e4e4;
+      border-radius: 8px;
+      padding: 6px;
+      max-height: 120px;
+      overflow: auto;
+      display: none; /* only when ?showraw=1 */
+      white-space: pre;
     }
   </style>
 </head>
 
 <body>
-  <h2 id="pageTitle">ESS PRODUCTION STATUS (DEV)</h2>
-
-  <!-- Controls (persisted in localStorage) -->
-  <div id="ctl">
-    <label>Yield:
-      <select id="modeSel">
-        <option value="real">Real</option>
-        <option value="mock">Mock</option>
-      </select>
-    </label>
-
-    <label>Smooth:
-      <select id="smoothSel">
-        <option value="off">Off</option>
-        <option value="ema3">EMA (fast)</option>
-        <option value="ema6">EMA (slow)</option>
-        <option value="med3">Median(3)</option>
-      </select>
-    </label>
-
-    <label>Y-axis:
-      <select id="ySel">
-        <option value="full">Full (0–100)</option>
-        <option value="auto">Auto zoom</option>
-        <option value="tight5">Tight ±5%</option>
-      </select>
-    </label>
-
-    <label title="Show last N raw points in tooltip">
-      <input id="rawChk" type="checkbox" />
-      Raw
-    </label>
-
-    <label title="How many raw points to show">
-      N <input id="rawN" type="number" min="3" max="60" value="10" style="width:56px;" />
-    </label>
-
-    <span class="hint" id="ctlHint"></span>
-  </div>
-
+  <h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION STATUS (DEV)</h2>
   <div id="dbg"></div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const showLinks = params.get("links") === "1";
     const debug = params.get("debug") === "1";
+    const showTagIfPresent = params.get("tag") === "1";
+
+    // Yield source:
+    //   ?yield=real  -> fetch yield_live.json (default)
+    //   ?yield=mock  -> mock series only
+    const yieldMode = (params.get("yield") || "real").toLowerCase();
+
+    // New controls:
+    //   ?clean=1 (default) -> sanitize obvious OCR/counter glitches
+    //   ?smooth=none|ema|median (default none)
+    //   ?alpha=0.35  (EMA alpha, used when smooth=ema)
+    //   ?med=5       (median window, odd, used when smooth=median)
+    //   ?yzoom=1 (default 1) -> zoom Y axis to series range with padding
+    //   ?ypad=0.02   (zoom padding)
+    //   ?showraw=1   -> show last few raw points in tooltip
+    const cleanOn = (params.get("clean") ?? "1") === "1";
+    const smoothMode = (params.get("smooth") || "none").toLowerCase();
+    const emaAlpha = Number(params.get("alpha") || "0.35");
+    const medWin = Math.max(3, Math.min(15, parseInt(params.get("med") || "5", 10) || 5));
+    const yZoom = (params.get("yzoom") ?? "1") === "1";
+    const yPad = Math.max(0, Math.min(0.2, Number(params.get("ypad") || "0.02")));
+    const showRaw = params.get("showraw") === "1";
 
     document.title = "ESS PRODUCTION STATUS (DEV)";
 
@@ -203,7 +176,6 @@
     const CSV_URL   = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
     const YIELD_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
 
-    // handler -> IP (used by STATUS row link)
     const HANDLER_IP = {
       "NS-3": "10.20.10.187",
       "NS-4": "10.20.10.238",
@@ -211,124 +183,11 @@
       "CHROMA": "10.20.10.38",
     };
 
-    // ---------- UI (persisted) ----------
-    const ui = {
-      mode: (params.get("yield") || "real").toLowerCase(),   // real/mock
-      smooth: (params.get("smooth") || "off").toLowerCase(), // off/ema3/ema6/med3
-      yScale: (params.get("y") || "auto").toLowerCase(),     // full/auto/tight5
-      showRaw: (params.get("raw") === "1"),
-      rawN: Math.max(3, Math.min(60, parseInt(params.get("rawN") || "10", 10) || 10)),
-    };
-
-    const LS_KEY = "index_dev_yield_ui_v1";
-
-    function loadUiFromLS() {
-      try {
-        const j = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
-        if (typeof j.mode === "string") ui.mode = j.mode;
-        if (typeof j.smooth === "string") ui.smooth = j.smooth;
-        if (typeof j.yScale === "string") ui.yScale = j.yScale;
-        if (typeof j.showRaw === "boolean") ui.showRaw = j.showRaw;
-        if (typeof j.rawN === "number") ui.rawN = Math.max(3, Math.min(60, j.rawN));
-      } catch {}
-    }
-    function saveUiToLS() {
-      try { localStorage.setItem(LS_KEY, JSON.stringify(ui)); } catch {}
-    }
-
-    // Allow URL params to override LS (so you can share links)
-    loadUiFromLS();
-
-    const modeSel  = document.getElementById("modeSel");
-    const smoothSel= document.getElementById("smoothSel");
-    const ySel     = document.getElementById("ySel");
-    const rawChk   = document.getElementById("rawChk");
-    const rawNInp  = document.getElementById("rawN");
-    const ctlHint  = document.getElementById("ctlHint");
-
-    function syncUiToControls() {
-      modeSel.value = (ui.mode === "mock") ? "mock" : "real";
-      smoothSel.value = ["off","ema3","ema6","med3"].includes(ui.smooth) ? ui.smooth : "off";
-      ySel.value = ["full","auto","tight5"].includes(ui.yScale) ? ui.yScale : "auto";
-      rawChk.checked = !!ui.showRaw;
-      rawNInp.value = ui.rawN;
-      ctlHint.textContent = `mode=${modeSel.value} smooth=${smoothSel.value} y=${ySel.value}`;
-    }
-
-    function clearYieldDrawCache() {
-      // force all tooltips to redraw next hover
-      document.querySelectorAll(".yieldHover").forEach(el => {
-        el.dataset.loaded = "0";
-      });
-    }
-
-    function onUiChanged() {
-      ui.mode = modeSel.value;
-      ui.smooth = smoothSel.value;
-      ui.yScale = ySel.value;
-      ui.showRaw = rawChk.checked;
-      ui.rawN = Math.max(3, Math.min(60, parseInt(rawNInp.value || "10", 10) || 10));
-
-      saveUiToLS();
-      yieldCache = null;
-      yieldCacheMode = null;
-      clearYieldDrawCache();
-      syncUiToControls();
-      loadCSV(); // re-render now
-    }
-
-    modeSel.addEventListener("change", onUiChanged);
-    smoothSel.addEventListener("change", onUiChanged);
-    ySel.addEventListener("change", onUiChanged);
-    rawChk.addEventListener("change", onUiChanged);
-    rawNInp.addEventListener("change", onUiChanged);
-
-    syncUiToControls();
-
-    // ---------- utils ----------
-    function norm(s) { return (s || "").toString().replace(/\r/g, "").trim().toUpperCase(); }
-    function escHtml(s) {
-      return String(s ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
-    function clamp01(x) {
-      const v = Number(x);
-      if (!Number.isFinite(v)) return 0;
-      return Math.max(0, Math.min(1, v));
-    }
-    function toInt(x) {
-      const v = parseInt((x || "").toString().replace(/,/g, "").trim(), 10);
-      return Number.isNaN(v) ? null : v;
-    }
-    function pad2(n) { return String(n).padStart(2, "0"); }
-    function fmtDateTime(d) {
-      return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-    }
-    function parseDateTimeLocal(s) {
-      const raw = (s || "").toString().trim();
-      if (!raw) return null;
-      let x = raw.replace(" ", "T");
-      x = x.replace(/\.(\d{3})\d+/, ".$1");
-      const d = new Date(x);
-      return Number.isNaN(d.getTime()) ? null : d;
-    }
-
-    function parseCSV(text) {
-      const lines = text.replace(/\r/g, "").trim().split(/\n/);
-      if (!lines.length) return [];
-      const first = lines[0];
-      const delim = first.includes("\t") ? "\t" : ",";
-      return lines.map(line => line.split(delim));
-    }
-
     function equalizeLastColumn(table) {
       if (!table) return;
       const headerRow = table.querySelector("tr");
       if (!headerRow) return;
+
       const heads = Array.from(headerRow.children);
       if (heads.length < 3) return;
       const lastIdx = heads.length - 1;
@@ -339,8 +198,8 @@
         if (w > 0) widths.push(w);
       }
       if (!widths.length) return;
-      const avg = widths.reduce((a, b) => a + b, 0) / widths.length;
 
+      const avg = widths.reduce((a, b) => a + b, 0) / widths.length;
       for (const row of Array.from(table.rows)) {
         const cell = row.cells[lastIdx];
         if (cell) {
@@ -348,6 +207,61 @@
           cell.style.maxWidth = avg.toFixed(1) + "px";
         }
       }
+    }
+
+    function showTagBox(on) {
+      const el = document.getElementById("lotBox");
+      if (el) el.style.display = on ? "" : "none";
+    }
+
+    function shouldShowTagBoxFromTable(rows) {
+      if (!showTagIfPresent) return false;
+      if (!rows) return false;
+
+      const lotRow = (rows || []).find(r => norm(r?.[0]) === "LOT NUMBER");
+      if (!lotRow) return false;
+
+      for (let c = 1; c < lotRow.length; c++) {
+        const v = String(lotRow[c] ?? "").trim();
+        if (v && v.toUpperCase() !== "NA") return true;
+      }
+      return false;
+    }
+
+    function norm(s) { return (s || "").toString().replace(/\r/g, "").trim().toUpperCase(); }
+
+    function toInt(x) {
+      const v = parseInt((x || "").toString().replace(/,/g, "").trim(), 10);
+      return Number.isNaN(v) ? null : v;
+    }
+
+    function sumAutosForCol(rows, colIndex) {
+      const a1 = rows.find(r => norm(r[0]) === "AUTO1") || [];
+      const a2 = rows.find(r => norm(r[0]) === "AUTO2") || [];
+      const a3 = rows.find(r => norm(r[0]) === "AUTO3") || [];
+      return (toInt(a1[colIndex]) || 0) + (toInt(a2[colIndex]) || 0) + (toInt(a3[colIndex]) || 0);
+    }
+
+    function parseCSV(text) {
+      const lines = text.replace(/\r/g, "").trim().split(/\n/);
+      if (!lines.length) return [];
+      const first = lines[0];
+      const delim = first.includes("\t") ? "\t" : ",";
+      return lines.map(line => line.split(delim));
+    }
+
+    function parseDateTimeLocal(s) {
+      const raw = (s || "").toString().trim();
+      if (!raw) return null;
+      let x = raw.replace(" ", "T");
+      x = x.replace(/\.(\d{3})\d+/, ".$1");
+      const d = new Date(x);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    function pad2(n) { return String(n).padStart(2, "0"); }
+    function fmtDateTime(d) {
+      return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
     }
 
     window.addEventListener("resize", () => {
@@ -365,25 +279,27 @@
       if (!stepRow) return "";
       return (stepRow[colIndex] || "").toString().trim();
     }
+
     function getLotForCol(rows, colIndex) {
       const lotRow = findRowByLabel(rows, "LOT NUMBER");
       if (!lotRow) return "";
       return (lotRow[colIndex] || "").toString().trim();
     }
 
-    function sumAutosForCol(rows, colIndex) {
-      const a1 = rows.find(r => norm(r[0]) === "AUTO1") || [];
-      const a2 = rows.find(r => norm(r[0]) === "AUTO2") || [];
-      const a3 = rows.find(r => norm(r[0]) === "AUTO3") || [];
-      return (toInt(a1[colIndex]) || 0) + (toInt(a2[colIndex]) || 0) + (toInt(a3[colIndex]) || 0);
+    // ====== Yield hover HTML ======
+    function escHtml(s) {
+      return String(s ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
     }
 
-    // ---------- Yield hover HTML ----------
     function yieldHoverHtml(labelText, lot, step, which) {
       const lot2 = (lot || "").trim();
       const step2 = (step || "").trim();
-      const which2 = (which || "").trim().toUpperCase();
-
+      const which2 = (which || "").trim();
       return `
         <span class="yieldHover"
               data-lot="${escHtml(lot2)}"
@@ -393,17 +309,24 @@
           <div class="yieldTip">
             <div class="yieldTipTitle">${escHtml(which2)} yield history</div>
             <div class="yieldTipSub">${escHtml(lot2)} / ${escHtml(step2)}</div>
-            <canvas class="yieldCanvas" width="240" height="70"></canvas>
+            <canvas class="yieldCanvas" width="240" height="80"></canvas>
             <div class="yieldLegend"><span>old</span><span>new</span></div>
             <div class="yieldNote" data-note>Loading…</div>
+            <div class="yieldRaw" data-raw></div>
           </div>
         </span>
       `;
     }
 
-    // ---------- Yield cache ----------
+    // ====== Yield data loader ======
     let yieldCache = null;
     let yieldCacheMode = null;
+
+    function nowIsoNoMs() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2,"0");
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
 
     async function fetchJson(url) {
       const res = await fetch(url + (url.includes("?") ? "&" : "?") + "v=" + Date.now(), { cache: "no-store" });
@@ -412,16 +335,15 @@
       return JSON.parse(txt);
     }
 
-    function nowIsoNoMs() {
-      const d = new Date();
-      return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
-    }
-
     function makeMockYieldJsonFromRows(rows) {
-      const out = { meta:{ updated: nowIsoNoMs(), mode:"mock" }, data:{} };
+      // mock shape: { data: { "LOT||STEP": { AUTO1:[...], AUTO2:[...] } } }
+      const out = {
+        meta: { updated: nowIsoNoMs(), mode: "mock", note: "Mock series derived from current table." },
+        data: {}
+      };
 
-      const lotRow   = findRowByLabel(rows, "LOT NUMBER") || [];
-      const stepRow  = findRowByLabel(rows, "TEST STEP") || [];
+      const lotRow = findRowByLabel(rows, "LOT NUMBER") || [];
+      const stepRow = findRowByLabel(rows, "TEST STEP") || [];
       const totalRow = findRowByLabel(rows, "TOTAL") || [];
       const auto1Row = findRowByLabel(rows, "AUTO1") || [];
       const auto2Row = findRowByLabel(rows, "AUTO2") || [];
@@ -429,7 +351,7 @@
       const maxCols = Math.max(lotRow.length, stepRow.length, totalRow.length, auto1Row.length, auto2Row.length);
       for (let c = 1; c < maxCols; c++) {
         const lot = (lotRow[c] || "").toString().trim();
-        const step= (stepRow[c] || "").toString().trim();
+        const step = (stepRow[c] || "").toString().trim();
         if (!lot || lot.toUpperCase() === "NA") continue;
         if (!step || step.toUpperCase() === "NA") continue;
 
@@ -437,31 +359,33 @@
         const a1 = toInt(auto1Row[c]) || 0;
         const a2 = toInt(auto2Row[c]) || 0;
 
-        const y1 = total > 0 ? a1/total : 0;
-        const y2 = total > 0 ? a2/total : 0;
+        const y1 = total > 0 ? (a1 / total) : 0;
+        const y2 = total > 0 ? (a2 / total) : 0;
 
-        function mkObjects(y, tester) {
+        const key = `${lot}||${step}`;
+
+        function mkSeries(y) {
           const pts = [];
-          let base = clamp01(y);
-          let v = clamp01(base - 0.03);
-          for (let i=0;i<11;i++) {
-            v = clamp01(v + (base - v)*0.25 + (Math.random()-0.5)*0.02);
-            pts.push({ t: nowIsoNoMs(), tester: tester || "DEV", good: Math.round(v*10000), total: 10000, yield: v });
+          let base = Math.max(0, Math.min(1, y));
+          let v = Math.max(0, Math.min(1, base - 0.06));
+          for (let i = 0; i < 11; i++) {
+            v = v + (base - v) * 0.25 + (Math.random() - 0.5) * 0.02;
+            v = Math.max(0, Math.min(1, v));
+            pts.push(v);
           }
-          pts.push({ t: nowIsoNoMs(), tester: tester || "DEV", good: Math.round(base*10000), total: 10000, yield: base });
+          pts.push(base);
           return pts;
         }
 
-        out.data[`${lot}|${step}|AUTO1`] = mkObjects(y1, "DEV");
-        out.data[`${lot}|${step}|AUTO2`] = mkObjects(y2, "DEV");
+        out.data[key] = { lot, step, AUTO1: mkSeries(y1), AUTO2: mkSeries(y2) };
       }
       return out;
     }
 
     async function loadYieldCache(rowsForMock) {
-      if (yieldCache && yieldCacheMode === ui.mode) return yieldCache;
+      if (yieldCache && yieldCacheMode === yieldMode) return yieldCache;
 
-      if (ui.mode === "mock") {
+      if (yieldMode === "mock") {
         yieldCache = makeMockYieldJsonFromRows(rowsForMock || []);
         yieldCacheMode = "mock";
         return yieldCache;
@@ -479,137 +403,189 @@
       }
     }
 
-    // IMPORTANT: your yield_live.json keys look like:
-    //   LOT|STEP|AUTO1  and value is an array of objects: {t, tester, good, total, yield}
-    function getYieldPoints(yj, lot, step, which) {
+    function clamp01(x) { return Math.max(0, Math.min(1, x)); }
+
+    // --- Smoothing helpers ---
+    function smoothEMA(vals, alpha) {
+      const a = (Number.isFinite(alpha) ? alpha : 0.35);
+      if (!vals.length) return vals.slice();
+      const out = [];
+      let s = vals[0];
+      out.push(s);
+      for (let i = 1; i < vals.length; i++) {
+        s = a * vals[i] + (1 - a) * s;
+        out.push(s);
+      }
+      return out;
+    }
+
+    function median(arr) {
+      const a = arr.slice().sort((x,y)=>x-y);
+      const m = Math.floor(a.length/2);
+      return (a.length % 2) ? a[m] : (a[m-1] + a[m]) / 2;
+    }
+
+    function smoothMedian(vals, win) {
+      const w = (win % 2 === 1) ? win : (win + 1);
+      const half = Math.floor(w/2);
+      const out = [];
+      for (let i = 0; i < vals.length; i++) {
+        const lo = Math.max(0, i - half);
+        const hi = Math.min(vals.length, i + half + 1);
+        out.push(median(vals.slice(lo, hi)));
+      }
+      return out;
+    }
+
+    function applySmoothing(vals) {
+      if (!vals || vals.length < 3) return vals ? vals.slice() : [];
+      if (smoothMode === "ema") return smoothEMA(vals, emaAlpha);
+      if (smoothMode === "median") return smoothMedian(vals, medWin);
+      return vals.slice(); // none
+    }
+
+    // --- Sanitizer: repair obvious "good collapse while total steady/up" glitches ---
+    function sanitizePoints(points) {
+      if (!cleanOn) return points.slice();
+      const cleaned = [];
+      let prevGood = null;
+      let prevTotal = null;
+
+      for (const p of points) {
+        const g = Number(p.good);
+        const t = Number(p.total);
+
+        if (!Number.isFinite(g) || !Number.isFinite(t) || t <= 0) {
+          cleaned.push(p);
+          continue;
+        }
+
+        if (prevGood != null && prevTotal != null) {
+          const totalReset = (t < prevTotal * 0.70);         // treat as new run/lot boundary
+          if (!totalReset) {
+            const goodDroppedBig = (g < prevGood * 0.70);    // big drop
+            const totalSteadyOrUp = (t >= prevTotal * 0.98);
+
+            if (goodDroppedBig && totalSteadyOrUp) {
+              const fixedGood = prevGood;
+              const fixedYield = fixedGood / t;
+              cleaned.push({ ...p, good: fixedGood, yield: fixedYield, y: clamp01(fixedYield), _fixed: true });
+              prevTotal = t;
+              continue;
+            }
+
+            if (g < prevGood && t >= prevTotal) {
+              const fixedGood = prevGood;
+              const fixedYield = fixedGood / t;
+              cleaned.push({ ...p, good: fixedGood, yield: fixedYield, y: clamp01(fixedYield), _fixed: true });
+              prevTotal = t;
+              continue;
+            }
+          } else {
+            prevGood = null;
+            prevTotal = null;
+          }
+        }
+
+        cleaned.push({ ...p, y: clamp01(p.y) });
+        prevGood = g;
+        prevTotal = t;
+      }
+
+      return cleaned;
+    }
+
+    // --- Read series from yield_live.json (REAL) or mock (MOCK) ---
+    function getYieldSeries(yj, lot, step, which) {
       const lot2 = (lot || "").trim();
       const step2 = (step || "").trim();
       const which2 = (which || "").trim().toUpperCase();
-      const key = `${lot2}|${step2}|${which2}`;
 
-      let arr = null;
+      // REAL shape (your pasted data):
+      // yj.data["LOT|STEP|AUTO1"] = [ {t, tester, good, total, yield}, ... ]
+      const keyReal = `${lot2}|${step2}|${which2}`;
 
-      if (yj && yj.data && yj.data[key]) arr = yj.data[key];
-      if (!arr && yj && yj[key]) arr = yj[key]; // fallback if top-level keyed
-      if (!Array.isArray(arr) || arr.length < 2) throw new Error("missing lot history");
+      // MOCK shape:
+      // yj.data["LOT||STEP"] = { AUTO1:[...], AUTO2:[...] }
+      const keyMock = `${lot2}||${step2}`;
 
-      // normalize to [{t, y}]
-      const pts = arr.map(o => {
-        if (o && typeof o === "object") {
-          const y = (o.yield != null) ? Number(o.yield)
-                  : (o.good != null && o.total) ? (Number(o.good)/Number(o.total))
-                  : Number(o);
-          return { t: (o.t || ""), y: clamp01(y), good: o.good, total: o.total, tester: o.tester };
-        }
-        return { t: "", y: clamp01(o) };
-      });
+      // Try real first
+      if (yj && yj.data && Array.isArray(yj.data[keyReal]) && yj.data[keyReal].length) {
+        // build points; y is yield; keep good/total/t for sanitizer + raw display
+        const pts = yj.data[keyReal].map(o => {
+          const y = (o && typeof o.yield === "number") ? o.yield : Number(o);
+          return {
+            t: (o && o.t) ? String(o.t) : "",
+            tester: (o && o.tester) ? String(o.tester) : "",
+            good: (o && o.good != null) ? Number(o.good) : NaN,
+            total: (o && o.total != null) ? Number(o.total) : NaN,
+            y: clamp01(Number.isFinite(y) ? y : 0),
+            yield: Number.isFinite(y) ? y : 0
+          };
+        });
 
-      // sort by time if parseable
-      pts.sort((a,b) => {
-        const ta = Date.parse(a.t || "") || 0;
-        const tb = Date.parse(b.t || "") || 0;
-        return ta - tb;
-      });
+        // sort by time if present
+        pts.sort((a,b) => String(a.t).localeCompare(String(b.t)));
 
-      return pts;
-    }
-
-    // ---------- Smoothing ----------
-    function smoothPoints(points) {
-      const pts = points.slice();
-      if (ui.smooth === "off") return pts;
-
-      if (ui.smooth === "med3") {
-        // median of last 3 (simple spike suppressor)
-        const out = [];
-        for (let i=0;i<pts.length;i++) {
-          const a = pts[Math.max(0,i-2)].y;
-          const b = pts[Math.max(0,i-1)].y;
-          const c = pts[i].y;
-          const s = [a,b,c].sort((x,y)=>x-y);
-          out.push({ ...pts[i], y: s[1] });
-        }
-        return out;
+        // sanitize, then convert to y array
+        const cleanPts = sanitizePoints(pts);
+        const yvals = cleanPts.map(p => clamp01(p.y));
+        return { yvals, points: cleanPts, mode: "real" };
       }
 
-      if (ui.smooth === "ema3" || ui.smooth === "ema6") {
-        const alpha = (ui.smooth === "ema3") ? 0.55 : 0.30;
-        const out = [];
-        let ema = pts[0].y;
-        out.push({ ...pts[0], y: ema });
-        for (let i=1;i<pts.length;i++) {
-          ema = alpha*pts[i].y + (1-alpha)*ema;
-          out.push({ ...pts[i], y: ema });
-        }
-        return out;
+      // Try mock
+      if (yj && yj.data && yj.data[keyMock] && Array.isArray(yj.data[keyMock][which2])) {
+        const arr = yj.data[keyMock][which2];
+        const yvals = arr.map(x => clamp01(Number(x) || 0));
+        return { yvals, points: [], mode: "mock" };
       }
 
-      return pts;
+      throw new Error("missing lot history");
     }
 
-    // ---------- Draw mini chart with Y zoom ----------
-    function drawMiniChart(canvas, points) {
+    function computeZoomRange(vals) {
+      // vals are 0..1
+      let mn = 1, mx = 0;
+      for (const v of vals) {
+        if (!Number.isFinite(v)) continue;
+        mn = Math.min(mn, v);
+        mx = Math.max(mx, v);
+      }
+      if (mn > mx) { mn = 0; mx = 1; }
+      // handle flat line
+      if (Math.abs(mx - mn) < 1e-6) {
+        const c = mn;
+        mn = Math.max(0, c - 0.05);
+        mx = Math.min(1, c + 0.05);
+      }
+      mn = Math.max(0, mn - yPad);
+      mx = Math.min(1, mx + yPad);
+      // avoid super tiny range
+      if (mx - mn < 0.02) {
+        const mid = (mx + mn) / 2;
+        mn = Math.max(0, mid - 0.01);
+        mx = Math.min(1, mid + 0.01);
+      }
+      return { yMin: mn, yMax: mx };
+    }
+
+    function drawMiniChart(canvas, seriesVals, yMin, yMax) {
       const ctx = canvas.getContext("2d");
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
-      const n = points.length;
-      if (n < 2) return;
-
-      const ys = points.map(p => clamp01(p.y));
-      let yMin = 0, yMax = 1;
-
-      if (ui.yScale === "auto") {
-        let mn = Math.min(...ys);
-        let mx = Math.max(...ys);
-
-        let pad = (mx - mn) * 0.15;
-        if (!Number.isFinite(pad) || pad <= 0) pad = 0.02;
-
-        mn -= pad; mx += pad;
-
-        const minSpan = 0.05; // 5% minimum window
-        if ((mx - mn) < minSpan) {
-          const mid = (mx + mn) / 2;
-          mn = mid - minSpan/2;
-          mx = mid + minSpan/2;
-        }
-        yMin = Math.max(0, mn);
-        yMax = Math.min(1, mx);
-      }
-
-      if (ui.yScale === "tight5") {
-        const last = ys[ys.length - 1];
-        const span = 0.10; // ±5%
-        yMin = Math.max(0, last - span/2);
-        yMax = Math.min(1, last + span/2);
-        if (yMax - yMin < span) {
-          if (yMin === 0) yMax = Math.min(1, yMin + span);
-          if (yMax === 1) yMin = Math.max(0, yMax - span);
-        }
-      }
-
-      if (ui.yScale === "full") {
-        yMin = 0; yMax = 1;
-      }
-
-      if (yMax <= yMin + 1e-6) { yMin = 0; yMax = 1; }
-
-      const yToPix = (v, top, bot) => {
-        const t = (clamp01(v) - yMin) / (yMax - yMin);
-        const tt = Math.max(0, Math.min(1, t));
-        return bot - tt * (bot - top);
-      };
-
-      // grid
+      // background grid
       ctx.lineWidth = 1;
       ctx.strokeStyle = "#e6e6e6";
       for (let i = 1; i <= 3; i++) {
-        const yy = (h * i) / 4;
-        ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(w, yy); ctx.stroke();
+        const y = (h * i) / 4;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
       }
 
-      // axis labels
+      // axis labels (zoomed)
       ctx.fillStyle = "#666";
       ctx.font = "11px Arial";
       const topPct = Math.round(yMax * 100);
@@ -617,47 +593,47 @@
       ctx.fillText(topPct + "%", 6, 12);
       ctx.fillText(botPct + "%", 10, h - 6);
 
-      // plot
-      const padL = 44, padR = 6, padT = 6, padB = 16;
+      const n = seriesVals.length;
+      if (n < 2) return;
+
+      const padL = 42, padR = 8, padT = 6, padB = 14;
       const x0 = padL, x1 = w - padR;
       const y0 = padT, y1 = h - padB;
+
+      const denom = Math.max(1e-9, (yMax - yMin));
 
       ctx.strokeStyle = "#111";
       ctx.lineWidth = 2;
       ctx.beginPath();
-      for (let i=0;i<n;i++) {
-        const t = i/(n-1);
-        const x = x0 + t*(x1-x0);
-        const y = yToPix(points[i].y, y0, y1);
-        if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      for (let i = 0; i < n; i++) {
+        const t = i / (n - 1);
+        const x = x0 + t * (x1 - x0);
+        const v = seriesVals[i]; // 0..1
+        const vn = (v - yMin) / denom; // normalized to zoom
+        const y = y1 - clamp01(vn) * (y1 - y0);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
       }
       ctx.stroke();
 
-      // last dot + label
-      const lastV = clamp01(points[n-1].y);
+      // last point dot
+      const lastV = seriesVals[n - 1];
       const lastX = x1;
-      const lastY = yToPix(lastV, y0, y1);
+      const lastVn = (lastV - yMin) / denom;
+      const lastY = y1 - clamp01(lastVn) * (y1 - y0);
       ctx.fillStyle = "#111";
-      ctx.beginPath(); ctx.arc(lastX, lastY, 3, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
+      ctx.fill();
 
+      // label last %
       ctx.fillStyle = "#111";
       ctx.font = "12px Arial";
-      ctx.fillText(Math.round(lastV*100) + "%", x0, h - 2);
+      const pct = Math.round(lastV * 100);
+      ctx.fillText(pct + "%", x0, h - 2);
     }
 
-    function formatRaw(points) {
-      const take = Math.max(3, Math.min(60, ui.rawN|0));
-      const last = points.slice(-take);
-      return last.map(p => {
-        const t = (p.t || "").replace("T"," ").replace(/(\.\d+)?Z?$/,"");
-        const y = Math.round(clamp01(p.y)*1000)/10;
-        const gt = (p.good != null && p.total != null) ? `  (${p.good}/${p.total})` : "";
-        const te = p.tester ? ` ${p.tester}` : "";
-        return `${t}  ${y}%${gt}${te}`.trim();
-      }).join("\n");
-    }
-
-    // Bind ONE delegated handler for hover draw
+    // Delegated hover binder
     function bindYieldHoverDelegation(rowsForMock) {
       if (window.__yieldDelegationBound) return;
       window.__yieldDelegationBound = true;
@@ -665,13 +641,14 @@
       document.addEventListener("mouseover", async (ev) => {
         const el = ev.target.closest && ev.target.closest(".yieldHover");
         if (!el) return;
-
-        // re-draw if loaded==0 or missing
         if (el.dataset.loaded === "1") return;
         el.dataset.loaded = "1";
 
         const canvas = el.querySelector("canvas.yieldCanvas");
         const note = el.querySelector("[data-note]");
+        const rawBox = el.querySelector("[data-raw]");
+
+        if (rawBox) rawBox.style.display = showRaw ? "block" : "none";
 
         try {
           note.textContent = "Loading…";
@@ -681,58 +658,86 @@
           const which = el.getAttribute("data-which") || "";
 
           const yj = await loadYieldCache(rowsForMock || []);
-          let pts = getYieldPoints(yj, lot, step, which);
+          const got = getYieldSeries(yj, lot, step, which);
 
-          // apply smoothing (visual only)
-          const sm = smoothPoints(pts);
+          // y-values (0..1), optionally smoothed
+          const smoothed = applySmoothing(got.yvals);
 
-          drawMiniChart(canvas, sm);
+          const range = yZoom ? computeZoomRange(smoothed) : { yMin: 0, yMax: 1 };
+          drawMiniChart(canvas, smoothed, range.yMin, range.yMax);
 
-          const modeShown = (yieldCacheMode || ui.mode);
-          const last = sm[sm.length - 1];
-          const extra = ui.showRaw ? ("\n\nRAW:\n" + formatRaw(pts)) : "";
-          note.textContent =
-            `${modeShown} • smooth=${ui.smooth} • y=${ui.yScale}\nlast=${Math.round(last.y*1000)/10}% • points=${pts.length}${extra}`;
+          const modeShown = (yieldCacheMode || yieldMode);
+          const cleanTag = cleanOn ? "clean" : "raw";
+          const smoothTag = smoothMode === "none" ? "no-smooth" : (smoothMode === "ema" ? `ema(a=${emaAlpha})` : `median(w=${medWin})`);
+          const zoomTag = yZoom ? `zoom(${Math.round(range.yMin*100)}–${Math.round(range.yMax*100)}%)` : "full(0–100%)";
+
+          note.textContent = (modeShown.startsWith("mock") ? "Mock data" : "Real data") + ` • ${cleanTag} • ${smoothTag} • ${zoomTag}`;
+
+          if (showRaw && rawBox) {
+            if (got.points && got.points.length) {
+              const last = got.points.slice(-8);
+              const lines = last.map(p => {
+                const t = (p.t || "").replace("T", " ").slice(0,16);
+                const y = (p.yield != null) ? (p.yield * 100).toFixed(2) + "%" : "NA";
+                const g = Number.isFinite(p.good) ? String(Math.trunc(p.good)) : "NA";
+                const tot = Number.isFinite(p.total) ? String(Math.trunc(p.total)) : "NA";
+                const fx = p._fixed ? " FIX" : "";
+                return `${t}  y=${y}  good=${g}  total=${tot}${fx}`;
+              });
+              rawBox.textContent = lines.join("\n");
+            } else {
+              rawBox.textContent = "(no raw points in this mode)";
+            }
+          }
+
         } catch (e) {
           const ctx = canvas.getContext("2d");
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.fillStyle = "#b00020";
           ctx.font = "12px Arial";
           ctx.fillText("missing lot history", 10, 22);
-          note.textContent = `Missing lot history\n(${String(e && e.message ? e.message : e)})`;
+          note.textContent = "Missing lot history";
+          if (rawBox) rawBox.textContent = "";
         }
       });
     }
 
-    // ---------- freeze logic ----------
+    // ===== existing freeze logic state =====
     let prevRowsByLabel = null;
+    let lastCSVRows = null;
 
-    // ---------- main ----------
     async function loadCSV() {
       try {
-        dbg(`Loading CSV…
-Yield mode: ${ui.mode}
+        dbg(
+`Loading CSV…
+Yield mode: ${yieldMode}
 Yield URL: ${YIELD_URL}
-Smooth: ${ui.smooth}
-Y scale: ${ui.yScale}`);
+clean=${cleanOn} smooth=${smoothMode} alpha=${emaAlpha} med=${medWin}
+yzoom=${yZoom} ypad=${yPad} showraw=${showRaw}`
+        );
 
-        const resp = await fetch(CSV_URL + "?v=" + Date.now(), { cache: "no-store" });
+        const resp = await fetch(
+          CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "v=" + Date.now(),
+          { cache: "no-store" }
+        );
+
         if (!resp.ok) { dbg(`CSV fetch failed: ${resp.status} ${resp.statusText}`); return; }
 
         const text = await resp.text();
         const rows = parseCSV(text);
-        if (!rows.length) { dbg("CSV parsed but rows empty."); return; }
+        if (!rows.length) { dbg("CSV parsed but rows is empty."); return; }
 
-        // handler row for STATUS link
+        showTagBox(shouldShowTagBoxFromTable(rows));
+
         const handlerRow = rows.find(r => norm(r[0]) === "HANDLER") || [];
-        function handlerAtCol(colIndex) { return (handlerRow[colIndex] || "").toString().trim().toUpperCase(); }
+        function handlerAtCol(colIndex) {
+          return (handlerRow[colIndex] || "").toString().trim().toUpperCase();
+        }
 
-        // STATUS per column
         const statusRow = rows.find(r => norm(r[0]) === "STATUS") || [];
         const statusByCol = {};
         for (let c = 1; c < statusRow.length; c++) statusByCol[c] = (statusRow[c] || "").toString().trim().toLowerCase();
 
-        // TOTAL IN per column
         const totalInRow = rows.find(r => norm(r[0]) === "TOTAL IN") || [];
         const totalInByCol = {};
         for (let c = 1; c < totalInRow.length; c++) {
@@ -740,16 +745,14 @@ Y scale: ${ui.yScale}`);
           if (v !== null) totalInByCol[c] = v;
         }
 
-        // TOTAL row
         const totalRow = rows.find(r => norm(r[0]) === "TOTAL") || [];
 
-        // Freeze numeric values when STATUS=error
+        // Freeze numeric values when STATUS=error for that column
         const freezeLabels = new Set(["TOTAL IN", "LOADING COUNTS", "TOTAL", "AUTO1", "AUTO2", "AUTO3"]);
         if (prevRowsByLabel) {
           for (const r of rows) {
             const label = norm(r[0]);
             if (!freezeLabels.has(label)) continue;
-
             const prevRow = prevRowsByLabel[label];
             if (!prevRow) continue;
 
@@ -762,9 +765,13 @@ Y scale: ${ui.yScale}`);
           }
         }
 
+        lastCSVRows = rows;
+
         function findLastRow(rows, label) {
           const want = norm(label);
-          for (let i = rows.length - 1; i >= 0; i--) if (norm(rows[i]?.[0]) === want) return rows[i];
+          for (let i = rows.length - 1; i >= 0; i--) {
+            if (norm(rows[i]?.[0]) === want) return rows[i];
+          }
           return null;
         }
 
@@ -772,7 +779,7 @@ Y scale: ${ui.yScale}`);
         const lastUpdRow = findLastRow(rows, "LAST UPDATE") || [];
         const loadingRow = rows.find(r => norm(r[0]) === "LOADING COUNTS") || [];
 
-        // ESTIMATED FINISH row
+        // Estimated finish row
         const estFinishRow = [];
         estFinishRow[0] = "ESTIMATED FINISH";
         const maxColsEF = Math.max(...rows.map(r => r.length));
@@ -828,7 +835,6 @@ Y scale: ${ui.yScale}`);
                 : "TESTER";
             }
 
-            // Handler links (non-header only)
             if (!isHeader) {
               if (c === "CHROMA") cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e" target="_blank">CHROMA</a>` : "CHROMA";
               if (c === "NS-3")   cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46" target="_blank">NS-3</a>`   : "NS-3";
@@ -836,7 +842,6 @@ Y scale: ${ui.yScale}`);
               if (c === "NS-5")   cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/468fc957-7879-440e-b1ea-b7e7dfef37f6" target="_blank">NS-5</a>`   : "NS-5";
             }
 
-            // VNC links
             if (showLinks && c === "AP-1")   cellContent = `<a href="vnc://AP-1">AP-1</a>`;
             if (showLinks && c === "AP-2")   cellContent = `<a href="vnc://AP-2">AP-2</a>`;
             if (showLinks && c === "S100_1") cellContent = `<a href="vnc://S100-1">S100_1</a>`;
@@ -930,10 +935,7 @@ Y scale: ${ui.yScale}`);
             // First column styling
             if (colIndex === 0) {
               cellEl.style.backgroundColor = isHeader ? "#2c3e50" : "#dff0d8";
-              if (isHeader) {
-                cellEl.style.color = "white";
-                cellEl.style.fontWeight = "bold";
-              }
+              if (isHeader) { cellEl.style.color = "white"; cellEl.style.fontWeight = "bold"; }
             }
 
             // Tester/Handler row highlight
@@ -945,27 +947,10 @@ Y scale: ${ui.yScale}`);
             // STATUS cell coloring
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const st = (cell || "").toString().trim().toLowerCase();
-
-              if (st === "running") {
-                cellEl.style.color = "green";
-                cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#dff6df";
-              }
-              if (st === "error") {
-                cellEl.style.color = "red";
-                cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#ffd6d6";
-              }
-              if (st === "stopped") {
-                cellEl.style.color = "goldenrod";
-                cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#fff3cd";
-              }
-              if (st === "maint") {
-                cellEl.style.color = "blue";
-                cellEl.style.fontWeight = "bold";
-                cellEl.style.backgroundColor = "#d6e6ff";
-              }
+              if (st === "running") { cellEl.style.color = "green"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#dff6df"; }
+              if (st === "error")   { cellEl.style.color = "red";   cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#ffd6d6"; }
+              if (st === "stopped") { cellEl.style.color = "goldenrod"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#fff3cd"; }
+              if (st === "maint")   { cellEl.style.color = "blue";  cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#d6e6ff"; }
             }
 
             // Number checks
@@ -1012,10 +997,10 @@ Y scale: ${ui.yScale}`);
         document.body.appendChild(table);
         requestAnimationFrame(() => equalizeLastColumn(table));
 
-        // yield hover draw
+        // Bind yield hover drawing
         bindYieldHoverDelegation(rows);
 
-        // update prev snapshot
+        // Update prev snapshot
         const newPrev = {};
         for (const r of rows) {
           const label = norm(r[0]);
@@ -1031,7 +1016,6 @@ Y scale: ${ui.yScale}`);
     }
 
     window.addEventListener("load", () => {
-      syncUiToControls();
       loadCSV();
       setInterval(loadCSV, 30000);
     });
