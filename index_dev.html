@@ -1,4 +1,4 @@
-<!-- MARKER: INDEX_DEV_YIELD_V20260207_0740 -->
+<!-- MARKER: INDEX_DEV_YIELD_V20260207_SMOOTH_GLITCHFILTER -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -61,13 +61,14 @@
     /* ===== Yield hover mini chart ===== */
     .yieldHover { position: relative; display: inline-block; cursor: help; }
     .yieldHover:hover .yieldTip { display: block; }
+
     .yieldTip {
       display: none;
       position: absolute;
       left: 0;
       top: 110%;
-      min-width: 240px;
-      max-width: 260px;
+      min-width: 280px;
+      max-width: 340px;
       background: #fff;
       border: 1px solid #aaa;
       border-radius: 10px;
@@ -75,20 +76,54 @@
       padding: 10px 10px 8px 10px;
       z-index: 9999;
     }
-    .yieldTipTitle { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #222; }
+    .yieldTipTitle {
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: #222;
+    }
     .yieldTipSub {
-      font-size: 12px; color: #555; margin-bottom: 8px;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .yieldCanvas {
-      width: 220px; height: 70px;
+      width: 240px;
+      height: 78px;
       border: 1px solid #ddd;
       border-radius: 8px;
       display: block;
       background: #fafafa;
     }
-    .yieldLegend { margin-top: 6px; font-size: 11px; color: #666; display: flex; justify-content: space-between; }
-    .yieldNote { margin-top: 6px; font-size: 11px; color: #777; }
+    .yieldLegend {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+    }
+    .yieldNote {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #777;
+      white-space: pre-wrap;
+    }
+    .yieldRaw {
+      margin-top: 6px;
+      padding: 6px 8px;
+      border: 1px dashed #ccc;
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 11px;
+      color: #333;
+      max-height: 140px;
+      overflow: auto;
+      display: none;
+      background: #fcfcfc;
+    }
   </style>
 </head>
 
@@ -101,11 +136,22 @@
     const showLinks = params.get("links") === "1";
     const debug = params.get("debug") === "1";
 
-    // yield source toggle:
-    //   ?yield=real  -> fetch yield_live.json from GitHub
-    //   ?yield=mock  -> mock series only
-    // default: real (auto-fallback to mock if fetch fails)
+    // yield:
+    //   ?yield=real  -> fetch yield_live.json
+    //   ?yield=mock  -> mock (table-derived)
+    // default: real (fallback to mock if fetch fails)
     const yieldMode = (params.get("yield") || "real").toLowerCase();
+
+    // smoothing:
+    //   smooth=off        -> raw
+    //   smooth=ma5        -> moving average window 5
+    //   smooth=ema0.25    -> EMA alpha 0.25
+    //   smooth=auto       -> glitch-filter + ma5
+    const smoothMode = (params.get("smooth") || "off").toLowerCase();
+
+    // show raw samples in tooltip (last N)
+    const showRaw = params.get("yraw") === "1";
+    const rawN = Math.max(3, Math.min(25, parseInt(params.get("yrawn") || "10", 10) || 10));
 
     document.title = "ESS PRODUCTION STATUS (DEV)";
 
@@ -120,6 +166,7 @@
 
     const CSV_URL   = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
     const YIELD_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
+
     const showTagIfPresent = params.get("tag") === "1";
 
     const HANDLER_IP = {
@@ -129,57 +176,11 @@
       "CHROMA": "10.20.10.38",
     };
 
-    function equalizeLastColumn(table) {
-      if (!table) return;
-      const headerRow = table.querySelector("tr");
-      if (!headerRow) return;
-      const heads = Array.from(headerRow.children);
-      if (heads.length < 3) return;
-      const lastIdx = heads.length - 1;
-      const widths = [];
-      for (let i = 1; i <= lastIdx - 1; i++) {
-        const w = heads[i].getBoundingClientRect().width;
-        if (w > 0) widths.push(w);
-      }
-      if (!widths.length) return;
-      const avg = widths.reduce((a, b) => a + b, 0) / widths.length;
-      for (const row of Array.from(table.rows)) {
-        const cell = row.cells[lastIdx];
-        if (cell) {
-          cell.style.width = avg.toFixed(1) + "px";
-          cell.style.maxWidth = avg.toFixed(1) + "px";
-        }
-      }
-    }
-
-    function showTagBox(on) {
-      const el = document.getElementById("lotBox");
-      if (el) el.style.display = on ? "" : "none";
-    }
-
-    function shouldShowTagBoxFromTable(rows) {
-      if (!showTagIfPresent) return false;
-      if (!rows) return false;
-      const lotRow = (rows || []).find(r => norm(r?.[0]) === "LOT NUMBER");
-      if (!lotRow) return false;
-      for (let c = 1; c < lotRow.length; c++) {
-        const v = String(lotRow[c] ?? "").trim();
-        if (v && v.toUpperCase() !== "NA") return true;
-      }
-      return false;
-    }
-
     function norm(s) { return (s || "").toString().replace(/\r/g, "").trim().toUpperCase(); }
+
     function toInt(x) {
       const v = parseInt((x || "").toString().replace(/,/g, "").trim(), 10);
       return Number.isNaN(v) ? null : v;
-    }
-
-    function sumAutosForCol(rows, colIndex) {
-      const a1 = rows.find(r => norm(r[0]) === "AUTO1") || [];
-      const a2 = rows.find(r => norm(r[0]) === "AUTO2") || [];
-      const a3 = rows.find(r => norm(r[0]) === "AUTO3") || [];
-      return (toInt(a1[colIndex]) || 0) + (toInt(a2[colIndex]) || 0) + (toInt(a3[colIndex]) || 0);
     }
 
     function parseCSV(text) {
@@ -203,59 +204,74 @@
       return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
     }
 
-    window.addEventListener("resize", () => {
-      const t = document.querySelector("table");
-      if (t) requestAnimationFrame(() => equalizeLastColumn(t));
-    });
+    function equalizeLastColumn(table) {
+      if (!table) return;
+      const headerRow = table.querySelector("tr");
+      if (!headerRow) return;
+      const heads = Array.from(headerRow.children);
+      if (heads.length < 3) return;
+      const lastIdx = heads.length - 1;
+
+      const widths = [];
+      for (let i = 1; i <= lastIdx - 1; i++) {
+        const w = heads[i].getBoundingClientRect().width;
+        if (w > 0) widths.push(w);
+      }
+      if (!widths.length) return;
+      const avg = widths.reduce((a, b) => a + b, 0) / widths.length;
+
+      for (const row of Array.from(table.rows)) {
+        const cell = row.cells[lastIdx];
+        if (cell) {
+          cell.style.width = avg.toFixed(1) + "px";
+          cell.style.maxWidth = avg.toFixed(1) + "px";
+        }
+      }
+    }
+
+    function showTagBox(on) {
+      const el = document.getElementById("lotBox");
+      if (el) el.style.display = on ? "" : "none";
+    }
+
+    function shouldShowTagBoxFromTable(rows) {
+      if (!showTagIfPresent) return false;
+      if (!rows) return false;
+      const lotRow = (rows || []).find(r => norm(r?.[0]) === "LOT NUMBER");
+      if (!lotRow) return false;
+
+      for (let c = 1; c < lotRow.length; c++) {
+        const v = String(lotRow[c] ?? "").trim();
+        if (v && v.toUpperCase() !== "NA") return true;
+      }
+      return false;
+    }
 
     function findRowByLabel(rows, label) {
       const want = norm(label);
       return (rows || []).find(r => norm(r[0]) === want) || null;
     }
+
     function getStepForCol(rows, colIndex) {
       const stepRow = findRowByLabel(rows, "TEST STEP");
       return stepRow ? (stepRow[colIndex] || "").toString().trim() : "";
     }
+
     function getLotForCol(rows, colIndex) {
       const lotRow = findRowByLabel(rows, "LOT NUMBER");
       return lotRow ? (lotRow[colIndex] || "").toString().trim() : "";
     }
 
-    // ====== NEW: detect bad TOTAL and pick denom ======
-    function isSaneTotal(total, loading, totalIn) {
-      if (!Number.isFinite(total) || total <= 0) return false;
-
-      // if TOTAL IN exists, total shouldn't exceed it
-      if (Number.isFinite(totalIn) && totalIn > 0) {
-        if (total > totalIn * 1.02) return false;
-      }
-
-      // if LOADING exists, total should be same order of magnitude (loose band)
-      if (Number.isFinite(loading) && loading > 0) {
-        if (total > loading * 1.5) return false;
-        if (total < loading * 0.5) return false;
-      }
-
-      return true;
+    function sumAutosForCol(rows, colIndex) {
+      const a1 = rows.find(r => norm(r[0]) === "AUTO1") || [];
+      const a2 = rows.find(r => norm(r[0]) === "AUTO2") || [];
+      const a3 = rows.find(r => norm(r[0]) === "AUTO3") || [];
+      return (toInt(a1[colIndex]) || 0) + (toInt(a2[colIndex]) || 0) + (toInt(a3[colIndex]) || 0);
     }
 
-    function pickDenom(total, loading, totalIn) {
-      if (isSaneTotal(total, loading, totalIn)) return { denom: total, reason: "TOTAL" };
-      if (Number.isFinite(loading) && loading > 0) return { denom: loading, reason: "LOADING" };
-      if (Number.isFinite(totalIn) && totalIn > 0) return { denom: totalIn, reason: "TOTAL IN" };
-      return { denom: null, reason: "NONE" };
-    }
-
-    function denomWarn(reason, total, loading, totalIn) {
-      if (reason === "TOTAL") return "";
-      const t = Number.isFinite(total) ? total.toLocaleString() : "NA";
-      const l = Number.isFinite(loading) ? loading.toLocaleString() : "NA";
-      const i = Number.isFinite(totalIn) ? totalIn.toLocaleString() : "NA";
-      const tip = `TOTAL looks wrong (TOTAL=${t}, LOADING=${l}, TOTAL IN=${i}) → using ${reason}`;
-      return ` <span title="${tip.replace(/"/g,'&quot;')}">⚠</span>`;
-    }
-
-    // ====== Yield hover HTML ======
+    // =========================
+    // Yield hover HTML
+    // =========================
     function escHtml(s) {
       return String(s ?? "")
         .replace(/&/g, "&amp;")
@@ -278,15 +294,18 @@
           <div class="yieldTip">
             <div class="yieldTipTitle">${escHtml(which2)} yield history</div>
             <div class="yieldTipSub">${escHtml(lot2)} / ${escHtml(step2)}</div>
-            <canvas class="yieldCanvas" width="220" height="70"></canvas>
+            <canvas class="yieldCanvas" width="240" height="78"></canvas>
             <div class="yieldLegend"><span>old</span><span>new</span></div>
             <div class="yieldNote" data-note>Loading…</div>
+            <div class="yieldRaw" data-raw></div>
           </div>
         </span>
       `;
     }
 
-    // ====== Yield data loader ======
+    // =========================
+    // Yield cache + fetch
+    // =========================
     let yieldCache = null;
     let yieldCacheMode = null;
 
@@ -304,18 +323,23 @@
     }
 
     function makeMockYieldJsonFromRows(rows) {
-      const out = { meta: { updated: nowIsoNoMs(), mode: "mock" }, data: {} };
+      const out = {
+        meta: {
+          updated: nowIsoNoMs(),
+          denom: "TOTAL",
+          mode: "mock",
+          note: "Mock series derived from current table (not persisted).",
+        },
+        data: {}
+      };
 
-      const lotRow = findRowByLabel(rows, "LOT NUMBER") || [];
-      const stepRow = findRowByLabel(rows, "TEST STEP") || [];
+      const lotRow   = findRowByLabel(rows, "LOT NUMBER") || [];
+      const stepRow  = findRowByLabel(rows, "TEST STEP") || [];
       const totalRow = findRowByLabel(rows, "TOTAL") || [];
-      const loadingRow = findRowByLabel(rows, "LOADING COUNTS") || [];
-      const totalInRow = findRowByLabel(rows, "TOTAL IN") || [];
       const auto1Row = findRowByLabel(rows, "AUTO1") || [];
       const auto2Row = findRowByLabel(rows, "AUTO2") || [];
 
-      const maxCols = Math.max(lotRow.length, stepRow.length, totalRow.length, auto1Row.length, auto2Row.length, loadingRow.length, totalInRow.length);
-
+      const maxCols = Math.max(lotRow.length, stepRow.length, totalRow.length, auto1Row.length, auto2Row.length);
       for (let c = 1; c < maxCols; c++) {
         const lot = (lotRow[c] || "").toString().trim();
         const step = (stepRow[c] || "").toString().trim();
@@ -323,32 +347,32 @@
         if (!step || step.toUpperCase() === "NA") continue;
 
         const total = toInt(totalRow[c]) || 0;
-        const loading = toInt(loadingRow[c]) || 0;
-        const totalIn = toInt(totalInRow[c]) || 0;
-
         const a1 = toInt(auto1Row[c]) || 0;
         const a2 = toInt(auto2Row[c]) || 0;
 
-        const { denom } = pickDenom(total, loading, totalIn);
-        const d = denom || 0;
+        const y1 = total > 0 ? (a1 / total) : 0;
+        const y2 = total > 0 ? (a2 / total) : 0;
 
-        const y1 = d > 0 ? (a1 / d) : 0;
-        const y2 = d > 0 ? (a2 / d) : 0;
-
-        const key = `${lot}||${step}`;
-        function mkSeries(y) {
+        function mkSamples(y, testerName) {
           const pts = [];
-          let base = Math.max(0, Math.min(1, y));
-          let v = Math.max(0, Math.min(1, base - 0.06));
+          let base = clamp01(y);
+          let v = clamp01(base - 0.03);
           for (let i = 0; i < 11; i++) {
-            v = v + (base - v) * 0.25 + (Math.random() - 0.5) * 0.02;
-            v = Math.max(0, Math.min(1, v));
-            pts.push(v);
+            v = clamp01(v + (base - v) * 0.25);
+            pts.push({
+              t: nowIsoNoMs(),
+              tester: testerName || "",
+              good: Math.round(v * 1000),
+              total: 1000,
+              yield: v
+            });
           }
-          pts.push(base);
+          pts.push({ t: nowIsoNoMs(), tester: testerName || "", good: Math.round(base * 1000), total: 1000, yield: base });
           return pts;
         }
-        out.data[key] = { lot, step, AUTO1: mkSeries(y1), AUTO2: mkSeries(y2) };
+
+        out.data[`${lot}|${step}|AUTO1`] = mkSamples(y1, "");
+        out.data[`${lot}|${step}|AUTO2`] = mkSamples(y2, "");
       }
       return out;
     }
@@ -374,56 +398,232 @@
       }
     }
 
-    function getYieldSeries(yj, lot, step, which) {
-      const lot2 = (lot || "").trim();
-      const step2 = (step || "").trim();
-      const which2 = (which || "").trim().toUpperCase();
-      const key = `${lot2}||${step2}`;
-
-      // yield_live.json in your repo is: data: { "<lot>|<step>|AUTO1": [ {t,tester,good,total,yield}, ... ] }
-      const keyPipe = `${lot2}|${step2}|${which2}`;
-
-      let series = null;
-
-      // preferred (pipe keys) -> map objects to .yield
-      if (yj && yj.data && yj.data[keyPipe] && Array.isArray(yj.data[keyPipe])) {
-        series = yj.data[keyPipe].map(p => Number(p?.yield));
-      }
-
-      // fallback shapes
-      if (!series && yj && yj.data && yj.data[key] && yj.data[key][which2]) series = yj.data[key][which2];
-      if (!series && yj && yj.lots && yj.lots[lot2] && yj.lots[lot2][step2] && yj.lots[lot2][step2][which2]) series = yj.lots[lot2][step2][which2];
-      if (!series && yj && yj[key] && yj[key][which2]) series = yj[key][which2];
-
-      if (!Array.isArray(series) || !series.length) throw new Error("missing lot history");
-      return series.map(x => {
-        const v = Number(x);
-        if (!Number.isFinite(v)) return 0;
-        return Math.max(0, Math.min(1, v));
-      });
+    // =========================
+    // Yield parsing (REAL FILE)
+    // Your yield_live.json: yj.data["LOT|STEP|AUTO1"] = [{t, tester, good, total, yield}, ...]
+    // =========================
+    function clamp01(v) {
+      v = Number(v);
+      if (!Number.isFinite(v)) return 0;
+      return Math.max(0, Math.min(1, v));
     }
 
-    function drawMiniChart(canvas, series) {
+    function normStepForKey(step) {
+      // keep underscores/hyphens, just normalize whitespace
+      return (step || "").toString().trim().replace(/\s+/g, "_");
+    }
+
+    function buildKeyCandidates(lot, step, which) {
+      const lot2 = (lot || "").toString().trim();
+      const step2 = (step || "").toString().trim();
+      const which2 = (which || "").toString().trim().toUpperCase();
+
+      const sA = step2;
+      const sB = normStepForKey(step2);
+      const sC = sB.replace(/_+/g, "_");
+
+      const keys = [
+        `${lot2}|${sA}|${which2}`,
+        `${lot2}|${sB}|${which2}`,
+        `${lot2}|${sC}|${which2}`,
+      ];
+
+      // de-dupe
+      return Array.from(new Set(keys.filter(k => k.length > 2)));
+    }
+
+    function getYieldSamples(yj, lot, step, which) {
+      if (!yj) throw new Error("no yield json");
+
+      // shape expected: { meta, data: { key: [samples...] } }
+      const data = yj.data || yj.lots || yj || null;
+      if (!data) throw new Error("missing data");
+
+      const candidates = buildKeyCandidates(lot, step, which);
+      let arr = null;
+
+      if (yj.data) {
+        for (const k of candidates) {
+          if (Array.isArray(yj.data[k])) { arr = yj.data[k]; break; }
+        }
+      }
+
+      // fallback: sometimes stored flat as root[key]
+      if (!arr) {
+        for (const k of candidates) {
+          if (Array.isArray(yj[k])) { arr = yj[k]; break; }
+        }
+      }
+
+      if (!Array.isArray(arr) || arr.length === 0) throw new Error("missing lot history");
+      return arr;
+    }
+
+    function samplesToPoints(samples) {
+      // convert to {t:Date, y:number, good, total}
+      const pts = [];
+      for (const s of samples) {
+        const t = (s && s.t) ? new Date(String(s.t)) : null;
+        const good = Number(s?.good);
+        const total = Number(s?.total);
+        let y = s?.yield;
+
+        if (!Number.isFinite(y)) {
+          if (Number.isFinite(good) && Number.isFinite(total) && total > 0) y = good / total;
+          else y = 0;
+        }
+        pts.push({
+          t: (t && !Number.isNaN(t.getTime())) ? t : null,
+          y: clamp01(y),
+          good: Number.isFinite(good) ? good : null,
+          total: Number.isFinite(total) ? total : null,
+          raw: s
+        });
+      }
+
+      // sort by time if parseable
+      pts.sort((a,b) => {
+        const ta = a.t ? a.t.getTime() : 0;
+        const tb = b.t ? b.t.getTime() : 0;
+        return ta - tb;
+      });
+
+      return pts;
+    }
+
+    // Drop obvious OCR/glitch resets:
+    // - total decreasing
+    // - good decreasing drastically (reset) while total continues
+    // - good > total
+    function filterGlitchPoints(points) {
+      if (!points || points.length < 2) return points || [];
+      const out = [];
+      let prevGood = null;
+      let prevTotal = null;
+
+      let dropped = 0;
+
+      for (const p of points) {
+        const good = p.good;
+        const total = p.total;
+
+        // if we don't have counters, keep (chart still uses yield)
+        if (!Number.isFinite(good) || !Number.isFinite(total) || total <= 0) {
+          out.push(p);
+          continue;
+        }
+
+        // impossible
+        if (good < 0 || total < 0 || good > total) { dropped++; continue; }
+
+        if (prevTotal != null && total < prevTotal) { dropped++; continue; }
+
+        if (prevGood != null) {
+          // big reset: good collapses while total doesn't reset
+          if (good < prevGood * 0.20 && total >= prevTotal) {
+            dropped++;
+            continue;
+          }
+          // also catch micro-good with large total (typical OCR "16" vs "7800")
+          if (good <= 100 && prevGood >= 1000 && total >= prevTotal) {
+            dropped++;
+            continue;
+          }
+        }
+
+        out.push(p);
+        prevGood = good;
+        prevTotal = total;
+      }
+
+      out.__dropped = dropped;
+      return out;
+    }
+
+    // =========================
+    // Optional smoothing
+    // =========================
+    function parseSmoothMode(s) {
+      const x = (s || "off").toLowerCase().trim();
+      if (x === "off" || x === "raw") return { type: "off" };
+      if (x === "auto") return { type: "auto" };
+      if (x.startsWith("ma")) {
+        const n = parseInt(x.slice(2), 10);
+        return { type: "ma", n: Number.isFinite(n) && n >= 2 ? n : 5 };
+      }
+      if (x.startsWith("ema")) {
+        const a = parseFloat(x.slice(3));
+        const alpha = Number.isFinite(a) ? Math.max(0.01, Math.min(0.99, a)) : 0.25;
+        return { type: "ema", alpha };
+      }
+      return { type: "off" };
+    }
+
+    function movingAverage(points, windowN) {
+      const n = Math.max(2, windowN | 0);
+      const out = [];
+      let sum = 0;
+      const q = [];
+      for (const p of points) {
+        const y = clamp01(p.y);
+        q.push(y);
+        sum += y;
+        if (q.length > n) sum -= q.shift();
+        out.push({ ...p, y: sum / q.length });
+      }
+      return out;
+    }
+
+    function ema(points, alpha) {
+      const a = Math.max(0.01, Math.min(0.99, alpha));
+      const out = [];
+      let prev = null;
+      for (const p of points) {
+        const y = clamp01(p.y);
+        prev = (prev == null) ? y : (a * y + (1 - a) * prev);
+        out.push({ ...p, y: prev });
+      }
+      return out;
+    }
+
+    function applySmoothing(points, modeStr) {
+      const mode = parseSmoothMode(modeStr);
+      if (!points || points.length < 3) return points || [];
+      if (mode.type === "auto") return movingAverage(points, 5);
+      if (mode.type === "ma") return movingAverage(points, mode.n);
+      if (mode.type === "ema") return ema(points, mode.alpha);
+      return points;
+    }
+
+    // =========================
+    // Drawing
+    // =========================
+    function drawMiniChart(canvas, points) {
       const ctx = canvas.getContext("2d");
       const w = canvas.width, h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
+      // grid
       ctx.lineWidth = 1;
       ctx.strokeStyle = "#e6e6e6";
       for (let i = 1; i <= 3; i++) {
         const y = (h * i) / 4;
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
       }
 
+      // labels
       ctx.fillStyle = "#666";
       ctx.font = "11px Arial";
       ctx.fillText("100%", 6, 12);
       ctx.fillText("0%", 10, h - 6);
 
-      const n = series.length;
+      const n = points.length;
       if (n < 2) return;
 
-      const padL = 36, padR = 6, padT = 6, padB = 14;
+      const padL = 40, padR = 6, padT = 6, padB = 16;
       const x0 = padL, x1 = w - padR;
       const y0 = padT, y1 = h - padB;
 
@@ -433,16 +633,18 @@
       for (let i = 0; i < n; i++) {
         const t = i / (n - 1);
         const x = x0 + t * (x1 - x0);
-        const v = series[i];
+        const v = clamp01(points[i].y);
         const y = y1 - v * (y1 - y0);
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
       ctx.stroke();
 
-      const lastV = series[n - 1];
+      // last dot + last pct
+      const lastV = clamp01(points[n - 1].y);
       const lastX = x1;
       const lastY = y1 - lastV * (y1 - y0);
+
       ctx.fillStyle = "#111";
       ctx.beginPath();
       ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
@@ -454,6 +656,15 @@
       ctx.fillText(pct + "%", x0, h - 2);
     }
 
+    function fmtSampleLine(s) {
+      const t = String(s?.t ?? "");
+      const good = (s?.good ?? "");
+      const total = (s?.total ?? "");
+      const y = Number.isFinite(s?.yield) ? (s.yield * 100).toFixed(2) + "%" : "";
+      return `${t}  good=${good} total=${total}  y=${y}`;
+    }
+
+    // delegated hover (works after re-render)
     function bindYieldHoverDelegation(rowsForMock) {
       if (window.__yieldDelegationBound) return;
       window.__yieldDelegationBound = true;
@@ -461,24 +672,45 @@
       document.addEventListener("mouseover", async (ev) => {
         const el = ev.target.closest && ev.target.closest(".yieldHover");
         if (!el) return;
+
         if (el.dataset.loaded === "1") return;
         el.dataset.loaded = "1";
 
         const canvas = el.querySelector("canvas.yieldCanvas");
         const note = el.querySelector("[data-note]");
+        const rawBox = el.querySelector("[data-raw]");
 
         try {
           note.textContent = "Loading…";
+
           const lot = el.getAttribute("data-lot") || "";
           const step = el.getAttribute("data-step") || "";
           const which = el.getAttribute("data-which") || "";
 
           const yj = await loadYieldCache(rowsForMock || []);
-          const series = getYieldSeries(yj, lot, step, which);
-          drawMiniChart(canvas, series);
+
+          const samples = getYieldSamples(yj, lot, step, which);
+          const pts0 = samplesToPoints(samples);
+
+          const ptsFiltered = filterGlitchPoints(pts0);
+          const dropped = ptsFiltered.__dropped || 0;
+
+          const ptsDisplay = applySmoothing(ptsFiltered, smoothMode);
+          drawMiniChart(canvas, ptsDisplay);
 
           const modeShown = (yieldCacheMode || yieldMode);
-          note.textContent = (modeShown.startsWith("mock") ? "Mock data" : "Real data");
+          const smoothShown = (smoothMode === "off" ? "raw" : smoothMode);
+
+          note.textContent =
+            (modeShown.startsWith("mock") ? "Mock data" : "Real data") +
+            ` • ${smoothShown}` +
+            (dropped ? ` • dropped ${dropped} glitch sample(s)` : "");
+
+          if (showRaw && rawBox) {
+            rawBox.style.display = "block";
+            const tail = samples.slice(-rawN);
+            rawBox.textContent = tail.map(fmtSampleLine).join("\n");
+          }
         } catch (e) {
           const ctx = canvas.getContext("2d");
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -490,13 +722,20 @@
       });
     }
 
-    // ===== existing freeze logic =====
+    // =========================
+    // CSV render + freeze logic
+    // =========================
     let prevRowsByLabel = null;
     let lastCSVRows = null;
 
+    window.addEventListener("resize", () => {
+      const t = document.querySelector("table");
+      if (t) requestAnimationFrame(() => equalizeLastColumn(t));
+    });
+
     async function loadCSV() {
       try {
-        dbg(`Loading CSV…\nYield mode: ${yieldMode}\nYield URL: ${YIELD_URL}`);
+        dbg(`Loading CSV…\nYield mode: ${yieldMode}\nSmooth: ${smoothMode}\nYield URL: ${YIELD_URL}`);
 
         const resp = await fetch(
           CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "v=" + Date.now(),
@@ -507,7 +746,7 @@
 
         const text = await resp.text();
         const rows = parseCSV(text);
-        if (!rows.length) { dbg("CSV parsed but rows empty."); return; }
+        if (!rows.length) { dbg("CSV parsed but rows is empty."); return; }
 
         showTagBox(shouldShowTagBoxFromTable(rows));
 
@@ -531,13 +770,16 @@
 
         const totalRow = rows.find(r => norm(r[0]) === "TOTAL") || [];
 
+        // Freeze numeric values when STATUS=error
         const freezeLabels = new Set(["TOTAL IN", "LOADING COUNTS", "TOTAL", "AUTO1", "AUTO2", "AUTO3"]);
         if (prevRowsByLabel) {
           for (const r of rows) {
             const label = norm(r[0]);
             if (!freezeLabels.has(label)) continue;
+
             const prevRow = prevRowsByLabel[label];
             if (!prevRow) continue;
+
             for (let c = 1; c < r.length; c++) {
               if ((statusByCol[c] || "") === "error") {
                 const prevVal = prevRow[c];
@@ -551,7 +793,9 @@
 
         function findLastRow(rows, label) {
           const want = norm(label);
-          for (let i = rows.length - 1; i >= 0; i--) if (norm(rows[i]?.[0]) === want) return rows[i];
+          for (let i = rows.length - 1; i >= 0; i--) {
+            if (norm(rows[i]?.[0]) === want) return rows[i];
+          }
           return null;
         }
 
@@ -569,7 +813,10 @@
           const loading = toInt(loadingRow[c]);
           const totalIn = totalInByCol[c];
 
-          if (!startDt || !updDt || loading === null || !totalIn || totalIn <= 0) { estFinishRow[c] = ""; continue; }
+          if (!startDt || !updDt || loading === null || !totalIn || totalIn <= 0) {
+            estFinishRow[c] = "";
+            continue;
+          }
 
           const elapsedMs = updDt.getTime() - startDt.getTime();
           const progress = loading / totalIn;
@@ -578,6 +825,7 @@
           const p = Math.min(1, Math.max(0.000001, progress));
           const estTotalMs = elapsedMs / p;
           const finishDt = new Date(startDt.getTime() + estTotalMs);
+
           estFinishRow[c] = fmtDateTime(finishDt);
         }
 
@@ -642,77 +890,62 @@
               }
             }
 
-            // AUTO1 progress + hover + denom fix
-            if (!isHeader && (rowLabel === "AUTO1" || rowLabel === "AUTO 1") && colIndex > 0) {
+            // AUTO1 progress + hover
+            if (!isHeader && rowLabel === "AUTO1" && colIndex > 0) {
               const auto1 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
-              const loading = toInt(loadingRow[colIndex]);
-              const totalIn = totalInByCol[colIndex];
-
-              const pick = pickDenom(total, loading, totalIn);
-              if (auto1 !== null && pick.denom !== null && pick.denom > 0) {
+              if (auto1 !== null && total !== null && total > 0) {
                 const lot = getLotForCol(rows, colIndex);
                 const step = getStepForCol(rows, colIndex);
-                let pct = (auto1 / pick.denom) * 100;
+                let pct = (auto1 / total) * 100;
                 pct = Math.max(0, Math.min(100, pct));
-                const warn = denomWarn(pick.reason, total, loading, totalIn);
                 cellContent = `
                   <div class="lc-wrap">
                     <div class="lc-num">${yieldHoverHtml(auto1.toLocaleString(), lot, step, "AUTO1")}</div>
                     <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
-                    <div class="lc-pct">${pct.toFixed(1)}%${warn}</div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
                   </div>
                 `;
               }
             }
 
-            // AUTO2 progress + hover + denom fix
-            if (!isHeader && (rowLabel === "AUTO2" || rowLabel === "AUTO 2") && colIndex > 0) {
+            // AUTO2 progress + hover
+            if (!isHeader && rowLabel === "AUTO2" && colIndex > 0) {
               const auto2 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
-              const loading = toInt(loadingRow[colIndex]);
-              const totalIn = totalInByCol[colIndex];
-
-              const pick = pickDenom(total, loading, totalIn);
-              if (auto2 !== null && pick.denom !== null && pick.denom > 0) {
+              if (auto2 !== null && total !== null && total > 0) {
                 const lot = getLotForCol(rows, colIndex);
                 const step = getStepForCol(rows, colIndex);
-                let pct = (auto2 / pick.denom) * 100;
+                let pct = (auto2 / total) * 100;
                 pct = Math.max(0, Math.min(100, pct));
-                const warn = denomWarn(pick.reason, total, loading, totalIn);
                 cellContent = `
                   <div class="lc-wrap">
                     <div class="lc-num">${yieldHoverHtml(auto2.toLocaleString(), lot, step, "AUTO2")}</div>
                     <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
-                    <div class="lc-pct">${pct.toFixed(1)}%${warn}</div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
                   </div>
                 `;
               }
             }
 
-            // AUTO3 progress (no hover) + denom fix
-            if (!isHeader && (rowLabel === "AUTO3" || rowLabel === "AUTO 3") && colIndex > 0) {
+            // AUTO3 progress
+            if (!isHeader && rowLabel === "AUTO3" && colIndex > 0) {
               const auto3 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
-              const loading = toInt(loadingRow[colIndex]);
-              const totalIn = totalInByCol[colIndex];
-
-              const pick = pickDenom(total, loading, totalIn);
-              if (auto3 !== null && pick.denom !== null && pick.denom > 0) {
-                let pct = (auto3 / pick.denom) * 100;
+              if (auto3 !== null && total !== null && total > 0) {
+                let pct = (auto3 / total) * 100;
                 pct = Math.max(0, Math.min(100, pct));
-                const warn = denomWarn(pick.reason, total, loading, totalIn);
                 cellContent = `
                   <div class="lc-wrap">
                     <div class="lc-num">${auto3.toLocaleString()}</div>
                     <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
-                    <div class="lc-pct">${pct.toFixed(1)}%${warn}</div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
                   </div>
                 `;
               }
             }
 
-            // STATUS row link to handler latest.png
+            // STATUS link to handler latest.png
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const hname = handlerAtCol(colIndex);
               const ip = HANDLER_IP[hname];
@@ -735,13 +968,12 @@
               cellEl.style.fontWeight = "bold";
             }
 
-            // STATUS coloring
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const st = (cell || "").toString().trim().toLowerCase();
               if (st === "running") { cellEl.style.color = "green"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#dff6df"; }
-              if (st === "error")   { cellEl.style.color = "red";   cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#ffd6d6"; }
+              if (st === "error")   { cellEl.style.color = "red"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#ffd6d6"; }
               if (st === "stopped") { cellEl.style.color = "goldenrod"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#fff3cd"; }
-              if (st === "maint")   { cellEl.style.color = "blue";  cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#d6e6ff"; }
+              if (st === "maint")   { cellEl.style.color = "blue"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#d6e6ff"; }
             }
 
             // Number checks
@@ -759,22 +991,10 @@
 
               if (rowLabel === "TOTAL") {
                 const total = toInt(cell);
-                const loading = toInt(loadingRow[colIndex]);
-                const totalIn = totalInByCol[colIndex];
-
-                // existing: TOTAL < autoSum
                 if (total !== null && total < autoSum) {
                   cellEl.style.backgroundColor = "#ffd6d6";
                   cellEl.style.fontWeight = "bold";
                   cellEl.style.color = "red";
-                }
-
-                // NEW: highlight insane TOTAL
-                if (total !== null && !isSaneTotal(total, loading, totalIn)) {
-                  cellEl.style.backgroundColor = "#ffd6d6";
-                  cellEl.style.fontWeight = "bold";
-                  cellEl.style.color = "red";
-                  cellEl.title = `TOTAL looks wrong (TOTAL=${total}, LOADING=${loading}, TOTAL IN=${totalIn})`;
                 }
               }
 
@@ -800,8 +1020,10 @@
         document.body.appendChild(table);
         requestAnimationFrame(() => equalizeLastColumn(table));
 
+        // bind hover (delegated)
         bindYieldHoverDelegation(rows);
 
+        // update prev snapshot
         const newPrev = {};
         for (const r of rows) {
           const label = norm(r[0]);
