@@ -1,4 +1,4 @@
-<!-- MARKER: INDEX_DEV_YIELD_TOGGLE_20260207_0610 -->
+<!-- MARKER: INDEX_DEV_YIELD_V20260207_0620 -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,6 +15,7 @@
       border: 1px solid #aaa;
       padding: 8px 12px;
       text-align: left;
+      vertical-align: top;
     }
     th {
       background-color: #2c3e50;
@@ -22,9 +23,15 @@
       font-weight: bold;
     }
 
-    a { color: #007bff; font-weight: bold; text-decoration: none; }
+    /* Default links */
+    a {
+      color: #007bff;
+      font-weight: bold;
+      text-decoration: none;
+    }
     a:hover { text-decoration: underline; }
 
+    /* Status links inherit status color + show pointer */
     a.statusLink,
     a.statusLink:visited,
     a.statusLink:hover,
@@ -35,6 +42,7 @@
       cursor: pointer;
     }
 
+    /* Debug line (hidden unless ?debug=1) */
     #dbg {
       width: 60%;
       margin: 6px auto 0 auto;
@@ -42,8 +50,10 @@
       font-size: 13px;
       color: #555;
       display: none;
+      white-space: pre-wrap;
     }
 
+    /* Progress bars */
     .lc-wrap { display: flex; flex-direction: column; gap: 6px; }
     .lc-num  { font-weight: 600; }
     .prog {
@@ -60,116 +70,80 @@
     }
     .lc-pct { font-size: 12px; color: #444; }
 
-    /* ===== Yield hover mini-chart ===== */
+    /* ===== Yield hover mini chart (small picture) ===== */
     .yieldHover {
       position: relative;
       display: inline-block;
-      cursor: pointer;
-      text-decoration: underline;
+      cursor: help;
     }
+    /* CSS-only popup so it always “pops up” even if JS fails */
+    .yieldHover:hover .yieldTip { display: block; }
+
     .yieldTip {
       display: none;
       position: absolute;
-      z-index: 9999;
-      top: 20px;
       left: 0;
-      width: 220px;
-      padding: 10px;
+      top: 110%;
+      min-width: 240px;
+      max-width: 260px;
+      background: #fff;
       border: 1px solid #aaa;
-      background: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-      border-radius: 8px;
+      border-radius: 10px;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+      padding: 10px 10px 8px 10px;
+      z-index: 9999;
     }
     .yieldTipTitle {
-      font-size: 12px;
       font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 4px;
       color: #222;
-      margin-bottom: 6px;
     }
     .yieldTipSub {
-      font-size: 11px;
+      font-size: 12px;
       color: #555;
       margin-bottom: 8px;
-      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 210px;
+      white-space: nowrap;
     }
     .yieldCanvas {
-      width: 200px;
+      width: 220px;
       height: 70px;
       border: 1px solid #ddd;
-      border-radius: 6px;
+      border-radius: 8px;
       display: block;
+      background: #fafafa;
     }
     .yieldLegend {
-      font-size: 11px;
-      color: #444;
       margin-top: 6px;
+      font-size: 11px;
+      color: #666;
       display: flex;
       justify-content: space-between;
     }
-
-    /* ===== Top bar toggle ===== */
-    .topbar {
-      width: 60%;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: Arial, sans-serif;
-    }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid #bbb;
-      border-radius: 999px;
-      padding: 6px 10px;
-      background: #fafafa;
-      font-size: 13px;
-      color: #333;
-      user-select: none;
-    }
-    .btn {
-      border: 1px solid #999;
-      border-radius: 999px;
-      padding: 6px 10px;
-      background: #fff;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 12px;
-    }
-    .btn:hover { background: #f2f2f2; }
-    .modeTag {
-      font-weight: 800;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid #ccc;
-      background: #fff;
-      font-size: 12px;
+    .yieldNote {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #777;
     }
   </style>
 </head>
 
 <body>
   <h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION STATUS (DEV)</h2>
-
-  <div class="topbar">
-    <div id="modePill" class="pill">
-      Yield Data:
-      <span id="modeTag" class="modeTag">REAL</span>
-      <span id="modeNote" style="font-size:12px;color:#666;"></span>
-    </div>
-    <button id="toggleBtn" class="btn">USE MOCK</button>
-  </div>
-
   <div id="dbg"></div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const showLinks = params.get("links") === "1";
     const debug = params.get("debug") === "1";
+
+    // yield source toggle:
+    //   ?yield=real  -> fetch yield_live.json from GitHub
+    //   ?yield=mock  -> mock series only
+    // default: real (but auto-fallback to mock if fetch fails)
+    const yieldMode = (params.get("yield") || "real").toLowerCase();
 
     // Force title always
     document.title = "ESS PRODUCTION STATUS (DEV)";
@@ -178,51 +152,16 @@
     if (debug) dbgEl.style.display = "block";
     function dbg(msg) { if (debug) dbgEl.textContent = msg; }
 
-    // ====== YOUR CSV ======
+    if (showLinks) {
+      document.getElementById("pageTitle").innerHTML =
+        `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION STATUS (DEV)`;
+    }
+
     const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
+    const YIELD_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
+    const showTagIfPresent = params.get("tag") === "1";
 
-    // ====== Yield JSON (REAL) ======
-    const YIELD_URL_REAL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
-
-    // ===== Yield Mode (REAL vs MOCK) =====
-    // Priority: query param -> localStorage -> default REAL
-    function getYieldMode() {
-      const q = params.get("mock");
-      if (q === "1") return "MOCK";
-      if (q === "0") return "REAL";
-      const saved = (localStorage.getItem("yield_mode") || "").toUpperCase();
-      if (saved === "MOCK" || saved === "REAL") return saved;
-      return "REAL";
-    }
-    function setYieldMode(mode) {
-      localStorage.setItem("yield_mode", mode);
-    }
-
-    let yieldMode = getYieldMode();
-    const modeTag = document.getElementById("modeTag");
-    const modeNote = document.getElementById("modeNote");
-    const toggleBtn = document.getElementById("toggleBtn");
-
-    function updateModeUI() {
-      modeTag.textContent = yieldMode;
-      toggleBtn.textContent = (yieldMode === "REAL") ? "USE MOCK" : "USE REAL";
-      modeNote.textContent = (yieldMode === "REAL")
-        ? "(from yield_live.json)"
-        : "(generated demo points)";
-    }
-    updateModeUI();
-
-    toggleBtn.addEventListener("click", () => {
-      yieldMode = (yieldMode === "REAL") ? "MOCK" : "REAL";
-      setYieldMode(yieldMode);
-      updateModeUI();
-      // reload yield cache so hover updates immediately
-      yieldCache = null;
-      yieldCacheLoadedAt = 0;
-      dbg("Yield mode switched: " + yieldMode);
-    });
-
-    // ===== handler -> IP (used by STATUS row link) =====
+    // handler -> IP (used by STATUS row link)
     const HANDLER_IP = {
       "NS-3": "10.20.10.187",
       "NS-4": "10.20.10.238",
@@ -232,10 +171,13 @@
 
     function equalizeLastColumn(table) {
       if (!table) return;
+
       const headerRow = table.querySelector("tr");
       if (!headerRow) return;
+
       const heads = Array.from(headerRow.children);
       if (heads.length < 3) return;
+
       const lastIdx = heads.length - 1;
 
       const widths = [];
@@ -254,6 +196,25 @@
           cell.style.maxWidth = avg.toFixed(1) + "px";
         }
       }
+    }
+
+    function showTagBox(on) {
+      const el = document.getElementById("lotBox");
+      if (el) el.style.display = on ? "" : "none";
+    }
+
+    function shouldShowTagBoxFromTable(rows) {
+      if (!showTagIfPresent) return false;
+      if (!rows) return false;
+
+      const lotRow = (rows || []).find(r => norm(r?.[0]) === "LOT NUMBER");
+      if (!lotRow) return false;
+
+      for (let c = 1; c < lotRow.length; c++) {
+        const v = String(lotRow[c] ?? "").trim();
+        if (v && v.toUpperCase() !== "NA") return true;
+      }
+      return false;
     }
 
     function norm(s) {
@@ -286,6 +247,7 @@
     function parseDateTimeLocal(s) {
       const raw = (s || "").toString().trim();
       if (!raw) return null;
+
       let x = raw.replace(" ", "T");
       x = x.replace(/\.(\d{3})\d+/, ".$1");
       const d = new Date(x);
@@ -318,79 +280,171 @@
       return (lotRow[colIndex] || "").toString().trim();
     }
 
-    // ===== Yield cache loading =====
+    // ====== Yield hover HTML (AUTO1/AUTO2 only) ======
+    function escHtml(s) {
+      return String(s ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function yieldHoverHtml(labelText, lot, step, which) {
+      const lot2 = (lot || "").trim();
+      const step2 = (step || "").trim();
+      const which2 = (which || "").trim();
+      // tooltip exists even if data missing; JS will draw "missing lot history"
+      return `
+        <span class="yieldHover"
+              data-lot="${escHtml(lot2)}"
+              data-step="${escHtml(step2)}"
+              data-which="${escHtml(which2)}">
+          ${escHtml(labelText)}
+          <div class="yieldTip">
+            <div class="yieldTipTitle">${escHtml(which2)} yield history</div>
+            <div class="yieldTipSub">${escHtml(lot2)} / ${escHtml(step2)}</div>
+            <canvas class="yieldCanvas" width="220" height="70"></canvas>
+            <div class="yieldLegend"><span>old</span><span>new</span></div>
+            <div class="yieldNote" data-note>Loading…</div>
+          </div>
+        </span>
+      `;
+    }
+
+    // ====== Yield data loader (real or mock) ======
     let yieldCache = null;
-    let yieldCacheLoadedAt = 0;
+    let yieldCacheMode = null;
 
-    function makeMockYieldData(rows) {
-      // Build mock data based on current visible lots/steps so it always "matches"
-      const header = rows[0] || [];
-      const maxCols = Math.max(...rows.map(r => r.length));
-      const out = { meta: { updated: new Date().toISOString(), mock: true }, data: {} };
+    function nowIsoNoMs() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2,"0");
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
 
+    async function fetchJson(url) {
+      const res = await fetch(url + (url.includes("?") ? "&" : "?") + "v=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const txt = await res.text();
+      return JSON.parse(txt);
+    }
+
+    function makeMockYieldJsonFromRows(rows) {
+      // Build a mock-ish structure keyed by LOT# + TEST STEP
+      // The series is fake but stable-looking.
+      const out = {
+        meta: {
+          updated: nowIsoNoMs(),
+          mode: "mock",
+          note: "Mock series derived from current table (not persisted).",
+        },
+        data: {}
+      };
+
+      const lotRow = findRowByLabel(rows, "LOT NUMBER") || [];
+      const stepRow = findRowByLabel(rows, "TEST STEP") || [];
+      const totalRow = findRowByLabel(rows, "TOTAL") || [];
+      const auto1Row = findRowByLabel(rows, "AUTO1") || [];
+      const auto2Row = findRowByLabel(rows, "AUTO2") || [];
+
+      const maxCols = Math.max(lotRow.length, stepRow.length, totalRow.length, auto1Row.length, auto2Row.length);
       for (let c = 1; c < maxCols; c++) {
-        const lot = getLotForCol(rows, c);
-        const step = getStepForCol(rows, c);
-        if (!lot || !step || norm(lot) === "NA" || norm(step) === "NA") continue;
+        const lot = (lotRow[c] || "").toString().trim();
+        const step = (stepRow[c] || "").toString().trim();
+        if (!lot || lot.toUpperCase() === "NA") continue;
+        if (!step || step.toUpperCase() === "NA") continue;
 
-        for (const which of ["AUTO1", "AUTO2"]) {
-          const key = `${lot}|${step}|${which}`;
-          const base = 0.92 - (Math.random() * 0.08);
+        const total = toInt(totalRow[c]) || 0;
+        const a1 = toInt(auto1Row[c]) || 0;
+        const a2 = toInt(auto2Row[c]) || 0;
+
+        const y1 = total > 0 ? (a1 / total) : 0;
+        const y2 = total > 0 ? (a2 / total) : 0;
+
+        const key = `${lot}||${step}`;
+        // make a little "history" around current value
+        function mkSeries(y) {
+          // 12 points, drifting slightly toward current y
           const pts = [];
-          const now = Date.now();
-          for (let i = 12; i >= 0; i--) {
-            const y = Math.max(0.80, Math.min(0.99, base + (Math.random() - 0.5) * 0.03));
-            pts.push({
-              t: new Date(now - i * 5 * 60 * 1000).toISOString(),
-              tester: (header[c] || "").toString().trim(),
-              good: 1000 + i * 30,
-              total: 1100 + i * 30,
-              yield: y
-            });
+          let base = Math.max(0, Math.min(1, y));
+          let v = Math.max(0, Math.min(1, base - 0.06));
+          for (let i = 0; i < 11; i++) {
+            v = v + (base - v) * 0.25 + (Math.random() - 0.5) * 0.02;
+            v = Math.max(0, Math.min(1, v));
+            pts.push(v);
           }
-          out.data[key] = pts;
+          pts.push(base);
+          return pts;
         }
+
+        out.data[key] = {
+          lot, step,
+          AUTO1: mkSeries(y1),
+          AUTO2: mkSeries(y2),
+        };
       }
-      out.meta.active_keys = Object.keys(out.data).length;
+
       return out;
     }
 
     async function loadYieldCache(rowsForMock) {
-      const ageMs = Date.now() - yieldCacheLoadedAt;
-      if (yieldCache && ageMs < 15000) return yieldCache; // small cache
+      if (yieldCache && yieldCacheMode === yieldMode) return yieldCache;
 
-      if (yieldMode === "MOCK") {
-        yieldCache = makeMockYieldData(rowsForMock);
-        yieldCacheLoadedAt = Date.now();
+      if (yieldMode === "mock") {
+        yieldCache = makeMockYieldJsonFromRows(rowsForMock || []);
+        yieldCacheMode = "mock";
         return yieldCache;
       }
 
-      // REAL
-      const url = YIELD_URL_REAL + (YIELD_URL_REAL.includes("?") ? "&" : "?") + "v=" + Date.now();
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) throw new Error("Yield JSON fetch failed: " + res.status);
-      const json = await res.json();
-      yieldCache = json;
-      yieldCacheLoadedAt = Date.now();
-      return yieldCache;
+      // real mode (fetch), but fallback to mock on error
+      try {
+        const j = await fetchJson(YIELD_URL);
+        yieldCache = j;
+        yieldCacheMode = "real";
+        return yieldCache;
+      } catch (e) {
+        // fallback
+        yieldCache = makeMockYieldJsonFromRows(rowsForMock || []);
+        yieldCacheMode = "mock(fallback)";
+        return yieldCache;
+      }
     }
 
-    function getYieldSeries(yieldJson, lot, step, which) {
-      const key = `${lot}|${step}|${which}`;
-      const arr = (yieldJson && yieldJson.data && yieldJson.data[key]) ? yieldJson.data[key] : null;
-      return Array.isArray(arr) ? arr : null;
+    function getYieldSeries(yj, lot, step, which) {
+      const lot2 = (lot || "").trim();
+      const step2 = (step || "").trim();
+      const which2 = (which || "").trim().toUpperCase();
+
+      // Accept multiple possible shapes:
+      // A) { data: { "LOT||STEP": { AUTO1:[...], AUTO2:[...] } } }
+      // B) { lots: { LOT: { STEP: { AUTO1:[...]} } } }
+      // C) { "<LOT||STEP>": ... } (unlikely but we’ll try)
+      const key = `${lot2}||${step2}`;
+
+      let series = null;
+
+      if (yj && yj.data && yj.data[key] && yj.data[key][which2]) series = yj.data[key][which2];
+      if (!series && yj && yj.lots && yj.lots[lot2] && yj.lots[lot2][step2] && yj.lots[lot2][step2][which2]) {
+        series = yj.lots[lot2][step2][which2];
+      }
+      if (!series && yj && yj[key] && yj[key][which2]) series = yj[key][which2];
+
+      if (!Array.isArray(series) || !series.length) throw new Error("missing lot history");
+      return series.map(x => {
+        const v = Number(x);
+        if (!Number.isFinite(v)) return 0;
+        return Math.max(0, Math.min(1, v));
+      });
     }
 
     function drawMiniChart(canvas, series) {
       const ctx = canvas.getContext("2d");
       const w = canvas.width, h = canvas.height;
-
-      // clear
       ctx.clearRect(0, 0, w, h);
 
-      // grid baseline
-      ctx.strokeStyle = "#eee";
+      // background grid
       ctx.lineWidth = 1;
+      ctx.strokeStyle = "#e6e6e6";
       for (let i = 1; i <= 3; i++) {
         const y = (h * i) / 4;
         ctx.beginPath();
@@ -399,113 +453,98 @@
         ctx.stroke();
       }
 
-      if (!series || series.length < 2) {
-        ctx.fillStyle = "#666";
-        ctx.font = "12px Arial";
-        ctx.fillText("no history", 10, 20);
-        return;
-      }
+      // axis labels 0% / 100%
+      ctx.fillStyle = "#666";
+      ctx.font = "11px Arial";
+      ctx.fillText("100%", 6, 12);
+      ctx.fillText("0%", 10, h - 6);
 
-      // map yields 0..1 -> chart
-      const ys = series.map(p => (typeof p.yield === "number" ? p.yield : null)).filter(v => v !== null);
-      if (ys.length < 2) return;
+      // plot series
+      const n = series.length;
+      if (n < 2) return;
 
-      const minY = Math.max(0, Math.min(...ys));
-      const maxY = Math.min(1, Math.max(...ys));
-      const span = Math.max(0.0001, maxY - minY);
+      const padL = 36, padR = 6, padT = 6, padB = 14;
+      const x0 = padL, x1 = w - padR;
+      const y0 = padT, y1 = h - padB;
 
-      function xAt(i) { return (i / (series.length - 1)) * (w - 10) + 5; }
-      function yAt(v) {
-        const t = (v - minY) / span;
-        return (h - 8) - t * (h - 16);
-      }
-
-      ctx.strokeStyle = "#2e7d32";
+      ctx.strokeStyle = "#111";
       ctx.lineWidth = 2;
       ctx.beginPath();
-      series.forEach((p, i) => {
-        const v = (typeof p.yield === "number") ? p.yield : minY;
-        const x = xAt(i);
-        const y = yAt(v);
+      for (let i = 0; i < n; i++) {
+        const t = i / (n - 1);
+        const x = x0 + t * (x1 - x0);
+        const v = series[i]; // 0..1
+        const y = y1 - v * (y1 - y0);
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
-      });
+      }
       ctx.stroke();
 
       // last point dot
-      const last = series[series.length - 1];
-      const lv = (typeof last.yield === "number") ? last.yield : minY;
-      ctx.fillStyle = "#1b5e20";
+      const lastV = series[n - 1];
+      const lastX = x1;
+      const lastY = y1 - lastV * (y1 - y0);
+      ctx.fillStyle = "#111";
       ctx.beginPath();
-      ctx.arc(xAt(series.length - 1), yAt(lv), 3, 0, Math.PI * 2);
+      ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
       ctx.fill();
+
+      // label last %
+      ctx.fillStyle = "#111";
+      ctx.font = "12px Arial";
+      const pct = Math.round(lastV * 100);
+      ctx.fillText(pct + "%", x0, h - 2);
     }
 
-    function makeYieldHoverEl(labelText, lot, step, which, rowsForMock) {
-      const wrap = document.createElement("span");
-      wrap.className = "yieldHover";
-      wrap.textContent = labelText;
+    // Bind ONE delegated handler so hover always works even after re-render
+    function bindYieldHoverDelegation(rowsForMock) {
+      // remove old if any (idempotent)
+      if (window.__yieldDelegationBound) return;
+      window.__yieldDelegationBound = true;
 
-      const tip = document.createElement("div");
-      tip.className = "yieldTip";
+      document.addEventListener("mouseover", async (ev) => {
+        const el = ev.target.closest && ev.target.closest(".yieldHover");
+        if (!el) return;
 
-      const title = document.createElement("div");
-      title.className = "yieldTipTitle";
-      title.textContent = `${which} yield (history)`;
+        // only draw once per element
+        if (el.dataset.loaded === "1") return;
+        el.dataset.loaded = "1";
 
-      const sub = document.createElement("div");
-      sub.className = "yieldTipSub";
-      sub.textContent = `${lot} / ${step}`;
+        const tip = el.querySelector(".yieldTip");
+        const canvas = el.querySelector("canvas.yieldCanvas");
+        const note = el.querySelector("[data-note]");
 
-      const canvas = document.createElement("canvas");
-      canvas.className = "yieldCanvas";
-      canvas.width = 200;
-      canvas.height = 70;
-
-      const legend = document.createElement("div");
-      legend.className = "yieldLegend";
-      legend.innerHTML = `<span>old</span><span>new</span>`;
-
-      tip.appendChild(title);
-      tip.appendChild(sub);
-      tip.appendChild(canvas);
-      tip.appendChild(legend);
-      wrap.appendChild(tip);
-
-      let loaded = false;
-
-      async function ensureLoaded() {
-        if (loaded) return;
-        loaded = true;
+        // ensure popup shows even if chart fails (CSS handles display)
         try {
-          const yj = await loadYieldCache(rowsForMock);
+          note.textContent = "Loading…";
+          const lot = el.getAttribute("data-lot") || "";
+          const step = el.getAttribute("data-step") || "";
+          const which = el.getAttribute("data-which") || "";
+
+          const yj = await loadYieldCache(rowsForMock || []);
           const series = getYieldSeries(yj, lot, step, which);
           drawMiniChart(canvas, series);
+
+          const modeShown = (yieldCacheMode || yieldMode);
+          note.textContent = (modeShown.startsWith("mock") ? "Mock data" : "Real data");
         } catch (e) {
           const ctx = canvas.getContext("2d");
-          ctx.clearRect(0,0,canvas.width,canvas.height);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.fillStyle = "#b00020";
           ctx.font = "12px Arial";
-          ctx.fillText("missing lot history", 10, 20);
+          ctx.fillText("missing lot history", 10, 22);
+          note.textContent = "Missing lot history";
         }
-      }
-
-      wrap.addEventListener("mouseenter", () => {
-        tip.style.display = "block";
-        ensureLoaded();
       });
-      wrap.addEventListener("mouseleave", () => {
-        tip.style.display = "none";
-      });
-
-      return wrap;
     }
 
+    // ===== existing freeze logic state =====
     let prevRowsByLabel = null;
+    let lastCSVRows = null;
 
     async function loadCSV() {
       try {
-        dbg("Loading CSV…");
+        dbg(`Loading CSV…\nYield mode: ${yieldMode}\nYield URL: ${YIELD_URL}`);
 
         const resp = await fetch(
           CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "v=" + Date.now(),
@@ -519,12 +558,15 @@
 
         const text = await resp.text();
         const rows = parseCSV(text);
+
         if (!rows.length) {
           dbg("CSV parsed but rows is empty.");
           return;
         }
 
-        // handler row
+        showTagBox(shouldShowTagBoxFromTable(rows));
+
+        // ✅ HANDLER row tells us which handler belongs to each tester column
         const handlerRow = rows.find(r => norm(r[0]) === "HANDLER") || [];
         function handlerAtCol(colIndex) {
           return (handlerRow[colIndex] || "").toString().trim().toUpperCase();
@@ -548,12 +590,13 @@
         // TOTAL row
         const totalRow = rows.find(r => norm(r[0]) === "TOTAL") || [];
 
-        // Freeze numeric values when STATUS=error
+        // Freeze numeric values when STATUS=error for that column
         const freezeLabels = new Set(["TOTAL IN", "LOADING COUNTS", "TOTAL", "AUTO1", "AUTO2", "AUTO3"]);
         if (prevRowsByLabel) {
           for (const r of rows) {
             const label = norm(r[0]);
             if (!freezeLabels.has(label)) continue;
+
             const prevRow = prevRowsByLabel[label];
             if (!prevRow) continue;
 
@@ -567,6 +610,8 @@
             }
           }
         }
+
+        lastCSVRows = rows;
 
         function findLastRow(rows, label) {
           const want = norm(label);
@@ -582,6 +627,7 @@
 
         const estFinishRow = [];
         estFinishRow[0] = "ESTIMATED FINISH";
+
         const maxColsEF = Math.max(...rows.map(r => r.length));
         for (let c = 1; c < maxColsEF; c++) {
           const startDt = parseDateTimeLocal(startRow[c]);
@@ -606,6 +652,7 @@
           const p = Math.min(1, Math.max(0.000001, progress));
           const estTotalMs = elapsedMs / p;
           const finishDt = new Date(startDt.getTime() + estTotalMs);
+
           estFinishRow[c] = fmtDateTime(finishDt);
         }
 
@@ -642,11 +689,11 @@
             // links mode: TESTER header links
             if (isHeader && c === "TESTER") {
               cellContent = showLinks
-                ? `<a href="https://connect.raspberrypi.com/devices" target="_blank">TESTER</a>`
+                ? `<a href="https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0" target="_blank">TESTER</a>`
                 : "TESTER";
             }
 
-            // Handler links
+            // Handler links (non-header only)
             if (!isHeader) {
               if (c === "CHROMA") cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e" target="_blank">CHROMA</a>` : "CHROMA";
               if (c === "NS-3")   cellContent = showLinks ? `<a href="https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46" target="_blank">NS-3</a>`   : "NS-3";
@@ -677,74 +724,45 @@
               }
             }
 
-            // AUTO1 / AUTO2 progress + yield hover mini-chart on the *number*
+            // AUTO1 progress + hover mini chart
             if (!isHeader && (rowLabel === "AUTO1" || rowLabel === "AUTO 1") && colIndex > 0) {
               const auto1 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
               if (auto1 !== null && total !== null && total > 0) {
                 const lot = getLotForCol(rows, colIndex);
                 const step = getStepForCol(rows, colIndex);
-
-                const pct = Math.max(0, Math.min(100, (auto1 / total) * 100));
-                // Wrap the numeric display with yield hover
-                const tmp = document.createElement("div");
-                tmp.className = "lc-wrap";
-
-                const numLine = document.createElement("div");
-                numLine.className = "lc-num";
-                const hoverEl = makeYieldHoverEl(auto1.toLocaleString(), lot, step, "AUTO1", rows);
-                numLine.appendChild(hoverEl);
-
-                const bar = document.createElement("div");
-                bar.className = "prog";
-                bar.innerHTML = `<div class="bar" style="width:${pct.toFixed(1)}%"></div>`;
-
-                const pctEl = document.createElement("div");
-                pctEl.className = "lc-pct";
-                pctEl.textContent = pct.toFixed(1) + "%";
-
-                tmp.appendChild(numLine);
-                tmp.appendChild(bar);
-                tmp.appendChild(pctEl);
-
-                // convert to HTML
-                cellContent = tmp.outerHTML;
+                let pct = (auto1 / total) * 100;
+                pct = Math.max(0, Math.min(100, pct));
+                cellContent = `
+                  <div class="lc-wrap">
+                    <div class="lc-num">${yieldHoverHtml(auto1.toLocaleString(), lot, step, "AUTO1")}</div>
+                    <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                  </div>
+                `;
               }
             }
 
+            // AUTO2 progress + hover mini chart
             if (!isHeader && (rowLabel === "AUTO2" || rowLabel === "AUTO 2") && colIndex > 0) {
               const auto2 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
               if (auto2 !== null && total !== null && total > 0) {
                 const lot = getLotForCol(rows, colIndex);
                 const step = getStepForCol(rows, colIndex);
-
-                const pct = Math.max(0, Math.min(100, (auto2 / total) * 100));
-                const tmp = document.createElement("div");
-                tmp.className = "lc-wrap";
-
-                const numLine = document.createElement("div");
-                numLine.className = "lc-num";
-                const hoverEl = makeYieldHoverEl(auto2.toLocaleString(), lot, step, "AUTO2", rows);
-                numLine.appendChild(hoverEl);
-
-                const bar = document.createElement("div");
-                bar.className = "prog";
-                bar.innerHTML = `<div class="bar" style="width:${pct.toFixed(1)}%"></div>`;
-
-                const pctEl = document.createElement("div");
-                pctEl.className = "lc-pct";
-                pctEl.textContent = pct.toFixed(1) + "%";
-
-                tmp.appendChild(numLine);
-                tmp.appendChild(bar);
-                tmp.appendChild(pctEl);
-
-                cellContent = tmp.outerHTML;
+                let pct = (auto2 / total) * 100;
+                pct = Math.max(0, Math.min(100, pct));
+                cellContent = `
+                  <div class="lc-wrap">
+                    <div class="lc-num">${yieldHoverHtml(auto2.toLocaleString(), lot, step, "AUTO2")}</div>
+                    <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                  </div>
+                `;
               }
             }
 
-            // AUTO3 progress (unchanged)
+            // AUTO3 progress (no hover)
             if (!isHeader && (rowLabel === "AUTO3" || rowLabel === "AUTO 3") && colIndex > 0) {
               const auto3 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
@@ -761,7 +779,7 @@
               }
             }
 
-            // STATUS row links to handler /latest.png
+            // ✅ STATUS row links to handler latest.png
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const hname = handlerAtCol(colIndex);
               const ip = HANDLER_IP[hname];
@@ -792,15 +810,33 @@
             // STATUS cell coloring
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const st = (cell || "").toString().trim().toLowerCase();
-              if (st === "running") { cellEl.style.color = "green"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#dff6df"; }
-              if (st === "error")   { cellEl.style.color = "red";   cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#ffd6d6"; }
-              if (st === "stopped") { cellEl.style.color = "goldenrod"; cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#fff3cd"; }
-              if (st === "maint")   { cellEl.style.color = "blue";  cellEl.style.fontWeight = "bold"; cellEl.style.backgroundColor = "#d6e6ff"; }
+
+              if (st === "running") {
+                cellEl.style.color = "green";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#dff6df";
+              }
+              if (st === "error") {
+                cellEl.style.color = "red";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#ffd6d6";
+              }
+              if (st === "stopped") {
+                cellEl.style.color = "goldenrod";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#fff3cd";
+              }
+              if (st === "maint") {
+                cellEl.style.color = "blue";
+                cellEl.style.fontWeight = "bold";
+                cellEl.style.backgroundColor = "#d6e6ff";
+              }
             }
 
-            // Number checks
+            // ===== Number checks =====
             if (!isHeader && colIndex > 0) {
               const autoSum = autoSumByCol[colIndex] || 0;
+
               if (rowLabel === "LOADING COUNTS") {
                 const loading = toInt(cell);
                 if (loading !== null && loading < autoSum) {
@@ -809,6 +845,7 @@
                   cellEl.style.color = "red";
                 }
               }
+
               if (rowLabel === "TOTAL") {
                 const total = toInt(cell);
                 if (total !== null && total < autoSum) {
@@ -817,6 +854,7 @@
                   cellEl.style.color = "red";
                 }
               }
+
               if (rowLabel === "TOTAL IN") {
                 const totalIn = toInt(cell);
                 const loading = toInt(loadingRow[colIndex]);
@@ -838,6 +876,9 @@
         if (old) old.remove();
         document.body.appendChild(table);
         requestAnimationFrame(() => equalizeLastColumn(table));
+
+        // Bind yield hover drawing (delegated, works across re-renders)
+        bindYieldHoverDelegation(rows);
 
         // Update prev snapshot
         const newPrev = {};
