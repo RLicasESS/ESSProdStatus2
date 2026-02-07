@@ -176,22 +176,29 @@
     }
 
     // =========================
-    // Popover sparkline drawing
+    // Popover sparkline drawing (VISIBLE ON DARK BG)
     // =========================
     function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
 
     function drawSparkline(canvas, yieldsPct) {
       const ctx = canvas.getContext('2d');
       const w = canvas.width, h = canvas.height;
+
       ctx.clearRect(0,0,w,h);
 
+      // make the line visible on dark background
+      ctx.strokeStyle = "rgba(255,255,255,0.85)";
+      ctx.fillStyle   = "rgba(255,255,255,0.85)";
+      ctx.lineWidth   = 2;
+
       // subtle baseline
-      ctx.globalAlpha = 0.25;
+      ctx.save();
+      ctx.globalAlpha = 0.18;
       ctx.beginPath();
       ctx.moveTo(0, h-1);
       ctx.lineTo(w, h-1);
       ctx.stroke();
-      ctx.globalAlpha = 1;
+      ctx.restore();
 
       if (!yieldsPct || yieldsPct.length < 2) {
         ctx.beginPath();
@@ -215,14 +222,16 @@
         return (h - pad) - t * (h - pad*2);
       };
 
+      // line
       ctx.beginPath();
       ctx.moveTo(x(0), y(yieldsPct[0]));
       for (let i=1; i<n; i++) ctx.lineTo(x(i), y(yieldsPct[i]));
       ctx.stroke();
 
+      // last dot
       const lx = x(n-1), ly = y(yieldsPct[n-1]);
       ctx.beginPath();
-      ctx.arc(lx, ly, 2.5, 0, Math.PI*2);
+      ctx.arc(lx, ly, 3.0, 0, Math.PI*2);
       ctx.fill();
     }
 
