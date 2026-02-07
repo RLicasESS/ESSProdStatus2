@@ -8,29 +8,30 @@
   <style>
     html, body { margin:0; padding:0; background:#000; color:#ddd; font-family: Arial, Helvetica, sans-serif; }
     .wrap { padding: 14px; }
-    h1 { margin: 0 0 12px 0; font-size: 18px; color:#fff; }
-    .note { font-size: 12px; color:#aaa; margin-bottom: 12px; }
+    h1 { margin: 0 0 10px 0; font-size: 18px; color:#fff; }
+    .note { font-size: 12px; color:#aaa; margin-bottom: 12px; line-height:1.35; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
     table { width: 100%; border-collapse: collapse; }
     th, td { border-bottom: 1px solid rgba(255,255,255,0.10); padding: 8px 10px; font-size: 12px; }
     th { text-align: left; color:#fff; position: sticky; top: 0; background: #090909; z-index: 1; }
     tr:hover td { background: rgba(255,255,255,0.03); }
-    .lotLink { cursor: help; text-decoration: underline; text-underline-offset: 2px; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
 
-    /* Hover popover container */
+    .lotLink { cursor: help; text-decoration: underline; text-underline-offset: 2px; }
+
+    /* Hover popover */
     #yieldPopover {
       position: fixed;
       z-index: 9999;
       display: none;
-      pointer-events: none; /* don't steal mouse */
+      pointer-events: none;
       background: rgba(20,20,20,0.95);
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 10px;
       padding: 10px 10px 8px 10px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.45);
       color: #ddd;
-      max-width: 260px;
-      white-space: pre-line; /* allow \n in meta */
+      max-width: 270px;
     }
     #yieldPopover .title {
       font-size: 12px;
@@ -50,8 +51,8 @@
     }
     #yieldPopover canvas {
       display: block;
-      width: 240px;  /* CSS size */
-      height: 60px;  /* CSS size */
+      width: 240px;
+      height: 60px;
     }
   </style>
 </head>
@@ -60,11 +61,12 @@
   <div class="wrap">
     <h1>ESS PRODUCTION STATUS (DEV)</h1>
     <div class="note">
-      Hover a LOT to see a small historical yield chart popover.
-      Requires <span class="mono">yield_history.json</span> in the same folder as this page.
+      Hover a LOT to see a tiny yield history popover.
+      This dev page tries to load <span class="mono">yield_history.json</span> from the same folder.
+      If missing (or the lot isn’t found), it shows <b>MOCK DATA</b>.
     </div>
 
-    <!-- SAMPLE TABLE (replace with your real table renderer) -->
+    <!-- SAMPLE TABLE ONLY (replace with your real table code) -->
     <table>
       <thead>
         <tr>
@@ -117,18 +119,65 @@
 
   <script>
     // =========================
-    // Hover popover sparkline
+    // Yield history loader + MOCK fallback
     // =========================
     let yieldCache = null;
 
+    function hash32(s) {
+      s = String(s || "");
+      let h = 2166136261 >>> 0;
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+
+    function genMockLotSeries(lot, n = 18) {
+      const h = hash32(lot);
+      const testerPool = ["AP-1", "AP-2", "S100_1", "S100_2"];
+      const stepPool = ["FT1", "RT-1", "RT-2", "25C_BIN1_25C_FT-1", "25C_BIN2_65C_FT-1"];
+
+      const tester = testerPool[h % testerPool.length];
+      const step = stepPool[(h >>> 3) % stepPool.length];
+
+      const base = 94 + ((h % 560) / 100);          // 94.00..99.59
+      const amp  = 0.15 + (((h >>> 9) % 35) / 100); // 0.15..0.50 (% points)
+
+      const start = Date.now() - n * 60 * 60 * 1000;
+      const out = [];
+      for (let i = 0; i < n; i++) {
+        const w = Math.sin((i + (h % 7)) * 0.55) * amp + Math.cos((i + (h % 11)) * 0.23) * (amp * 0.6);
+        const yPct = Math.max(80, Math.min(100, base + w));
+        const total = 5000 + ((h + i * 97) % 18000);
+        const good = Math.round(total * (yPct / 100));
+        const t = new Date(start + i * 60 * 60 * 1000).toISOString();
+        out.push({ t, tester, step, yield: +(yPct / 100).toFixed(6), good, total });
+      }
+      return out;
+    }
+
     async function loadYieldHistory() {
       if (yieldCache) return yieldCache;
-      const res = await fetch('yield_history.json', { cache: 'no-store' });
-      if (!res.ok) throw new Error('Missing yield_history.json (HTTP ' + res.status + ')');
-      yieldCache = await res.json();
+
+      try {
+        const res = await fetch("yield_history.json", { cache: "no-store" });
+        if (res.ok) {
+          yieldCache = await res.json();
+          yieldCache.__mock = false;
+          return yieldCache;
+        }
+      } catch (e) {
+        // ignore; fallback to mock
+      }
+
+      yieldCache = { __mock: true };
       return yieldCache;
     }
 
+    // =========================
+    // Popover sparkline drawing
+    // =========================
     function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
 
     function drawSparkline(canvas, yieldsPct) {
@@ -152,7 +201,6 @@
         return;
       }
 
-      // local min/max, clamped to a sane band
       let minY = Math.min(...yieldsPct);
       let maxY = Math.max(...yieldsPct);
       minY = clamp(minY, 80, 100);
@@ -190,7 +238,7 @@
       let top  = ev.clientY + pad;
 
       if (left + w > vw - 6) left = ev.clientX - w - pad;
-      if (top + h > vh - 6) top  = ev.clientY - h - pad;
+      if (top + h > vh - 6)  top  = ev.clientY - h - pad;
 
       pop.style.left = left + 'px';
       pop.style.top  = top + 'px';
@@ -205,28 +253,29 @@
       title.textContent = `Yield — ${lot}`;
       meta.textContent = 'Loading...';
 
-      try {
-        const hist = await loadYieldHistory();
-        const rows = (hist && hist[lot]) ? hist[lot] : [];
+      const hist = await loadYieldHistory();
+      const isMock = !!hist.__mock;
 
-        const yieldsPct = rows.map(r => Math.round((r.yield || 0) * 10000) / 100);
-        drawSparkline(canvas, yieldsPct);
+      let rows = (hist && hist[lot]) ? hist[lot] : [];
+      if (!rows.length) {
+        rows = genMockLotSeries(lot, 18);
+        hist[lot] = rows; // cache mock per-lot
+      }
 
-        if (rows.length) {
-          const last = rows[rows.length - 1];
-          const y = Math.round((last.yield || 0) * 10000) / 100;
-          meta.textContent =
-            `Last: ${last.t || ''}\n` +
-            `Yield: ${y}%  (${last.good}/${last.total})\n` +
-            `${last.tester || ''}  ${last.step || ''}`;
-        } else {
-          meta.textContent = 'No history for this lot.';
-        }
-      } catch (e) {
-        // If yield_history.json is missing, show a readable message.
-        meta.textContent = String(e);
-        // Draw "no data" dash
-        drawSparkline(canvas, []);
+      const yieldsPct = rows.map(r => Math.round((r.yield || 0) * 10000) / 100);
+      drawSparkline(canvas, yieldsPct);
+
+      if (rows.length) {
+        const last = rows[rows.length - 1];
+        const y = Math.round((last.yield || 0) * 10000) / 100;
+        const prefix = isMock ? "MOCK DATA (no yield_history.json)\n" : "";
+        meta.textContent =
+          prefix +
+          `Last: ${last.t || ''}\n` +
+          `Yield: ${y}%  (${last.good}/${last.total})\n` +
+          `${last.tester || ''}  ${last.step || ''}`;
+      } else {
+        meta.textContent = (isMock ? "MOCK DATA\n" : "") + "No history for this lot.";
       }
 
       positionPopoverNearMouse(pop, ev);
@@ -247,10 +296,8 @@
     document.addEventListener('mouseover', (ev) => {
       const el = ev.target.closest('.lotLink');
       if (!el) return;
-
       const lot = el.getAttribute('data-lot') || el.textContent.trim();
       if (!lot) return;
-
       clearTimeout(hoverTimer);
       hoverTimer = setTimeout(() => showYieldPopoverForLot(lot, ev), 120);
     });
