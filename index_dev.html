@@ -1,4 +1,4 @@
-<!-- MARKER: INDEX_DEV_YIELD_V20260207_0620 -->
+<!-- MARKER: INDEX_DEV_YIELD_V20260207_1125 -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -330,8 +330,7 @@
     }
 
     function makeMockYieldJsonFromRows(rows) {
-      // Build a mock-ish structure keyed by LOT# + TEST STEP
-      // The series is fake but stable-looking.
+      // Build a mock-ish structure keyed by LOT||STEP
       const out = {
         meta: {
           updated: nowIsoNoMs(),
@@ -362,9 +361,7 @@
         const y2 = total > 0 ? (a2 / total) : 0;
 
         const key = `${lot}||${step}`;
-        // make a little "history" around current value
         function mkSeries(y) {
-          // 12 points, drifting slightly toward current y
           const pts = [];
           let base = Math.max(0, Math.min(1, y));
           let v = Math.max(0, Math.min(1, base - 0.06));
@@ -377,11 +374,7 @@
           return pts;
         }
 
-        out.data[key] = {
-          lot, step,
-          AUTO1: mkSeries(y1),
-          AUTO2: mkSeries(y2),
-        };
+        out.data[key] = { lot, step, AUTO1: mkSeries(y1), AUTO2: mkSeries(y2) };
       }
 
       return out;
@@ -403,38 +396,51 @@
         yieldCacheMode = "real";
         return yieldCache;
       } catch (e) {
-        // fallback
         yieldCache = makeMockYieldJsonFromRows(rowsForMock || []);
         yieldCacheMode = "mock(fallback)";
         return yieldCache;
       }
     }
 
+    // ✅ FIXED: supports your real yield_live.json shape:
+    //   yj.data["LOT|STEP|AUTO1"] = [{t, tester, good, total, yield}, ...]
+    // plus your mock shape:
+    //   yj.data["LOT||STEP"] = {AUTO1:[0..1], AUTO2:[0..1]}
     function getYieldSeries(yj, lot, step, which) {
       const lot2 = (lot || "").trim();
       const step2 = (step || "").trim();
       const which2 = (which || "").trim().toUpperCase();
 
-      // Accept multiple possible shapes:
-      // A) { data: { "LOT||STEP": { AUTO1:[...], AUTO2:[...] } } }
-      // B) { lots: { LOT: { STEP: { AUTO1:[...]} } } }
-      // C) { "<LOT||STEP>": ... } (unlikely but we’ll try)
-      const key = `${lot2}||${step2}`;
-
-      let series = null;
-
-      if (yj && yj.data && yj.data[key] && yj.data[key][which2]) series = yj.data[key][which2];
-      if (!series && yj && yj.lots && yj.lots[lot2] && yj.lots[lot2][step2] && yj.lots[lot2][step2][which2]) {
-        series = yj.lots[lot2][step2][which2];
+      // --- REAL FORMAT ---
+      const keyPipe = `${lot2}|${step2}|${which2}`;
+      if (yj && yj.data && Array.isArray(yj.data[keyPipe])) {
+        const arr = yj.data[keyPipe]
+          .map(p => Number(p && p.yield))
+          .filter(v => Number.isFinite(v))
+          .map(v => Math.max(0, Math.min(1, v)));
+        if (arr.length) return arr.length === 1 ? [arr[0], arr[0]] : arr;
       }
-      if (!series && yj && yj[key] && yj[key][which2]) series = yj[key][which2];
 
-      if (!Array.isArray(series) || !series.length) throw new Error("missing lot history");
-      return series.map(x => {
-        const v = Number(x);
-        if (!Number.isFinite(v)) return 0;
-        return Math.max(0, Math.min(1, v));
-      });
+      // --- MOCK FORMAT ---
+      const keyMock = `${lot2}||${step2}`;
+      if (yj && yj.data && yj.data[keyMock] && Array.isArray(yj.data[keyMock][which2])) {
+        const arr = yj.data[keyMock][which2]
+          .map(x => Number(x))
+          .filter(v => Number.isFinite(v))
+          .map(v => Math.max(0, Math.min(1, v)));
+        if (arr.length) return arr.length === 1 ? [arr[0], arr[0]] : arr;
+      }
+
+      // --- legacy shapes (optional) ---
+      if (yj && yj.lots && yj.lots[lot2] && yj.lots[lot2][step2] && Array.isArray(yj.lots[lot2][step2][which2])) {
+        const arr = yj.lots[lot2][step2][which2]
+          .map(x => Number(x))
+          .filter(v => Number.isFinite(v))
+          .map(v => Math.max(0, Math.min(1, v)));
+        if (arr.length) return arr.length === 1 ? [arr[0], arr[0]] : arr;
+      }
+
+      throw new Error("missing lot history");
     }
 
     function drawMiniChart(canvas, series) {
@@ -461,7 +467,12 @@
 
       // plot series
       const n = series.length;
-      if (n < 2) return;
+      if (n < 2) {
+        ctx.fillStyle = "#b00020";
+        ctx.font = "12px Arial";
+        ctx.fillText("missing lot history", 10, 22);
+        return;
+      }
 
       const padL = 36, padR = 6, padT = 6, padB = 14;
       const x0 = padL, x1 = w - padR;
@@ -498,7 +509,6 @@
 
     // Bind ONE delegated handler so hover always works even after re-render
     function bindYieldHoverDelegation(rowsForMock) {
-      // remove old if any (idempotent)
       if (window.__yieldDelegationBound) return;
       window.__yieldDelegationBound = true;
 
@@ -510,11 +520,9 @@
         if (el.dataset.loaded === "1") return;
         el.dataset.loaded = "1";
 
-        const tip = el.querySelector(".yieldTip");
         const canvas = el.querySelector("canvas.yieldCanvas");
         const note = el.querySelector("[data-note]");
 
-        // ensure popup shows even if chart fails (CSS handles display)
         try {
           note.textContent = "Loading…";
           const lot = el.getAttribute("data-lot") || "";
@@ -534,6 +542,7 @@
           ctx.font = "12px Arial";
           ctx.fillText("missing lot history", 10, 22);
           note.textContent = "Missing lot history";
+          if (debug) console.log("YIELD MISS", e);
         }
       });
     }
