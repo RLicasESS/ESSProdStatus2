@@ -3,6 +3,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ESS PRODUCTION STATUS (DEV)</title>
   <style>
     table {
@@ -53,10 +54,13 @@
     .prog > .bar { height: 100%; width: 0%; background: #2e7d32; }
     .lc-pct { font-size: 12px; color: #444; }
 
+    /* ---------- Yield tooltip ---------- */
     .yieldHover { position: relative; display: inline-block; cursor: help; }
-    .yieldHover:hover .yieldTip { display: block; }
+    /* JS toggles .isOpen for mobile + desktop */
+    .yieldTip { display: none; }
+    .yieldHover.isOpen .yieldTip { display: block; }
+
     .yieldTip {
-      display: none;
       position: absolute;
       left: 0;
       top: 110%;
@@ -78,9 +82,16 @@
       border-radius: 8px;
       display: block;
       background: #fafafa;
+      touch-action: none;
     }
     .yieldLegend { margin-top: 6px; font-size: 11px; color: #666; display: flex; justify-content: space-between; }
     .yieldNote   { margin-top: 6px; font-size: 11px; color: #777; }
+
+    /* Mobile layout: make table full-width and tooltip not clipped */
+    @media (max-width: 800px) {
+      table, #dbg { width: 96%; }
+      .yieldTip { left: 50%; transform: translateX(-50%); }
+    }
   </style>
 </head>
 
@@ -109,8 +120,9 @@
       return Number.isFinite(n) && n >= 3 ? n : 0;
     })();
 
-    // Optional: y-axis zoom to data range: ?yzoom=1
-    const yZoom = params.get("yzoom") === "1";
+    // yScale: ?yScale=auto (preferred), or legacy ?yzoom=1
+    const yScale = (params.get("yScale") || "").toLowerCase();
+    const yZoom = (yScale === "auto") || (params.get("yzoom") === "1");
 
     document.title = "ESS PRODUCTION STATUS (DEV)";
 
@@ -328,7 +340,6 @@
       // Fallbacks (older shapes you had):
       const key2 = `${lot2}||${step2}`;
       if (!arr && yj && yj.data && yj.data[key2] && Array.isArray(yj.data[key2][which2])) {
-        // old "numeric array" series -> convert
         const nums = yj.data[key2][which2];
         arr = nums.map(v => ({ t: "", tester: "", good: null, total: null, yield: Number(v) }));
       }
@@ -367,9 +378,13 @@
       return out;
     }
 
-    function drawMiniChart(canvas, series, opts) {
+    function drawMiniChart(canvas, series) {
       const ctx = canvas.getContext("2d");
-      const w = canvas.width, h = canvas.height;
+
+      // IMPORTANT: after DPR scaling we draw in CSS pixels
+      const w = canvas.clientWidth || 220;
+      const h = canvas.clientHeight || 70;
+
       ctx.clearRect(0, 0, w, h);
 
       let s = series.slice();
@@ -382,7 +397,7 @@
         const pad = Math.max(0.01, (mx - mn) * 0.25);
         yMin = Math.max(0, mn - pad);
         yMax = Math.min(1, mx + pad);
-        if (yMax - yMin < 0.02) { // avoid too-flat zoom
+        if (yMax - yMin < 0.02) {
           yMin = Math.max(0, yMin - 0.01);
           yMax = Math.min(1, yMax + 0.01);
         }
@@ -396,7 +411,7 @@
         ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(w, yy); ctx.stroke();
       }
 
-      // labels (top/bottom reflect zoom)
+      // labels
       ctx.fillStyle = "#666";
       ctx.font = "11px Arial";
       ctx.fillText(Math.round(yMax * 100) + "%", 6, 12);
@@ -439,20 +454,37 @@
       ctx.fillText(Math.round(lastV * 100) + "%", x0, h - 2);
     }
 
+    // ===== Yield hover delegation (desktop hover + mobile tap) =====
     function bindYieldHoverDelegation(rowsForMock) {
       if (window.__yieldDelegationBound) return;
       window.__yieldDelegationBound = true;
 
-      document.addEventListener("mouseover", async (ev) => {
-        const el = ev.target.closest && ev.target.closest(".yieldHover");
-        if (!el) return;
+      const isTouch = window.matchMedia && window.matchMedia("(hover: none), (pointer: coarse)").matches;
 
+      function closeAll() {
+        document.querySelectorAll(".yieldHover.isOpen").forEach(x => x.classList.remove("isOpen"));
+      }
+
+      function ensureDprCanvas(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const cw = canvas.clientWidth || 220;
+        const ch = canvas.clientHeight || 70;
+        const w = Math.max(1, Math.round(cw * dpr));
+        const h = Math.max(1, Math.round(ch * dpr));
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in CSS pixels
+        }
+      }
+
+      async function loadAndDraw(el) {
         if (el.dataset.loaded === "1") return;
         el.dataset.loaded = "1";
 
         const canvas = el.querySelector("canvas.yieldCanvas");
         const note = el.querySelector("[data-note]");
-
         try {
           note.textContent = "Loading…";
           const lot  = el.getAttribute("data-lot") || "";
@@ -462,22 +494,54 @@
           const yj = await loadYieldCache(rowsForMock || []);
           const objSeries = getYieldObjSeries(yj, lot, step, which);
 
-          // Convert to numeric series (0..1)
           const series = objSeries.map(p => {
             const v = Number(p.yield);
             return Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : 0;
           });
 
-          drawMiniChart(canvas, series, {});
+          ensureDprCanvas(canvas);
+          drawMiniChart(canvas, series);
           note.textContent = (yieldCacheMode && yieldCacheMode.startsWith("mock")) ? "Mock data" : "Real data";
         } catch (e) {
+          ensureDprCanvas(canvas);
           const ctx = canvas.getContext("2d");
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.clearRect(0, 0, canvas.clientWidth || 220, canvas.clientHeight || 70);
           ctx.fillStyle = "#b00020";
           ctx.font = "12px Arial";
           ctx.fillText("missing lot history", 10, 22);
           note.textContent = "Missing lot history";
         }
+      }
+
+      // Desktop: open on hover
+      document.addEventListener("pointerenter", async (ev) => {
+        if (isTouch) return;
+        const el = ev.target.closest && ev.target.closest(".yieldHover");
+        if (!el) return;
+        el.classList.add("isOpen");
+        await loadAndDraw(el);
+      }, true);
+
+      document.addEventListener("pointerleave", (ev) => {
+        if (isTouch) return;
+        const el = ev.target.closest && ev.target.closest(".yieldHover");
+        if (!el) return;
+        el.classList.remove("isOpen");
+      }, true);
+
+      // Mobile: tap to toggle; tap elsewhere closes
+      document.addEventListener("click", async (ev) => {
+        const el = ev.target.closest && ev.target.closest(".yieldHover");
+        if (!el) { closeAll(); return; }
+
+        const willOpen = !el.classList.contains("isOpen");
+        closeAll();
+        if (willOpen) {
+          el.classList.add("isOpen");
+          await loadAndDraw(el);
+        }
+        ev.preventDefault();
+        ev.stopPropagation();
       });
     }
 
@@ -486,7 +550,10 @@
 
     async function loadCSV() {
       try {
-        dbg(`Loading CSV…\nYield mode: ${yieldMode}\nYield URL: ${YIELD_URL}\nuseYieldForBars: ${useYieldForBars}\nsmooth: ${smoothWin}\nyzoom: ${yZoom}`);
+        dbg(
+          `Loading CSV…\nYield mode: ${yieldMode}\nYield URL: ${YIELD_URL}\nuseYieldForBars: ${useYieldForBars}\n` +
+          `smooth: ${smoothWin}\nyScale: ${yScale || "(none)"}\nyZoom: ${yZoom}`
+        );
 
         const resp = await fetch(
           CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "v=" + Date.now(),
@@ -589,7 +656,7 @@
 
             if (isHeader && c === "TESTER") {
               cellContent = showLinks
-                ? `<a href="https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0" target="_blank">TESTER</a>`
+                ? `<a href="https://connect.raspberrypi.com/devices" target="_blank">TESTER</a>`
                 : "TESTER";
             }
 
@@ -627,7 +694,6 @@
               const lot = getLotForCol(rows, colIndex);
               const step = getStepForCol(rows, colIndex);
 
-              let usedYield = false;
               let goodToShow = toInt(cell);
               let pct = null;
 
@@ -637,13 +703,11 @@
                   if (p && p.yield !== null) {
                     pct = p.yield * 100;
                     goodToShow = (p.good !== null) ? p.good : goodToShow;
-                    usedYield = true;
                   }
                 } catch (e) {}
               }
 
               if (pct === null) {
-                // fallback: old behavior
                 const auto1 = toInt(cell);
                 const total = toInt(totalRow[colIndex]);
                 if (auto1 !== null && total !== null && total > 0) pct = (auto1 / total) * 100;
@@ -656,7 +720,7 @@
                   <div class="lc-wrap">
                     <div class="lc-num">${yieldHoverHtml(label, lot, step, "AUTO1")}</div>
                     <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
-                    <div class="lc-pct">${pct.toFixed(1)}%${usedYield ? "" : ""}</div>
+                    <div class="lc-pct">${pct.toFixed(1)}%</div>
                   </div>
                 `;
               }
@@ -667,7 +731,6 @@
               const lot = getLotForCol(rows, colIndex);
               const step = getStepForCol(rows, colIndex);
 
-              let usedYield = false;
               let goodToShow = toInt(cell);
               let pct = null;
 
@@ -677,7 +740,6 @@
                   if (p && p.yield !== null) {
                     pct = p.yield * 100;
                     goodToShow = (p.good !== null) ? p.good : goodToShow;
-                    usedYield = true;
                   }
                 } catch (e) {}
               }
