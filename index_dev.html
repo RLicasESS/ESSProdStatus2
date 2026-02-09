@@ -1,4 +1,4 @@
-<!-- MARKER: INDEX_DEV_YIELD_V20260209_NULLSAFE_AUTOSCALE -->
+<!-- MARKER: INDEX_DEV_YIELD_V20260209_FIX_SCALE_SMOOTH_KEYS -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -56,7 +56,6 @@
 
     /* ---------- Yield tooltip ---------- */
     .yieldHover { position: relative; display: inline-block; cursor: help; }
-    /* JS toggles .isOpen for mobile + desktop */
     .yieldTip { display: none; }
     .yieldHover.isOpen .yieldTip { display: block; }
 
@@ -87,7 +86,6 @@
     .yieldLegend { margin-top: 6px; font-size: 11px; color: #666; display: flex; justify-content: space-between; }
     .yieldNote   { margin-top: 6px; font-size: 11px; color: #777; }
 
-    /* Mobile layout */
     @media (max-width: 800px) {
       table, #dbg { width: 96%; }
       .yieldTip { left: 50%; transform: translateX(-50%); }
@@ -114,16 +112,23 @@
     // ?yieldbar=0 -> revert to CSV auto/total bars
     const useYieldForBars = (params.get("yieldbar") || "1") !== "0";
 
-    // Optional: smooth mini-chart with median window: ?smooth=5
-    // (If you want "auto" behavior, keep smooth=0 or pass an odd >=3)
+    // Smoothing:
+    //   ?smooth=auto  -> default window 5
+    //   ?smooth=5     -> median window 5
+    //   ?smooth=0     -> off
     const smoothWin = (() => {
-      const n = parseInt(params.get("smooth") || "0", 10);
+      const raw = (params.get("smooth") || "").toLowerCase().trim();
+      if (!raw) return 0;
+      if (raw === "auto") return 5;
+      const n = parseInt(raw, 10);
       return Number.isFinite(n) && n >= 3 ? n : 0;
     })();
 
-    // yScale: ?yScale=auto (preferred), or legacy ?yzoom=1
-    const yScale = (params.get("yScale") || "").toLowerCase();
-    const yZoom = (yScale === "auto") || (params.get("yzoom") === "1");
+    // yScale:
+    //   ?yScale=auto  -> robust zoom
+    //   ?yScale=full  -> 0..100
+    const yScale = (params.get("yScale") || "auto").toLowerCase();
+    const yZoom = (yScale !== "full");
 
     document.title = "ESS PRODUCTION STATUS (DEV)";
 
@@ -251,6 +256,7 @@
     // ===== Yield cache =====
     let yieldCache = null;
     let yieldCacheMode = null;
+    let yieldKeyMap = null; // normalizedKey -> realKey
 
     async function fetchJson(url) {
       const res = await fetch(url + (url.includes("?") ? "&" : "?") + "v=" + Date.now(), { cache: "no-store" });
@@ -305,12 +311,40 @@
       return out;
     }
 
+    function normKeyPart_(s) {
+      // normalize for matching keys between CSV and JSON (whitespace/invisible/case differences)
+      return String(s ?? "")
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")  // zero-width
+        .replace(/\s+/g, " ")
+        .trim()
+        .toUpperCase();
+    }
+
+    function buildYieldKeyMap_(yj) {
+      const map = new Map();
+      if (!yj || !yj.data) return map;
+      for (const k of Object.keys(yj.data)) {
+        // We only care about pipe keys (LOT|STEP|AUTO1)
+        const kk = String(k);
+        const parts = kk.split("|");
+        if (parts.length >= 3) {
+          const nLot  = normKeyPart_(parts[0]);
+          const nStep = normKeyPart_(parts[1]);
+          const nW    = normKeyPart_(parts[2]);
+          const nk = `${nLot}|${nStep}|${nW}`;
+          if (!map.has(nk)) map.set(nk, kk);
+        }
+      }
+      return map;
+    }
+
     async function loadYieldCache(rowsForMock) {
       if (yieldCache && yieldCacheMode === yieldMode) return yieldCache;
 
       if (yieldMode === "mock") {
         yieldCache = makeMockYieldJsonFromRows(rowsForMock || []);
         yieldCacheMode = "mock";
+        yieldKeyMap = buildYieldKeyMap_(yieldCache);
         return yieldCache;
       }
 
@@ -318,30 +352,39 @@
         const j = await fetchJson(YIELD_URL);
         yieldCache = j;
         yieldCacheMode = "real";
+        yieldKeyMap = buildYieldKeyMap_(yieldCache);
         return yieldCache;
       } catch (e) {
         yieldCache = makeMockYieldJsonFromRows(rowsForMock || []);
         yieldCacheMode = "mock(fallback)";
+        yieldKeyMap = buildYieldKeyMap_(yieldCache);
         return yieldCache;
       }
     }
 
-    // ✅ Supports: data["LOT|STEP|AUTO1"] = [{..., yield:0.97}, ...]
+    function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+
+    // ✅ Robust key lookup + NO "bad -> 0" conversion here
     function getYieldObjSeries(yj, lot, step, which) {
-      const lot2 = (lot || "").trim();
-      const step2 = (step || "").trim();
-      const which2 = (which || "").trim().toUpperCase();
-      const keyPipe = `${lot2}|${step2}|${which2}`;
+      const lot2 = normKeyPart_(lot);
+      const step2 = normKeyPart_(step);
+      const which2 = normKeyPart_(which);
+      const nk = `${lot2}|${step2}|${which2}`;
+
+      let realKey = null;
+
+      if (yj && yj.data && Array.isArray(yj.data[`${lot}|${step}|${which}`])) {
+        // exact match already works
+        realKey = `${lot}|${step}|${which}`;
+      } else if (yieldKeyMap && yieldKeyMap.has(nk)) {
+        realKey = yieldKeyMap.get(nk);
+      } else if (yj && yj.data && Array.isArray(yj.data[nk])) {
+        // in case upstream already normalized
+        realKey = nk;
+      }
 
       let arr = null;
-      if (yj && yj.data && Array.isArray(yj.data[keyPipe])) arr = yj.data[keyPipe];
-
-      // Older fallback shape
-      const key2 = `${lot2}||${step2}`;
-      if (!arr && yj && yj.data && yj.data[key2] && Array.isArray(yj.data[key2][which2])) {
-        const nums = yj.data[key2][which2];
-        arr = nums.map(v => ({ t: "", tester: "", good: null, total: null, yield: Number(v) }));
-      }
+      if (realKey && yj && yj.data && Array.isArray(yj.data[realKey])) arr = yj.data[realKey];
 
       if (!Array.isArray(arr) || !arr.length) throw new Error("missing lot history");
       return arr;
@@ -357,38 +400,37 @@
         t: last.t || "",
         tester: last.tester || "",
         good, total,
-        yield: Number.isFinite(y) ? Math.max(0, Math.min(1, y)) : null
+        yield: Number.isFinite(y) ? clamp01(y) : null
       };
     }
 
-    // ---------- NULL-SAFE median smoothing ----------
     function medianSmooth(series, win) {
       if (!win || win < 3) return series.slice();
       const w = win % 2 === 1 ? win : win + 1;
       const half = Math.floor(w / 2);
-
       const out = [];
       for (let i = 0; i < series.length; i++) {
-        if (series[i] == null) { out.push(null); continue; }
-
         const a = Math.max(0, i - half);
         const b = Math.min(series.length - 1, i + half);
-
         const window = [];
-        for (let k = a; k <= b; k++) {
-          const v = series[k];
-          if (v != null) window.push(v);
-        }
-        if (!window.length) { out.push(null); continue; }
-
+        for (let k = a; k <= b; k++) window.push(series[k]);
         window.sort((x, y) => x - y);
         out.push(window[Math.floor(window.length / 2)]);
       }
       return out;
     }
 
-    // ---------- Mini chart (NULL-SAFE + autoscale ignores nulls + line breaks) ----------
-    function drawMiniChart(canvas, series) {
+    function quantile(arr, q) {
+      if (!arr.length) return 0;
+      const s = arr.slice().sort((a,b)=>a-b);
+      const pos = (s.length - 1) * q;
+      const base = Math.floor(pos);
+      const rest = pos - base;
+      if (s[base + 1] === undefined) return s[base];
+      return s[base] + rest * (s[base + 1] - s[base]);
+    }
+
+    function drawMiniChart(canvas, seriesRaw) {
       const ctx = canvas.getContext("2d");
 
       const w = canvas.clientWidth || 220;
@@ -396,23 +438,38 @@
 
       ctx.clearRect(0, 0, w, h);
 
-      let s = series.slice();
-      if (smoothWin) s = medianSmooth(s, smoothWin);
+      // filter invalids (NO "bad -> 0")
+      let s = (seriesRaw || []).filter(v => Number.isFinite(v)).map(clamp01);
 
-      // autoscale uses ONLY valid points
+      // if we somehow only have 1 point, duplicate for a flat line
+      if (s.length === 1) s = [s[0], s[0]];
+
+      if (smoothWin && s.length >= 3) s = medianSmooth(s, smoothWin);
+
       let yMin = 0, yMax = 1;
-      const valid = s.filter(v => v != null);
 
-      if (yZoom && valid.length) {
-        const mn = Math.min(...valid);
-        const mx = Math.max(...valid);
-        const pad = Math.max(0.01, (mx - mn) * 0.25);
-        yMin = Math.max(0, mn - pad);
-        yMax = Math.min(1, mx + pad);
+      if (yZoom && s.length >= 2) {
+        // robust scale (ignore extreme outliers)
+        const qLo = quantile(s, 0.10);
+        const qHi = quantile(s, 0.90);
+        let lo = Math.min(qLo, qHi);
+        let hi = Math.max(qLo, qHi);
 
-        if (yMax - yMin < 0.02) {
-          yMin = Math.max(0, yMin - 0.01);
-          yMax = Math.min(1, yMax + 0.01);
+        // always include last point in view
+        const lastV = s[s.length - 1];
+        lo = Math.min(lo, lastV);
+        hi = Math.max(hi, lastV);
+
+        // padding
+        const span = Math.max(1e-6, hi - lo);
+        const pad = Math.max(0.01, span * 0.25);
+        yMin = Math.max(0, lo - pad);
+        yMax = Math.min(1, hi + pad);
+
+        // if still too tight, widen a bit
+        if (yMax - yMin < 0.03) {
+          yMin = Math.max(0, yMin - 0.02);
+          yMax = Math.min(1, yMax + 0.02);
         }
       }
 
@@ -431,7 +488,7 @@
       ctx.fillText(Math.round(yMin * 100) + "%", 10, h - 6);
 
       const n = s.length;
-      if (n < 2 || !valid.length) return;
+      if (n < 2) return;
 
       const padL = 36, padR = 6, padT = 6, padB = 14;
       const x0 = padL, x1 = w - padR;
@@ -446,39 +503,25 @@
       ctx.strokeStyle = "#111";
       ctx.lineWidth = 2;
       ctx.beginPath();
-
-      // break line across nulls
-      let penDown = false;
       for (let i = 0; i < n; i++) {
-        const v = s[i];
-        const tt = i / (n - 1);
-        const x = x0 + tt * (x1 - x0);
-
-        if (v == null) { penDown = false; continue; }
-
-        const y = mapY(v);
-        if (!penDown) { ctx.moveTo(x, y); penDown = true; }
+        const t = i / (n - 1);
+        const x = x0 + t * (x1 - x0);
+        const y = mapY(s[i]);
+        if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
       ctx.stroke();
 
-      // last valid dot + label
-      let lastIdx = -1;
-      for (let i = n - 1; i >= 0; i--) {
-        if (s[i] != null) { lastIdx = i; break; }
-      }
-      if (lastIdx >= 0) {
-        const lastV = s[lastIdx];
-        const lastX = x0 + (lastIdx / (n - 1)) * (x1 - x0);
-        const lastY = mapY(lastV);
+      // last dot + label
+      const lastV = s[n - 1];
+      const lastX = x1;
+      const lastY = mapY(lastV);
+      ctx.fillStyle = "#111";
+      ctx.beginPath(); ctx.arc(lastX, lastY, 3, 0, Math.PI * 2); ctx.fill();
 
-        ctx.fillStyle = "#111";
-        ctx.beginPath(); ctx.arc(lastX, lastY, 3, 0, Math.PI * 2); ctx.fill();
-
-        ctx.fillStyle = "#111";
-        ctx.font = "12px Arial";
-        ctx.fillText(Math.round(lastV * 100) + "%", x0, h - 2);
-      }
+      ctx.fillStyle = "#111";
+      ctx.font = "12px Arial";
+      ctx.fillText(Math.round(lastV * 100) + "%", x0, h - 2);
     }
 
     // ===== Yield hover delegation (desktop hover + mobile tap) =====
@@ -521,11 +564,13 @@
           const yj = await loadYieldCache(rowsForMock || []);
           const objSeries = getYieldObjSeries(yj, lot, step, which);
 
-          // ✅ NULL-SAFE: invalid points become null (not 0)
-          const series = objSeries.map(p => {
-            const v = Number(p.yield);
-            return Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : null;
-          });
+          // IMPORTANT: filter invalid instead of turning them into 0
+          const series = objSeries
+            .map(p => Number(p.yield))
+            .filter(v => Number.isFinite(v))
+            .map(v => clamp01(v));
+
+          if (series.length < 1) throw new Error("missing lot history");
 
           ensureDprCanvas(canvas);
           drawMiniChart(canvas, series);
@@ -580,8 +625,7 @@
       try {
         dbg(
           `Loading CSV…\nYield mode: ${yieldMode}\nYield URL: ${YIELD_URL}\nuseYieldForBars: ${useYieldForBars}\n` +
-          `smooth: ${smoothWin}\nyScale: ${yScale || "(none)"}\nyZoom: ${yZoom}\n` +
-          `NOTE: null-safe autoscale enabled`
+          `smooth: ${smoothWin}\nyScale: ${yScale}\nyZoom: ${yZoom}`
         );
 
         const resp = await fetch(
@@ -701,7 +745,7 @@
             if (showLinks && c === "S100_1") cellContent = `<a href="vnc://S100-1">S100_1</a>`;
             if (showLinks && c === "S100_2") cellContent = `<a href="vnc://S100-2">S100_2</a>`;
 
-            // LOADING COUNTS progress (still CSV-based)
+            // LOADING COUNTS progress (CSV-based)
             if (!isHeader && rowLabel === "LOADING COUNTS" && colIndex > 0) {
               const loading = toInt(cell);
               const totalIn = totalInByCol[colIndex];
@@ -718,7 +762,7 @@
               }
             }
 
-            // ✅ AUTO1 yield bar synced to yield_live.json (same totals)
+            // ✅ AUTO1 yield bar + hover on the number
             if (!isHeader && (rowLabel === "AUTO1" || rowLabel === "AUTO 1") && colIndex > 0) {
               const lot = getLotForCol(rows, colIndex);
               const step = getStepForCol(rows, colIndex);
@@ -755,7 +799,7 @@
               }
             }
 
-            // ✅ AUTO2 yield bar synced to yield_live.json (same totals)
+            // ✅ AUTO2 yield bar + hover on the number
             if (!isHeader && (rowLabel === "AUTO2" || rowLabel === "AUTO 2") && colIndex > 0) {
               const lot = getLotForCol(rows, colIndex);
               const step = getStepForCol(rows, colIndex);
@@ -792,7 +836,7 @@
               }
             }
 
-            // AUTO3 bar unchanged (CSV-based)
+            // AUTO3 unchanged (CSV-based)
             if (!isHeader && (rowLabel === "AUTO3" || rowLabel === "AUTO 3") && colIndex > 0) {
               const auto3 = toInt(cell);
               const total = toInt(totalRow[colIndex]);
@@ -876,4 +920,3 @@
   </script>
 </body>
 </html>
-
