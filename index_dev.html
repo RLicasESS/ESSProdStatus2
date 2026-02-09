@@ -1,4 +1,4 @@
-<!-- MARKER: INDEX_DEV_YIELD_V20260207_SYNC_TOTALS -->
+<!-- MARKER: INDEX_DEV_YIELD_V20260209_NULLSAFE_AUTOSCALE -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -87,7 +87,7 @@
     .yieldLegend { margin-top: 6px; font-size: 11px; color: #666; display: flex; justify-content: space-between; }
     .yieldNote   { margin-top: 6px; font-size: 11px; color: #777; }
 
-    /* Mobile layout: make table full-width and tooltip not clipped */
+    /* Mobile layout */
     @media (max-width: 800px) {
       table, #dbg { width: 96%; }
       .yieldTip { left: 50%; transform: translateX(-50%); }
@@ -115,6 +115,7 @@
     const useYieldForBars = (params.get("yieldbar") || "1") !== "0";
 
     // Optional: smooth mini-chart with median window: ?smooth=5
+    // (If you want "auto" behavior, keep smooth=0 or pass an odd >=3)
     const smoothWin = (() => {
       const n = parseInt(params.get("smooth") || "0", 10);
       return Number.isFinite(n) && n >= 3 ? n : 0;
@@ -325,7 +326,7 @@
       }
     }
 
-    // ✅ Support your real JSON key shape: data["LOT|STEP|AUTO1"] = [{..., yield:0.97}, ...]
+    // ✅ Supports: data["LOT|STEP|AUTO1"] = [{..., yield:0.97}, ...]
     function getYieldObjSeries(yj, lot, step, which) {
       const lot2 = (lot || "").trim();
       const step2 = (step || "").trim();
@@ -333,11 +334,9 @@
       const keyPipe = `${lot2}|${step2}|${which2}`;
 
       let arr = null;
-
-      // Shape D (your pasted raw data)
       if (yj && yj.data && Array.isArray(yj.data[keyPipe])) arr = yj.data[keyPipe];
 
-      // Fallbacks (older shapes you had):
+      // Older fallback shape
       const key2 = `${lot2}||${step2}`;
       if (!arr && yj && yj.data && yj.data[key2] && Array.isArray(yj.data[key2][which2])) {
         const nums = yj.data[key2][which2];
@@ -362,26 +361,36 @@
       };
     }
 
+    // ---------- NULL-SAFE median smoothing ----------
     function medianSmooth(series, win) {
       if (!win || win < 3) return series.slice();
       const w = win % 2 === 1 ? win : win + 1;
       const half = Math.floor(w / 2);
+
       const out = [];
       for (let i = 0; i < series.length; i++) {
+        if (series[i] == null) { out.push(null); continue; }
+
         const a = Math.max(0, i - half);
         const b = Math.min(series.length - 1, i + half);
+
         const window = [];
-        for (let k = a; k <= b; k++) window.push(series[k]);
+        for (let k = a; k <= b; k++) {
+          const v = series[k];
+          if (v != null) window.push(v);
+        }
+        if (!window.length) { out.push(null); continue; }
+
         window.sort((x, y) => x - y);
         out.push(window[Math.floor(window.length / 2)]);
       }
       return out;
     }
 
+    // ---------- Mini chart (NULL-SAFE + autoscale ignores nulls + line breaks) ----------
     function drawMiniChart(canvas, series) {
       const ctx = canvas.getContext("2d");
 
-      // IMPORTANT: after DPR scaling we draw in CSS pixels
       const w = canvas.clientWidth || 220;
       const h = canvas.clientHeight || 70;
 
@@ -390,13 +399,17 @@
       let s = series.slice();
       if (smoothWin) s = medianSmooth(s, smoothWin);
 
+      // autoscale uses ONLY valid points
       let yMin = 0, yMax = 1;
-      if (yZoom && s.length) {
-        const mn = Math.min(...s);
-        const mx = Math.max(...s);
+      const valid = s.filter(v => v != null);
+
+      if (yZoom && valid.length) {
+        const mn = Math.min(...valid);
+        const mx = Math.max(...valid);
         const pad = Math.max(0.01, (mx - mn) * 0.25);
         yMin = Math.max(0, mn - pad);
         yMax = Math.min(1, mx + pad);
+
         if (yMax - yMin < 0.02) {
           yMin = Math.max(0, yMin - 0.01);
           yMax = Math.min(1, yMax + 0.01);
@@ -418,7 +431,7 @@
       ctx.fillText(Math.round(yMin * 100) + "%", 10, h - 6);
 
       const n = s.length;
-      if (n < 2) return;
+      if (n < 2 || !valid.length) return;
 
       const padL = 36, padR = 6, padT = 6, padB = 14;
       const x0 = padL, x1 = w - padR;
@@ -433,25 +446,39 @@
       ctx.strokeStyle = "#111";
       ctx.lineWidth = 2;
       ctx.beginPath();
+
+      // break line across nulls
+      let penDown = false;
       for (let i = 0; i < n; i++) {
-        const t = i / (n - 1);
-        const x = x0 + t * (x1 - x0);
-        const y = mapY(s[i]);
-        if (i === 0) ctx.moveTo(x, y);
+        const v = s[i];
+        const tt = i / (n - 1);
+        const x = x0 + tt * (x1 - x0);
+
+        if (v == null) { penDown = false; continue; }
+
+        const y = mapY(v);
+        if (!penDown) { ctx.moveTo(x, y); penDown = true; }
         else ctx.lineTo(x, y);
       }
       ctx.stroke();
 
-      // last dot + label
-      const lastV = s[n - 1];
-      const lastX = x1;
-      const lastY = mapY(lastV);
-      ctx.fillStyle = "#111";
-      ctx.beginPath(); ctx.arc(lastX, lastY, 3, 0, Math.PI * 2); ctx.fill();
+      // last valid dot + label
+      let lastIdx = -1;
+      for (let i = n - 1; i >= 0; i--) {
+        if (s[i] != null) { lastIdx = i; break; }
+      }
+      if (lastIdx >= 0) {
+        const lastV = s[lastIdx];
+        const lastX = x0 + (lastIdx / (n - 1)) * (x1 - x0);
+        const lastY = mapY(lastV);
 
-      ctx.fillStyle = "#111";
-      ctx.font = "12px Arial";
-      ctx.fillText(Math.round(lastV * 100) + "%", x0, h - 2);
+        ctx.fillStyle = "#111";
+        ctx.beginPath(); ctx.arc(lastX, lastY, 3, 0, Math.PI * 2); ctx.fill();
+
+        ctx.fillStyle = "#111";
+        ctx.font = "12px Arial";
+        ctx.fillText(Math.round(lastV * 100) + "%", x0, h - 2);
+      }
     }
 
     // ===== Yield hover delegation (desktop hover + mobile tap) =====
@@ -494,9 +521,10 @@
           const yj = await loadYieldCache(rowsForMock || []);
           const objSeries = getYieldObjSeries(yj, lot, step, which);
 
+          // ✅ NULL-SAFE: invalid points become null (not 0)
           const series = objSeries.map(p => {
             const v = Number(p.yield);
-            return Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : 0;
+            return Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : null;
           });
 
           ensureDprCanvas(canvas);
@@ -552,7 +580,8 @@
       try {
         dbg(
           `Loading CSV…\nYield mode: ${yieldMode}\nYield URL: ${YIELD_URL}\nuseYieldForBars: ${useYieldForBars}\n` +
-          `smooth: ${smoothWin}\nyScale: ${yScale || "(none)"}\nyZoom: ${yZoom}`
+          `smooth: ${smoothWin}\nyScale: ${yScale || "(none)"}\nyZoom: ${yZoom}\n` +
+          `NOTE: null-safe autoscale enabled`
         );
 
         const resp = await fetch(
@@ -847,3 +876,4 @@
   </script>
 </body>
 </html>
+
