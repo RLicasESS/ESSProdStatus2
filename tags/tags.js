@@ -1,6 +1,6 @@
 // ==========================================
-// TAG SEED UI (writes TAG_ID + IN to ESS Current Lots)
-// Backend: ESS Current Lots Apps Script WebApp
+// ESS Tags → Seed ESS Current Lots (Option A)
+// Backend: ESS Current Lots Apps Script Web App
 // ==========================================
 
 const API_URL =
@@ -8,13 +8,21 @@ const API_URL =
 
 function $(id) { return document.getElementById(id); }
 
-function show(el, on = true) { el.style.display = on ? "" : "none"; }
+function showStatus(html, isError = false) {
+  const el = $("status");
+  el.style.display = "";
+  el.style.padding = "10px";
+  el.style.borderRadius = "8px";
+  el.style.border = "1px solid #ccc";
+  el.style.background = isError ? "#fff2f2" : "#f3fff3";
+  el.style.color = isError ? "#b00020" : "#0a6b0a";
+  el.innerHTML = html;
+}
 
-function setStatus(msg, isError = false) {
-  const box = $("status");
-  box.textContent = msg;
-  box.style.color = isError ? "#b00020" : "#111";
-  show(box, true);
+function hideStatus() {
+  const el = $("status");
+  el.style.display = "none";
+  el.innerHTML = "";
 }
 
 async function apiGet(action, params = {}) {
@@ -22,83 +30,74 @@ async function apiGet(action, params = {}) {
   u.searchParams.set("action", action);
 
   for (const [k, v] of Object.entries(params)) {
-    if (v === undefined || v === null) continue;
-    u.searchParams.set(k, String(v));
+    u.searchParams.set(k, v);
   }
 
-  let res;
-  try {
-    res = await fetch(u.toString(), { redirect: "follow", cache: "no-store" });
-  } catch (e) {
-    throw new Error("Fetch failed (network/CORS): " + (e?.message || e));
-  }
-
+  const res = await fetch(u.toString(), { redirect: "follow", cache: "no-store" });
   const text = await res.text();
+
   let json;
   try {
     json = JSON.parse(text);
   } catch {
-    throw new Error("Non-JSON response: " + text.slice(0, 160));
+    throw new Error("Non-JSON response (auth / blocked / HTML): " + text.slice(0, 180));
   }
 
   if (!json.ok) throw new Error(json.error || "API error");
   return json;
 }
 
-function normTag(tag) {
-  // Keep as text (leading zeros preserved). Just trim.
-  return String(tag || "").trim();
-}
-
-function normLot(lot) {
-  // Lot tab name == lot id in your system (e.g. TGWFS0XW86)
-  return String(lot || "").trim();
-}
-
-function normIn(v) {
-  const t = String(v || "").replace(/,/g, "").trim();
+function cleanIntOrBlank(s) {
+  const t = String(s || "").replace(/,/g, "").trim();
   if (!t) return "";
-  const n = Number(t);
-  if (Number.isNaN(n)) return null;
-  return n;
+  const v = Number(t);
+  if (!Number.isFinite(v)) return null;
+  return Math.trunc(v);
 }
 
-async function submitSeed() {
-  const lot = normLot($("lot").value);
-  const tag = normTag($("tag").value);
-  const inVal = normIn($("in").value);
+async function seedTagAndIn() {
+  hideStatus();
 
-  if (!lot) return setStatus("Missing LOT ID.", true);
-  if (!tag) return setStatus("Missing TAG ID.", true);
-  if (inVal === null) return setStatus("IN must be a number (commas ok).", true);
+  const lot = $("lot").value.trim();
+  const tag = $("tag").value.trim();
+  const inRaw = $("in").value.trim();
 
-  setStatus("Sending…");
+  if (!lot) return showStatus("Missing Lot ID (tab name).", true);
+  if (!tag) return showStatus("Missing Tag ID.", true);
 
-  // action=tag_seed is added in Code.gs (see below)
-  const out = await apiGet("tag_seed", {
-    sheet: lot,       // lot tab name
-    lot_id: lot,      // for consistency / debug
-    tag_id: tag,      // text (leading zeros kept)
-    total_in: inVal   // number (or blank)
+  const inVal = cleanIntOrBlank(inRaw);
+  if (inVal === null) return showStatus("IN must be a number (or blank).", true);
+
+  showStatus("Sending…");
+
+  // This requires Code.gs to support action=seed_tag
+  const out = await apiGet("seed_tag", {
+    sheet: lot,          // tab name
+    lot_id: lot,         // same thing; Code.gs can use either
+    tag_id: tag,         // keep leading zeros on server via setText_
+    total_in: inVal === "" ? "" : String(inVal),
   });
 
-  setStatus(
-    `OK ✅  lot=${out.tab}  row=${out.row}  TAG_ID=${out.tag_id}  IN=${out.in || ""}`
+  showStatus(
+    `Done ✅<br><br>
+     <b>Tab</b>: ${out.tab}<br>
+     <b>TAG_ID</b>: ${out.tag_id}<br>
+     <b>IN</b>: ${out.in_val === "" ? "(blank)" : out.in_val}`
   );
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  show($("status"), false);
+  // Optional: quick reachability check (won't break if version isn't implemented)
+  apiGet("version")
+    .then(v => showStatus("API OK ✅<br><br>" + JSON.stringify(v), false))
+    .catch(() => hideStatus());
 
-  $("seed").onclick = () => submitSeed().catch(e => setStatus(e.message, true));
+  $("seed").onclick = () => seedTagAndIn().catch(e => showStatus(e.message, true));
 
+  // Press Enter in any field triggers submit
   for (const id of ["lot", "tag", "in"]) {
     $(id).addEventListener("keydown", ev => {
-      if (ev.key === "Enter") submitSeed().catch(e => setStatus(e.message, true));
+      if (ev.key === "Enter") seedTagAndIn().catch(e => showStatus(e.message, true));
     });
   }
-
-  // Optional: quick health check (will fail unless you add action=version in Code.gs)
-  // If you don't have version, remove this.
-  // apiGet("version").then(() => setStatus("API OK ✅")).catch(() => {});
 });
