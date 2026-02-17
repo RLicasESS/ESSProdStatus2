@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ESS Tags → Seed Current Lots</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 18px; }
+    .card { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-top: 12px; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    input { padding: 8px; font-size: 16px; }
+    button { padding: 9px 14px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .k { font-weight: 700; width: 140px; display:inline-block; }
+  </style>
+</head>
+<body>
+  <h2>ESS Tags → Seed ESS Current Lots</h2>
+
+  <div class="card">
+    <div class="row">
+      <label class="k">Lot ID (Tab)</label>
+      <input id="lot" placeholder="e.g. TGWFS0XW86" />
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <label class="k">Tag ID</label>
+      <input id="tag" placeholder="Scan tag" />
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <label class="k">IN (Total In)</label>
+      <input id="in" placeholder="e.g. 8298" />
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <button id="seed">Set TAG + IN</button>
+    </div>
+
+    <div id="status" style="display:none;margin-top:12px"></div>
+  </div>
+
+  <script src="tags.js?v=1"></script>
+</body>
+</html>
