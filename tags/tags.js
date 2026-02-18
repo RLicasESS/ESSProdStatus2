@@ -1,12 +1,10 @@
 // ==========================================
-// Tags UI → ESS Current Lots (VER33 UI)
-// - VIEW TAGS TABLE: calls action=tags_table (server scans lot tabs)
-// - LOOKUP: searches cached table
-//   - NOT FOUND  -> show Register UI (Register button)
-//   - FOUND      -> show Found UI (Edit + Deregister buttons)
-// - REGISTER: calls action=tag_seed
-// - EDIT: (toggle edit mode) then Save -> calls action=tag_seed (overwrite row2 identity fields)
-// - DEREGISTER: calls action=tag_deregister (clears TAG_ID in row2; removed from table)
+// Tags UI → ESS Current Lots (UI VER34)
+// Fixes:
+// 1) Heading switches between Registering vs Editing
+// 2) After Save/Register, hide the form box
+// 3) Deregister uses SHEET name (tab) so it actually clears row2 TAG_ID,
+//    then refreshes table so the lot disappears immediately.
 // ==========================================
 
 const API_URL =
@@ -16,7 +14,7 @@ function $(id) { return document.getElementById(id); }
 
 // ---------- Status helpers ----------
 function showStatus(html, isError = false) {
-  const el = $("status") || $("tableStatus") || $("result");
+  const el = $("result") || $("tableStatus") || $("status");
   if (!el) return;
   el.style.display = "";
   el.style.padding = "10px";
@@ -26,8 +24,9 @@ function showStatus(html, isError = false) {
   el.style.color = isError ? "#b00020" : "#0a6b0a";
   el.innerHTML = html;
 }
+
 function hideStatus() {
-  const el = $("status") || $("tableStatus") || $("result");
+  const el = $("result") || $("tableStatus") || $("status");
   if (!el) return;
   el.style.display = "none";
   el.innerHTML = "";
@@ -54,16 +53,16 @@ async function apiGet(action, params = {}) {
   return json;
 }
 
-function cleanIntOrBlank(s) {
+function cleanIntOrNull(s) {
   const t = String(s || "").replace(/,/g, "").trim();
-  if (!t) return "";
+  if (!t) return null;
   const v = Number(t);
-  if (!Number.isFinite(v)) return null;
-  return Math.trunc(v);
+  return Number.isFinite(v) ? Math.trunc(v) : NaN;
 }
 
 function normTag(s) {
-  return String(s || "").trim(); // keep leading zeros; exact match
+  // keep leading zeros; exact match
+  return String(s || "").trim();
 }
 
 // -------------------------------
@@ -80,17 +79,32 @@ let FOUND_MODE = false;  // found existing registration
 let EDIT_MODE = false;   // inputs editable when true
 
 // -------------------------------
-// DOM helpers for this page
-// index.html has: tag, lookup, viewTable, registerBox, lot, qty, product,
-// register, cancelRegister, tableBox, closeTable, table, result
+// Register box heading control
+// -------------------------------
+function setFormHeading_(text) {
+  const box = $("registerBox");
+  if (!box) return;
+
+  // Your index.html has the first bold div inside registerBox as the heading:
+  // <div style="font-weight:700;margin-bottom:8px">Registering new lot?</div>
+  const divs = box.querySelectorAll("div");
+  for (const d of divs) {
+    const st = (d.getAttribute("style") || "").toLowerCase();
+    if (st.includes("font-weight:700") && st.includes("margin-bottom")) {
+      d.textContent = text;
+      return;
+    }
+  }
+  // Fallback: do nothing if we can't find it
+}
+
+// -------------------------------
+// DOM helpers
 // -------------------------------
 function ensureDeregisterButton_() {
-  // Create a Deregister button dynamically (so you don't have to edit index.html)
-  // Put it next to "Register" and "Cancel" inside the registerBox.
   const box = $("registerBox");
   if (!box) return null;
 
-  // Find the row that contains register/cancel (your last button row)
   const row = box.querySelector("button#register")?.parentElement;
   if (!row) return null;
 
@@ -132,8 +146,10 @@ function hideRegisterBox_() {
 
 function setRegisterUIForNotFound_() {
   FOUND_MODE = false;
-  EDIT_MODE = true; // allow typing for new registration
+  EDIT_MODE = true; // new registration: editable
   setInputsEditable_(true);
+
+  setFormHeading_("Registering new lot?");
 
   const regBtn = $("register");
   if (regBtn) regBtn.textContent = "Register";
@@ -141,14 +157,15 @@ function setRegisterUIForNotFound_() {
   const deregBtn = ensureDeregisterButton_();
   if (deregBtn) deregBtn.style.display = "none";
 
-  // Cancel shows and just hides the box / clears
   if ($("cancelRegister")) $("cancelRegister").style.display = "";
 }
 
 function setRegisterUIForFoundView_() {
   FOUND_MODE = true;
-  EDIT_MODE = false; // view-only until user clicks Edit
+  EDIT_MODE = false; // view-only until Edit clicked
   setInputsEditable_(false);
+
+  setFormHeading_("Editing current lot?");
 
   const regBtn = $("register");
   if (regBtn) regBtn.textContent = "Edit Data";
@@ -161,8 +178,10 @@ function setRegisterUIForFoundView_() {
 
 function setRegisterUIForFoundEdit_() {
   FOUND_MODE = true;
-  EDIT_MODE = true;
+  EDIT_MODE = true; // editable
   setInputsEditable_(true);
+
+  setFormHeading_("Editing current lot?");
 
   const regBtn = $("register");
   if (regBtn) regBtn.textContent = "Save";
@@ -174,24 +193,18 @@ function setRegisterUIForFoundEdit_() {
 }
 
 // -------------------------------
-// Render tags table into <table id="table"><tbody>...
+// Table rendering
 // -------------------------------
 function renderTable(rows) {
   const table = $("table");
-  if (!table) {
-    showStatus("Loaded table, but #table not found.", true);
-    return;
-  }
+  if (!table) return;
+
   const tbody = table.querySelector("tbody");
-  if (!tbody) {
-    showStatus("Loaded table, but <tbody> not found.", true);
-    return;
-  }
+  if (!tbody) return;
 
   tbody.innerHTML = "";
 
   if (!rows || !rows.length) {
-    // keep header, show empty row
     const tr = document.createElement("tr");
     tr.innerHTML = `<td colspan="4" style="padding:10px;color:#555">No rows.</td>`;
     tbody.appendChild(tr);
@@ -222,12 +235,13 @@ function renderTable(rows) {
 // VIEW TAGS TABLE
 // -------------------------------
 async function viewTagsTable() {
-  hideStatus();
-
-  // Optional: show table box
+  // Always do a fresh pull (don’t trust cache)
   if ($("tableBox")) $("tableBox").style.display = "";
-
   if ($("tableStatus")) $("tableStatus").textContent = "Loading tags table…";
+
+  TAGS_TABLE = [];
+  TAGS_TABLE_TS = 0;
+  renderTable([]); // clear UI immediately
 
   const out = await apiGet("tags_table");
   TAGS_TABLE = Array.isArray(out.rows) ? out.rows : [];
@@ -259,7 +273,6 @@ function lookupTag() {
   showRegisterBox_();
 
   if (!hit) {
-    // NOT FOUND -> show register mode (blank fields)
     if ($("lot")) $("lot").value = "";
     if ($("qty")) $("qty").value = "";
     if ($("product")) $("product").value = "";
@@ -268,7 +281,7 @@ function lookupTag() {
     return showStatus("Not found. Enter Lot ID / Lot Qty / Product then click Register.");
   }
 
-  // FOUND -> show fields populated, but as view-only; buttons are Edit + Deregister
+  // FOUND → show edit/deregister UI (NOT register UI)
   if ($("lot")) $("lot").value = hit.LOT_ID || "";
   if ($("qty")) $("qty").value = hit.LOT_QTY || "";
   if ($("product")) $("product").value = hit.PRODUCT_NAME || "";
@@ -286,46 +299,49 @@ async function registerEditSaveClicked() {
   const tag = normTag($("tag")?.value);
   if (!tag) return showStatus("Missing Tag ID.", true);
 
-  // If FOUND and currently view-only, first click should enter edit mode (no API call)
+  // If FOUND and currently view-only: first click enters edit mode (no API call)
   if (FOUND_MODE && !EDIT_MODE) {
     setRegisterUIForFoundEdit_();
     return showStatus("Edit mode ✅ Update fields, then click Save.");
   }
 
-  // Otherwise we are registering new, or saving edits.
   const lot = $("lot")?.value.trim();
   const qtyRaw = $("qty")?.value.trim();
   const product = $("product")?.value.trim();
 
-  if (!lot) return showStatus("Missing Lot ID (this will be the tab name).", true);
+  if (!lot) return showStatus("Missing Lot ID.", true);
   if (!product) return showStatus("Missing Product Name.", true);
 
-  const qtyVal = cleanIntOrBlank(qtyRaw);
-  if (qtyVal === null) return showStatus("Lot Qty must be a number.", true);
-  if (qtyVal === "") return showStatus("Lot Qty cannot be blank.", true);
+  const qtyVal = cleanIntOrNull(qtyRaw);
+  if (qtyVal === null) return showStatus("Lot Qty cannot be blank.", true);
+  if (Number.isNaN(qtyVal)) return showStatus("Lot Qty must be a number.", true);
 
-  const verb = FOUND_MODE ? "Saving…" : "Registering…";
-  showStatus(verb);
+  // IMPORTANT:
+  // - If editing a FOUND row, write to the original SHEET tab name (hit.SHEET),
+  //   even if user changes LOT_ID field (we still update row2 LOT_ID cell).
+  // - If registering new, sheet == lot (tab name).
+  const sheetNameForWrite = (CURRENT_HIT && CURRENT_HIT.SHEET) ? String(CURRENT_HIT.SHEET).trim() : lot;
+
+  showStatus(FOUND_MODE ? "Saving…" : "Registering…");
 
   const out = await apiGet("tag_seed", {
-    sheet: lot,
+    sheet: sheetNameForWrite,
     lot_id: lot,
     tag_id: tag,
     product: product,
     qty: String(qtyVal)
   });
 
-  // After success, refresh table, then switch to found-view mode.
+  // Refresh table after write
   try { await viewTagsTable(); } catch { /* ignore */ }
 
-  // Update CURRENT_HIT from new table if possible
-  const newHit = TAGS_TABLE.find(r => normTag(r.TAG_ID) === tag) || null;
-  CURRENT_HIT = newHit;
+  // Hide the form after successful save/register (per your request)
+  hideRegisterBox_();
+  EDIT_MODE = false;
 
-  setRegisterUIForFoundView_();
   showStatus(
     `Done ✅<br><br>
-     <b>Tab</b>: ${out.tab || lot}<br>
+     <b>Sheet</b>: ${out.tab || sheetNameForWrite}<br>
      <b>LOT_ID</b>: ${out.lot_id || lot}<br>
      <b>TAG_ID</b>: ${out.tag_id || tag}<br>
      <b>PRODUCT</b>: ${out.product || product}<br>
@@ -342,26 +358,33 @@ async function deregisterClicked() {
   const tag = normTag($("tag")?.value);
   if (!tag) return showStatus("Missing Tag ID.", true);
 
-  const lot = $("lot")?.value.trim() || (CURRENT_HIT ? CURRENT_HIT.LOT_ID : "");
-  if (!lot) return showStatus("Missing Lot ID to deregister.", true);
+  if (!CURRENT_HIT) {
+    return showStatus("No current FOUND record selected. Lookup the tag first.", true);
+  }
 
-  // Optional confirm
-  const ok = window.confirm(`Deregister Tag ${tag} from Lot ${lot}?\n\nThis will clear TAG_ID in row 2 of that lot tab.`);
+  // CRITICAL FIX: use SHEET (tab name), not LOT_ID
+  const sheetName = String(CURRENT_HIT.SHEET || "").trim();
+  const lotIdCell = String($("lot")?.value.trim() || CURRENT_HIT.LOT_ID || "").trim();
+
+  if (!sheetName) return showStatus("Missing SHEET name for this record.", true);
+
+  const ok = window.confirm(
+    `Deregister Tag ${tag}?\n\nThis clears TAG_ID in row 2 of sheet "${sheetName}".`
+  );
   if (!ok) return;
 
   showStatus("Deregistering…");
 
-  const out = await apiGet("tag_deregister", { sheet: lot, lot_id: lot });
+  await apiGet("tag_deregister", { sheet: sheetName, lot_id: lotIdCell });
 
-  // Refresh table; this tag should disappear
+  // Force refresh table (clears cache first)
   try { await viewTagsTable(); } catch { /* ignore */ }
 
-  // Clear UI back to "not found" mode with blank fields
+  // Clear UI and hide form
   clearForm_();
-  showRegisterBox_();
-  setRegisterUIForNotFound_();
+  hideRegisterBox_();
 
-  showStatus(`Deregistered ✅<br><small>${out.note || ""}</small>`);
+  showStatus(`Deregistered ✅ (sheet "${sheetName}")`);
 }
 
 // -------------------------------
@@ -381,10 +404,8 @@ function closeTable() {
 // Wire up
 // -------------------------------
 window.addEventListener("DOMContentLoaded", () => {
-  // Ensure register box starts hidden
   hideRegisterBox_();
 
-  // Buttons
   if ($("viewTable")) $("viewTable").onclick = () => viewTagsTable().catch(e => showStatus(e.message, true));
   if ($("lookup")) $("lookup").onclick = () => { try { lookupTag(); } catch (e) { showStatus(String(e), true); } };
 
@@ -396,9 +417,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   if ($("closeTable")) $("closeTable").onclick = () => closeTable();
 
-  // Enter key behavior:
-  // - Enter on TAG triggers lookup
-  // - Enter on LOT/QTY/PRODUCT triggers register/edit/save (depending on mode)
   if ($("tag")) $("tag").addEventListener("keydown", ev => {
     if (ev.key === "Enter") lookupTag();
   });
