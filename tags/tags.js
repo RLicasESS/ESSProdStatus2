@@ -13,24 +13,75 @@ const API_URL =
 function $(id) { return document.getElementById(id); }
 
 // ---------- Status helpers ----------
-function showStatus(html, isError = false) {
-  const el = $("result") || $("tableStatus") || $("status");
+function showStatus(html, isError = false, opts = {}) {
+  const el = $("status");
   if (!el) return;
+
+  const { busy = false, blink = false } = opts;
+
   el.style.display = "";
-  el.style.padding = "10px";
-  el.style.borderRadius = "8px";
-  el.style.border = "1px solid #ccc";
-  el.style.background = isError ? "#fff2f2" : "#f3fff3";
+  el.style.padding = "14px 16px";
+  el.style.borderRadius = "10px";
+  el.style.border = isError ? "2px solid #b00020" : "2px solid #0a6b0a";
+  el.style.background = isError ? "#ffe6ea" : "#eaffea";
   el.style.color = isError ? "#b00020" : "#0a6b0a";
+
+  // BIG + loud
+  el.style.fontSize = "20px";
+  el.style.fontWeight = "900";
+  el.style.letterSpacing = "0.2px";
+  el.style.lineHeight = "1.25";
+
+  // Strong emphasis shadow so it pops
+  el.style.boxShadow = isError
+    ? "0 0 0 3px rgba(176,0,32,0.18)"
+    : "0 0 0 3px rgba(10,107,10,0.18)";
+
+  // Optional “busy” look
+  el.style.opacity = "1";
+  el.style.transform = "scale(1)";
+  el.style.transition = "opacity 120ms ease, transform 120ms ease";
+
+  // Blink support (CSS injected once)
+  ensureStatusBlinkCss_();
+  el.classList.toggle("status-blink", !!blink);
+  el.classList.toggle("status-busy", !!busy);
+
   el.innerHTML = html;
 }
 
 function hideStatus() {
-  const el = $("result") || $("tableStatus") || $("status");
+  const el = $("status");
   if (!el) return;
+  el.classList.remove("status-blink", "status-busy");
   el.style.display = "none";
   el.innerHTML = "";
 }
+
+// Inject animation CSS once
+function ensureStatusBlinkCss_() {
+  if (document.getElementById("statusBlinkCss")) return;
+
+  const css = `
+    @keyframes statusBlink {
+      0%   { opacity: 1;   transform: scale(1); }
+      50%  { opacity: 0.35; transform: scale(1.01); }
+      100% { opacity: 1;   transform: scale(1); }
+    }
+    .status-blink {
+      animation: statusBlink 0.85s ease-in-out infinite;
+    }
+    .status-busy {
+      filter: saturate(1.35) contrast(1.15);
+    }
+  `;
+
+  const style = document.createElement("style");
+  style.id = "statusBlinkCss";
+  style.textContent = css;
+  document.head.appendChild(style);
+}
+
 
 // ---------- API ----------
 async function apiGet(action, params = {}) {
