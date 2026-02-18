@@ -1,4 +1,4 @@
-<!-- MARKER: INDEX_DEV_YIELD_V20260211_FIX_TESTER_LINK -->
+<!-- MARKER: INDEX_YIELD_V20260211_FIX_TESTER_LINK -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -133,7 +133,7 @@
     const yScale = (params.get("yScale") || "auto").toLowerCase();
     const yZoom = (yScale !== "full");
 
-    document.title = "ESS PRODUCTION STATUS (DEV)";
+    document.title = "ESS PRODUCTION STATUS";
 
     const dbgEl = document.getElementById("dbg");
     if (debug) dbgEl.style.display = "block";
@@ -141,7 +141,7 @@
 
     if (showLinks) {
       document.getElementById("pageTitle").innerHTML =
-        `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION STATUS (DEV)`;
+        `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION STATUS`;
     }
 
     const CSV_URL   = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
