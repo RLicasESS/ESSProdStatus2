@@ -58,6 +58,64 @@ function hideStatus() {
   el.innerHTML = "";
 }
 
+function showTableStatus(msg, isError = false, opts = {}) {
+  const el = $("tableStatus");
+  if (!el) return;
+
+  const { blink = false } = opts;
+
+  el.style.display = "";
+  el.style.marginTop = "6px";
+  el.style.padding = "10px 12px";
+  el.style.borderRadius = "10px";
+  el.style.border = isError ? "2px solid #b00020" : "2px solid #0a6b0a";
+  el.style.background = isError ? "#ffe6ea" : "#eaffea";
+  el.style.color = isError ? "#b00020" : "#0a6b0a";
+
+  // louder
+  el.style.fontSize = "18px";
+  el.style.fontWeight = "900";
+  el.style.letterSpacing = "0.2px";
+  el.style.lineHeight = "1.25";
+  el.style.boxShadow = isError
+    ? "0 0 0 3px rgba(176,0,32,0.18)"
+    : "0 0 0 3px rgba(10,107,10,0.18)";
+
+  ensureTableBlinkCss_();
+  el.classList.toggle("table-blink", !!blink);
+
+  el.innerHTML = msg;
+}
+
+function clearTableStatus() {
+  const el = $("tableStatus");
+  if (!el) return;
+  el.classList.remove("table-blink");
+  el.style.display = "none";
+  el.innerHTML = "";
+}
+
+function ensureTableBlinkCss_() {
+  if (document.getElementById("tableBlinkCss")) return;
+
+  const css = `
+    @keyframes tableBlink {
+      0%   { opacity: 1; }
+      50%  { opacity: 0.35; }
+      100% { opacity: 1; }
+    }
+    .table-blink {
+      animation: tableBlink 0.85s ease-in-out infinite;
+    }
+  `;
+
+  const style = document.createElement("style");
+  style.id = "tableBlinkCss";
+  style.textContent = css;
+  document.head.appendChild(style);
+}
+
+
 // Inject animation CSS once
 function ensureStatusBlinkCss_() {
   if (document.getElementById("statusBlinkCss")) return;
@@ -286,24 +344,32 @@ function renderTable(rows) {
 // VIEW TAGS TABLE
 // -------------------------------
 async function viewTagsTable() {
-  // Always do a fresh pull (don’t trust cache)
+  hideStatus(); // keep your main status behavior if you want
+
+  // show the table box if your UI uses it
   if ($("tableBox")) $("tableBox").style.display = "";
-  if ($("tableStatus")) $("tableStatus").textContent = "Loading tags table…";
 
-  TAGS_TABLE = [];
-  TAGS_TABLE_TS = 0;
-  renderTable([]); // clear UI immediately
+  showTableStatus("Loading tags table…", false, { blink: true });
 
-  const out = await apiGet("tags_table");
-  TAGS_TABLE = Array.isArray(out.rows) ? out.rows : [];
-  TAGS_TABLE_TS = Date.now();
+  try {
+    const out = await apiGet("tags_table");
 
-  renderTable(TAGS_TABLE);
+    TAGS_TABLE = Array.isArray(out.rows) ? out.rows : [];
+    TAGS_TABLE_TS = Date.now();
 
-  const msg = `Loaded ✅ (${TAGS_TABLE.length} rows)`;
-  if ($("tableStatus")) $("tableStatus").textContent = msg + (out.updated ? ` — ${out.updated}` : "");
-  showStatus(msg, false);
+    renderTable(TAGS_TABLE);
+
+    showTableStatus(
+      `Loaded ✅ (${TAGS_TABLE.length} rows)` + (out.updated ? `<br><small>${out.updated}</small>` : ""),
+      false,
+      { blink: false }
+    );
+  } catch (e) {
+    showTableStatus("ERROR: " + (e && e.message ? e.message : String(e)), true, { blink: true });
+    throw e;
+  }
 }
+
 
 // -------------------------------
 // LOOKUP (uses cached table)
