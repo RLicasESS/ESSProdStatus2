@@ -3,42 +3,132 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ESS Tags → Seed Current Lots</title>
+  <title>ESS Tags</title>
+
   <style>
-    body { font-family: Arial, sans-serif; margin: 18px; }
-    .card { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-top: 12px; }
-    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    input { padding: 8px; font-size: 16px; }
-    button { padding: 9px 14px; font-size: 16px; font-weight: 700; cursor: pointer; }
-    .k { font-weight: 700; width: 140px; display:inline-block; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 18px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    input {
+      padding: 8px;
+      font-size: 16px;
+    }
+    button {
+      padding: 9px 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+    }
+    .k {
+      font-weight: 700;
+      width: 140px;
+      display: inline-block;
+    }
+    .danger {
+      color: #b00020;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 12px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      font-size: 14px;
+    }
+    th {
+      background: #f4f4f4;
+      text-align: left;
+    }
+    .small {
+      font-size: 12px;
+      color: #555;
+    }
   </style>
 </head>
-<body>
-  <h2>ESS Tags → Seed ESS Current Lots</h2>
 
+<body>
+
+  <h2>ESS Tags</h2>
+
+  <!-- TAG LOOKUP -->
   <div class="card">
     <div class="row">
-      <label class="k">Lot ID (Tab)</label>
-      <input id="lot" placeholder="e.g. TGWFS0XW86" />
-    </div>
-
-    <div class="row" style="margin-top:10px">
       <label class="k">Tag ID</label>
-      <input id="tag" placeholder="Scan tag" />
+      <input id="tag" placeholder="Scan or enter tag ID" />
+      <button id="lookup">Lookup</button>
+      <button id="viewTable">View Tags Table</button>
     </div>
 
-    <div class="row" style="margin-top:10px">
-      <label class="k">IN (Total In)</label>
-      <input id="in" placeholder="e.g. 8298" />
+    <div id="result" class="card" style="display:none"></div>
+
+    <!-- REGISTER BOX -->
+    <div id="registerBox" class="card" style="display:none">
+      <div style="font-weight:700;margin-bottom:8px">
+        Registering new lot?
+      </div>
+
+      <div class="row">
+        <label class="k">Lot ID</label>
+        <input id="lot" />
+      </div>
+
+      <div class="row" style="margin-top:8px">
+        <label class="k">Lot Qty</label>
+        <input id="qty" />
+      </div>
+
+      <div class="row" style="margin-top:8px">
+        <label class="k">Product Name</label>
+        <input id="product" />
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <button id="register">Register</button>
+        <button id="cancelRegister">Cancel</button>
+      </div>
     </div>
 
-    <div class="row" style="margin-top:12px">
-      <button id="seed">Set TAG + IN</button>
-    </div>
+    <!-- TAGS TABLE -->
+    <div id="tableBox" class="card" style="display:none">
+      <div style="font-weight:700;margin-bottom:8px">Tags Table</div>
+      <div id="tableStatus" class="small"></div>
 
-    <div id="status" style="display:none;margin-top:12px"></div>
+      <table id="table">
+        <thead>
+          <tr>
+            <th>TAG_ID</th>
+            <th>LOT_ID</th>
+            <th>LOT_QTY</th>
+            <th>PRODUCT_NAME</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="row" style="margin-top:10px">
+        <button id="closeTable">Close</button>
+      </div>
+    </div>
   </div>
 
-  <script src="tags.js?v=1"></script>
+  <script src="tags.js?v=13"></script>
 </body>
 </html>
