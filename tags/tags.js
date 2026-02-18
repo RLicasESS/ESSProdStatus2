@@ -1,9 +1,9 @@
 // ==========================================
-// ESS Tags UI → ESS Current Lots (VER25)
-// HTML IDs match index.html you pasted:
-// tag, lookup, viewTable, result, registerBox,
-// lot, qty, product, register, cancelRegister,
-// tableBox, table (tbody), closeTable, tableStatus
+// Tags UI → ESS Current Lots (matches index.html you posted)
+// - VIEW TAGS TABLE: action=tags_table
+// - LOOKUP: uses cached table; if found shows Found card + EDIT/DEREGISTER
+// - REGISTER/SAVE: action=tag_seed
+// - DEREGISTER: action=tag_deregister (clears TAG_ID in row 2)
 // ==========================================
 
 const API_URL =
@@ -11,53 +11,18 @@ const API_URL =
 
 function $(id) { return document.getElementById(id); }
 
-// -------------------------------
-// Result / status box
-// -------------------------------
-function showResult(html, isError = false) {
-  const el = $("result");
-  if (!el) return;
-  el.style.display = "";
-  el.style.border = "1px solid #ccc";
-  el.style.background = isError ? "#fff2f2" : "#f3fff3";
-  el.style.color = isError ? "#b00020" : "#0a6b0a";
-  el.innerHTML = html;
-}
-function hideResult() {
-  const el = $("result");
-  if (!el) return;
-  el.style.display = "none";
-  el.innerHTML = "";
-}
+function show(el) { if (el) el.style.display = ""; }
+function hide(el) { if (el) el.style.display = "none"; }
 
-// -------------------------------
-// Register box show/hide
-// -------------------------------
-function showRegisterBox(show) {
-  const box = $("registerBox");
-  if (!box) return;
-  box.style.display = show ? "" : "none";
-}
+function setHTML(el, html) { if (el) el.innerHTML = html; }
 
-function clearRegisterFields() {
-  if ($("lot")) $("lot").value = "";
-  if ($("qty")) $("qty").value = "";
-  if ($("product")) $("product").value = "";
-}
-
-// -------------------------------
-// Simple helpers
-// -------------------------------
-function normTag(s) {
-  return String(s || "").trim(); // keep leading zeros
-}
-
-function cleanIntOrBlank(s) {
-  const t = String(s || "").replace(/,/g, "").trim();
-  if (!t) return "";
-  const v = Number(t);
-  if (!Number.isFinite(v)) return null;
-  return Math.trunc(v);
+function escapeHtml(x) {
+  return String(x ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 async function apiGet(action, params = {}) {
@@ -74,157 +39,245 @@ async function apiGet(action, params = {}) {
   try {
     json = JSON.parse(text);
   } catch {
-    throw new Error("Non-JSON response (auth / blocked / HTML): " + text.slice(0, 180));
+    throw new Error("Non-JSON response (auth/blocked/HTML): " + text.slice(0, 180));
   }
 
   if (!json.ok) throw new Error(json.error || "API error");
   return json;
 }
 
+function cleanIntOrBlank(s) {
+  const t = String(s || "").replace(/,/g, "").trim();
+  if (!t) return "";
+  const v = Number(t);
+  if (!Number.isFinite(v)) return null;
+  return Math.trunc(v);
+}
+
+function normTag(s) {
+  return String(s || "").trim(); // keep leading zeros
+}
+
 // -------------------------------
 // Cached tags table
 // -------------------------------
-let TAGS_TABLE = []; // [{TAG_ID, LOT_ID, LOT_QTY, PRODUCT_NAME, SHEET}, ...]
+let TAGS_TABLE = [];
 let TAGS_TABLE_TS = 0;
 
-async function loadTagsTableIntoCache() {
+async function loadTagsTable(force = false) {
+  const maxAgeMs = 30 * 1000;
+  if (!force && TAGS_TABLE.length && (Date.now() - TAGS_TABLE_TS) < maxAgeMs) return TAGS_TABLE;
+
   const out = await apiGet("tags_table");
   TAGS_TABLE = Array.isArray(out.rows) ? out.rows : [];
   TAGS_TABLE_TS = Date.now();
-  return out;
+  return TAGS_TABLE;
 }
 
 // -------------------------------
-// Table UI
+// UI panels
 // -------------------------------
-function showTableBox(show) {
-  const box = $("tableBox");
-  if (!box) return;
-  box.style.display = show ? "" : "none";
+function resetPanels() {
+  hide($("result"));
+  hide($("registerBox"));
+  hide($("tableBox"));
 }
 
-function setTableStatus(text) {
-  const el = $("tableStatus");
+function showMessageCard(html, isError = false) {
+  const el = $("result");
   if (!el) return;
-  el.textContent = text || "";
+  el.classList.remove("danger");
+  el.style.border = "1px solid #ccc";
+  el.style.background = isError ? "#fff2f2" : "#f3fff3";
+  el.style.color = isError ? "#b00020" : "#0a6b0a";
+  setHTML(el, html);
+  show(el);
 }
 
-function renderTable(rows) {
+function openRegisterBox(mode, preset = {}) {
+  // mode: "new" | "edit"
+  resetPanels();
+  const box = $("registerBox");
+  if (!box) return;
+
+  // Fill fields
+  if ($("lot")) $("lot").value = preset.lot || "";
+  if ($("qty")) $("qty").value = preset.qty || "";
+  if ($("product")) $("product").value = preset.product || "";
+
+  // Button label
+  if ($("register")) $("register").textContent = (mode === "edit") ? "Save" : "Register";
+
+  // Stash edit context (which sheet we’re editing)
+  box.dataset.mode = mode;
+  box.dataset.sheet = preset.sheet || preset.lot || ""; // the tab name to write to
+
+  show(box);
+}
+
+function showFoundCard(hit) {
+  resetPanels();
+
+  const tag = hit.TAG_ID || "";
+  const lot = hit.LOT_ID || "";
+  const qty = hit.LOT_QTY || "";
+  const product = hit.PRODUCT_NAME || "";
+  const sheet = hit.SHEET || lot; // server may return SHEET name
+
+  const html = `
+    <div style="font-weight:700;margin-bottom:8px">Found ✅</div>
+    <div><span class="k">TAG_ID</span> ${escapeHtml(tag)}</div>
+    <div><span class="k">LOT_ID</span> ${escapeHtml(lot)}</div>
+    <div><span class="k">LOT_QTY</span> ${escapeHtml(qty)}</div>
+    <div><span class="k">PRODUCT</span> ${escapeHtml(product)}</div>
+
+    <div class="row" style="margin-top:12px">
+      <button id="editBtn">Edit Data</button>
+      <button id="deregBtn" style="background:#fff2f2;border:1px solid #f0b0b0">Deregister Tag</button>
+    </div>
+
+    <div class="small" style="margin-top:8px;color:#555">
+      Deregister clears TAG_ID on row 2 of the lot tab, so it disappears from Tags Table.
+    </div>
+  `;
+
+  const el = $("result");
+  if (!el) return;
+  el.style.background = "#f3fff3";
+  el.style.color = "#0a6b0a";
+  setHTML(el, html);
+  show(el);
+
+  // Wire buttons
+  const editBtn = $("editBtn");
+  const deregBtn = $("deregBtn");
+
+  if (editBtn) {
+    editBtn.onclick = () => openRegisterBox("edit", {
+      lot: lot,
+      qty: qty,
+      product: product,
+      sheet: sheet
+    });
+  }
+
+  if (deregBtn) {
+    deregBtn.onclick = async () => {
+      const ok = window.confirm(`Deregister TAG ${tag} from LOT ${lot}?\n\nThis will clear TAG_ID in row 2 of sheet "${sheet}".`);
+      if (!ok) return;
+
+      showMessageCard("Deregistering…");
+
+      // Requires Code.gs to implement action=tag_deregister
+      const out = await apiGet("tag_deregister", { sheet: sheet });
+
+      showMessageCard(`Deregistered ✅<br><small>${escapeHtml(out.note || "")}</small>`);
+
+      // Refresh table cache
+      try { await loadTagsTable(true); } catch {}
+    };
+  }
+}
+
+// -------------------------------
+// Table rendering (tableBox)
+// -------------------------------
+function renderTable(rows, updatedText = "") {
+  const box = $("tableBox");
+  const status = $("tableStatus");
   const table = $("table");
-  if (!table) return;
+  if (!box || !table) {
+    showMessageCard("Missing table UI elements (tableBox/table).", true);
+    return;
+  }
 
   const tbody = table.querySelector("tbody");
   if (!tbody) return;
 
   tbody.innerHTML = "";
 
-  if (!rows || rows.length === 0) {
-    setTableStatus("No rows.");
+  if (!rows || !rows.length) {
+    if (status) status.textContent = "No rows.";
+    show(box);
     return;
   }
 
   for (const r of rows) {
     const tr = document.createElement("tr");
-
-    const tdTag = document.createElement("td");
-    tdTag.textContent = r.TAG_ID ?? "";
-    tr.appendChild(tdTag);
-
-    const tdLot = document.createElement("td");
-    tdLot.textContent = r.LOT_ID ?? "";
-    tr.appendChild(tdLot);
-
-    const tdQty = document.createElement("td");
-    tdQty.textContent = r.LOT_QTY ?? "";
-    tr.appendChild(tdQty);
-
-    const tdProd = document.createElement("td");
-    tdProd.textContent = r.PRODUCT_NAME ?? "";
-    tr.appendChild(tdProd);
-
+    tr.innerHTML = `
+      <td>${escapeHtml(r.TAG_ID)}</td>
+      <td>${escapeHtml(r.LOT_ID)}</td>
+      <td>${escapeHtml(r.LOT_QTY)}</td>
+      <td>${escapeHtml(r.PRODUCT_NAME)}</td>
+    `;
     tbody.appendChild(tr);
   }
 
-  setTableStatus(`Loaded ${rows.length} rows.`);
+  if (status) status.textContent = `Loaded ${rows.length} rows. ${updatedText || ""}`.trim();
+  show(box);
 }
 
-// -------------------------------
-// VIEW TAGS TABLE button
-// -------------------------------
 async function viewTagsTable() {
-  hideResult();
-  setTableStatus("Loading…");
-  showTableBox(true);
+  resetPanels();
+  showMessageCard("Loading tags table…");
 
-  const out = await loadTagsTableIntoCache();
-  renderTable(TAGS_TABLE);
+  const out = await apiGet("tags_table");
+  TAGS_TABLE = Array.isArray(out.rows) ? out.rows : [];
+  TAGS_TABLE_TS = Date.now();
 
-  if (out.updated) setTableStatus(`Loaded ${TAGS_TABLE.length} rows. Updated: ${out.updated}`);
+  hide($("result"));
+  renderTable(TAGS_TABLE, out.updated || "");
 }
 
 // -------------------------------
-// LOOKUP button
-// Requirements:
-// - If found: show registerBox with fields filled
-// - If not found: show registerBox blank so user can register
+// LOOKUP
 // -------------------------------
 async function lookupTag() {
-  hideResult();
+  resetPanels();
 
   const tag = normTag($("tag")?.value);
-  if (!tag) {
-    showRegisterBox(false);
-    return showResult("Missing Tag ID.", true);
-  }
+  if (!tag) return showMessageCard("Missing Tag ID.", true);
 
   // Ensure cache exists
-  if (!TAGS_TABLE || TAGS_TABLE.length === 0) {
-    showResult("Loading table…");
-    await loadTagsTableIntoCache();
-    hideResult();
+  if (!TAGS_TABLE.length) {
+    try { await loadTagsTable(true); } catch (e) {
+      return showMessageCard(`Could not load tags table: ${escapeHtml(e.message)}`, true);
+    }
   }
 
   const hit = TAGS_TABLE.find(r => normTag(r.TAG_ID) === tag);
 
-  // Always show the register box (your requested UI)
-  showRegisterBox(true);
-
   if (!hit) {
-    clearRegisterFields();
-    showResult("Not found. Enter Lot ID / Lot Qty / Product Name, then click Register.", false);
+    // Not found -> open registration, keep lot/qty/product blank
+    showMessageCard("Not found. Registering new lot? Fill Lot/Qty/Product then click Register.");
+    openRegisterBox("new", { lot: "", qty: "", product: "" });
     return;
   }
 
-  // Fill fields
-  if ($("lot")) $("lot").value = hit.LOT_ID || "";
-  if ($("qty")) $("qty").value = hit.LOT_QTY || "";
-  if ($("product")) $("product").value = hit.PRODUCT_NAME || "";
-
-  showResult("Found ✅ Loaded Lot/Qty/Product into the form.", false);
+  // Found -> show found card with EDIT/DEREGISTER
+  showFoundCard(hit);
 }
 
 // -------------------------------
-// REGISTER button (calls tag_seed)
+// REGISTER / SAVE (tag_seed)
 // -------------------------------
-async function registerTag() {
-  hideResult();
-
+async function registerOrSave() {
   const tag = normTag($("tag")?.value);
   const lot = String($("lot")?.value || "").trim();
   const qtyRaw = String($("qty")?.value || "").trim();
   const product = String($("product")?.value || "").trim();
 
-  if (!tag) return showResult("Missing Tag ID.", true);
-  if (!lot) return showResult("Missing Lot ID (this will be the tab name).", true);
-  if (!product) return showResult("Missing Product Name.", true);
+  if (!tag) return showMessageCard("Missing Tag ID.", true);
+  if (!lot) return showMessageCard("Missing Lot ID.", true);
+  if (!product) return showMessageCard("Missing Product Name.", true);
 
   const qtyVal = cleanIntOrBlank(qtyRaw);
-  if (qtyVal === null) return showResult("Lot Qty must be a number.", true);
-  if (qtyVal === "") return showResult("Lot Qty cannot be blank for Register.", true);
+  if (qtyVal === null) return showMessageCard("Lot Qty must be a number.", true);
+  if (qtyVal === "") return showMessageCard("Lot Qty cannot be blank.", true);
 
-  showResult("Registering…");
+  showMessageCard("Saving…");
 
-  // tag_seed creates tab if needed + seeds row2 identity row
+  // tag_seed writes row 2 identity for that sheet
   const out = await apiGet("tag_seed", {
     sheet: lot,
     lot_id: lot,
@@ -233,52 +286,42 @@ async function registerTag() {
     qty: String(qtyVal)
   });
 
-  showResult(
-    `Registered ✅<br><br>
-     <b>Tab</b>: ${out.tab || lot}<br>
-     <b>LOT_ID</b>: ${out.lot_id || lot}<br>
-     <b>TAG_ID</b>: ${out.tag_id || tag}<br>
-     <b>PRODUCT</b>: ${out.product || product}<br>
-     <b>LOT_QTY (IN)</b>: ${out.in_qty ?? qtyVal}`
+  showMessageCard(
+    `Saved ✅<br><br>
+     <div><span class="k">Tab</span> ${escapeHtml(out.tab || lot)}</div>
+     <div><span class="k">LOT_ID</span> ${escapeHtml(out.lot_id || lot)}</div>
+     <div><span class="k">TAG_ID</span> ${escapeHtml(out.tag_id || tag)}</div>
+     <div><span class="k">PRODUCT</span> ${escapeHtml(out.product || product)}</div>
+     <div><span class="k">LOT_QTY</span> ${escapeHtml(out.in_qty ?? qtyVal)}</div>`
   );
 
-  // Refresh cache so lookup/table sees it immediately
-  try { await loadTagsTableIntoCache(); } catch {}
+  // refresh cache so lookup sees it immediately
+  try { await loadTagsTable(true); } catch {}
 }
 
 // -------------------------------
-// Wire up buttons + Enter behavior
+// Wire up
 // -------------------------------
 window.addEventListener("DOMContentLoaded", () => {
-  // Start hidden
-  showRegisterBox(false);
-  showTableBox(false);
-  hideResult();
+  if ($("lookup")) $("lookup").onclick = () => lookupTag().catch(e => showMessageCard(e.message, true));
+  if ($("viewTable")) $("viewTable").onclick = () => viewTagsTable().catch(e => showMessageCard(e.message, true));
+  if ($("closeTable")) $("closeTable").onclick = () => resetPanels();
 
-  if ($("lookup")) $("lookup").onclick = () => lookupTag().catch(e => showResult(e.message, true));
-  if ($("viewTable")) $("viewTable").onclick = () => viewTagsTable().catch(e => showResult(e.message, true));
-  if ($("register")) $("register").onclick = () => registerTag().catch(e => showResult(e.message, true));
+  if ($("register")) $("register").onclick = () => registerOrSave().catch(e => showMessageCard(e.message, true));
+  if ($("cancelRegister")) $("cancelRegister").onclick = () => resetPanels();
 
-  if ($("cancelRegister")) {
-    $("cancelRegister").onclick = () => {
-      showRegisterBox(false);
-      hideResult();
-    };
-  }
-
-  if ($("closeTable")) {
-    $("closeTable").onclick = () => showTableBox(false);
-  }
-
-  // Enter key: on Tag -> lookup; on Lot/Qty/Product -> register
-  if ($("tag")) $("tag").addEventListener("keydown", (ev) => {
-    if (ev.key === "Enter") lookupTag().catch(e => showResult(e.message, true));
+  // Enter behaviors
+  if ($("tag")) $("tag").addEventListener("keydown", ev => {
+    if (ev.key === "Enter") lookupTag().catch(e => showMessageCard(e.message, true));
   });
 
   for (const id of ["lot", "qty", "product"]) {
     if (!$(id)) continue;
-    $(id).addEventListener("keydown", (ev) => {
-      if (ev.key === "Enter") registerTag().catch(e => showResult(e.message, true));
+    $(id).addEventListener("keydown", ev => {
+      if (ev.key === "Enter") registerOrSave().catch(e => showMessageCard(e.message, true));
     });
   }
+
+  // Optional: preload table silently so first lookup is instant
+  loadTagsTable(false).catch(() => {});
 });
