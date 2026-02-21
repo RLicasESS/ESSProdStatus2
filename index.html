@@ -600,6 +600,32 @@
 
     let prevRowsByLabel = null;
 
+    function ensurePinnedTesterColumns(rows, pinnedTesters) {
+      if (!Array.isArray(rows) || rows.length === 0) return;
+    
+      const header = rows[0] || [];
+      // Header format is: ["TESTER", "S100_1", "S100_2", "AP-2", ...]
+      const existing = new Set();
+      for (let c = 1; c < header.length; c++) existing.add(norm(header[c]));
+    
+      // Insert missing pinned testers at the end (stable order)
+      const toAdd = [];
+      for (const t of pinnedTesters) {
+        if (!existing.has(norm(t))) toAdd.push(t);
+      }
+      if (!toAdd.length) return;
+    
+      // Extend header
+      for (const t of toAdd) header.push(t);
+    
+      // Extend every row to match header width
+      const targetLen = header.length;
+      for (let r = 1; r < rows.length; r++) {
+        while (rows[r].length < targetLen) rows[r].push("");
+      }
+    }
+
+    
     async function loadCSV() {
       try {
         dbg(
@@ -615,6 +641,10 @@
 
         const text = await resp.text();
         const rows = parseCSV(text);
+
+        // ✅ ADD THIS RIGHT HERE (after parsing)
+        ensurePinnedTesterColumns(rows, ["AP-1", "AP-2", "S100_1", "S100_2"]);
+        
         if (!rows.length) { dbg("CSV parsed but empty."); return; }
 
         const yj = await loadYieldCache(rows);
