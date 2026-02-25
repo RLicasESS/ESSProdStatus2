@@ -2,133 +2,82 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ESS Tags</title>
+  <title>NFC Encode (LOT / QTY / PRODUCT)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- Minimal styling -->
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 18px;
-    }
-    h2 {
-      margin-bottom: 10px;
-    }
-    .row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    input {
-      padding: 8px;
-      font-size: 16px;
-    }
-    button {
-      padding: 9px 14px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .card {
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 12px;
-      margin-top: 12px;
-    }
-    .k {
-      font-weight: 700;
-      width: 140px;
-      display: inline-block;
-    }
-    .danger {
-      color: #b00020;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 12px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      font-size: 14px;
-    }
-    th {
-      background: #f4f4f4;
-      text-align: left;
-    }
-    .small {
-      font-size: 12px;
-      color: #555;
-    }
+    :root { --fg:#0f172a; --bg:#f8fafc; --accent:#2563eb; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--fg); background:var(--bg); margin:0; }
+    header { padding:1rem 1.25rem; border-bottom:1px solid #e2e8f0; }
+    main { max-width:800px; margin:0 auto; padding:1.25rem; }
+    h1 { margin:.25rem 0 .5rem; font-weight:600; }
+    p.note { color:#475569; margin:.25rem 0 1rem; }
+    .grid { display:grid; gap:.75rem; grid-template-columns:1fr; }
+    label { font-size:.9rem; color:#334155; }
+    input { width:100%; padding:.65rem .75rem; border:1px solid #cbd5e1; border-radius:.5rem; font-size:1rem; }
+    .row { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:.75rem; }
+    button { cursor:pointer; border:0; padding:.7rem 1rem; border-radius:.5rem; font-weight:600; }
+    .primary { background:var(--accent); color:white; }
+    .secondary { background:#e2e8f0; color:#0f172a; }
+    .ok { color:#15803d; font-weight:600; }
+    .warn { color:#b45309; font-weight:600; }
+    .err { color:#b91c1c; font-weight:600; }
+    #log { white-space:pre-wrap; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:.5rem; padding:.75rem; margin-top:1rem; }
+    footer { border-top:1px solid #e2e8f0; padding:1rem 1.25rem; color:#64748b; font-size:.9rem; }
   </style>
+
+  <!-- JSZip + FileSaver (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <!-- Our app code -->
+  <script defer src="nfctags.js"></script>
 </head>
-
 <body>
+  <header>
+    <h1>NFC Encode – LOT / QTY / PRODUCT</h1>
+    <p class="note">
+      1) Generate the <code>.gototags</code> file, 2) double‑click it to open GoToTags, 3) press <b>Start ▶</b> then write a tag, 4) Read back to verify.
+    </p>
+  </header>
 
-  <h2>ESS Tags</h2>
-
-  <!-- TAG LOOKUP -->
-  <div class="card">
-    <div class="row">
-      <label class="k">Tag ID</label>
-      <input id="tag" placeholder="Scan or enter tag ID" />
-      <button id="lookup">Lookup</button>
-      <button id="viewTable">View Tags Table</button>
-    </div>
-
-    <div id="result" class="card" style="display:none"></div>
-
-    <!-- REGISTER BOX -->
-    <div id="registerBox" class="card" style="display:none">
-      <div style="font-weight:700;margin-bottom:8px">
-        Registering new lot?
+  <main>
+    <section>
+      <div class="grid">
+        <div>
+          <label for="lot">Lot</label>
+          <input id="lot" placeholder="e.g., LOT-2026-0001" />
+        </div>
+        <div>
+          <label for="qty">Quantity</label>
+          <input id="qty" placeholder="e.g., 25" />
+        </div>
+        <div>
+          <label for="product">Product</label>
+          <input id="product" placeholder="e.g., Widget Pro" />
+        </div>
       </div>
 
       <div class="row">
-        <label class="k">Lot ID</label>
-        <input id="lot" />
+        <button class="primary" id="btnGen">Generate Write File</button>
+        <button class="secondary" id="btnRead">Read Back (Web NFC)</button>
       </div>
 
-      <div class="row" style="margin-top:8px">
-        <label class="k">Lot Qty</label>
-        <input id="qty" />
-      </div>
+      <div id="status" class="note" style="margin-top:.75rem;"></div>
+      <div id="log" hidden></div>
+    </section>
 
-      <div class="row" style="margin-top:8px">
-        <label class="k">Product Name</label>
-        <input id="product" />
-      </div>
+    <section style="margin-top:2rem;">
+      <h3>How this works</h3>
+      <ul>
+        <li>The page loads your template <code>.gototags</code>, replaces the placeholders, and downloads a new operation file you can double‑click in Windows/macOS/Linux to open the GoToTags Desktop App. [3](https://gototags.com/desktop-app/operations/operation-file)</li>
+        <li>The “Read Back” button uses the <b>Web NFC API</b> which works on Chrome for Android (HTTPS, user gesture, NDEF‑formatted tags). [1](https://developer.chrome.com/docs/capabilities/nfc)[2](https://developer.mozilla.org/en-US/docs/Web/API/Web_NFC_API)</li>
+      </ul>
+    </section>
+  </main>
 
-      <div class="row" style="margin-top:10px">
-        <button id="register">Register</button>
-        <button id="cancelRegister">Cancel</button>
-      </div>
-    </div>
-
-    <!-- TAGS TABLE -->
-    <div id="tableBox" class="card" style="display:none">
-      <div style="font-weight:700;margin-bottom:8px">Tags Table</div>
-      <div id="tableStatus" class="small"></div>
-
-      <table id="table">
-        <thead>
-          <tr>
-            <th>TAG_ID</th>
-            <th>LOT_ID</th>
-            <th>LOT_QTY</th>
-            <th>PRODUCT_NAME</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-
-      <div class="row" style="margin-top:10px">
-        <button id="closeTable">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="tags.js?v=13"></script>
+  <footer>
+    Need help? Make sure this site is served over HTTPS and your Android device supports Web NFC.
+  </footer>
 </body>
 </html>
