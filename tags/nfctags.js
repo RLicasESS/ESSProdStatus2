@@ -1,5 +1,5 @@
 /* nfctags.js */
-const TEMPLATE_URL = 'encode_lot_template.gototags'; // same folder
+const TEMPLATE_URL = 'encode_lot_template.gototags'; // must exist in SAME folder as index.html
 
 const statusEl = () => document.getElementById('status');
 const logEl = () => document.getElementById('log');
@@ -34,7 +34,7 @@ async function isZipBlob(blob) {
 async function fetchTemplateBlob() {
   setStatus('Fetching template…', '');
   const res = await fetch(TEMPLATE_URL, {cache: 'no-store'});
-  if (!res.ok) throw new Error(`Failed to fetch template (${res.status})`);
+  if (!res.ok) throw new Error(`Failed to fetch ${TEMPLATE_URL} (${res.status})`);
   setStatus('Template loaded. Preparing data…', '');
   return await res.blob();
 }
@@ -42,6 +42,7 @@ async function fetchTemplateBlob() {
 async function makeGototagsFromTemplate({lot, qty, product}) {
   const tpl = await fetchTemplateBlob();
 
+  // Text operation file case (not a zip): wrap into a zip with file.gototags
   if (!(await isZipBlob(tpl))) {
     setStatus('Template is a text operation file. Repacking…', '');
     const text = await tpl.text();
@@ -56,12 +57,13 @@ async function makeGototagsFromTemplate({lot, qty, product}) {
     return await zip.generateAsync({type:'blob'});
   }
 
+  // Zip template
   setStatus('Unzipping template…', '');
   const zip = await JSZip.loadAsync(tpl);
 
-  // Replace in JSON entries
-  const jsonFiles = Object.values(zip.files).filter(f => !f.dir && f.name.toLowerCase().endsWith('.json'));
+  // Replace in *.json
   let replacedCount = 0;
+  const jsonFiles = Object.values(zip.files).filter(f => !f.dir && f.name.toLowerCase().endsWith('.json'));
   for (const f of jsonFiles) {
     const txt = await f.async('string');
     const rep = txt
@@ -71,7 +73,7 @@ async function makeGototagsFromTemplate({lot, qty, product}) {
     if (rep !== txt) { zip.file(f.name, rep); replacedCount++; }
   }
 
-  // Replace in any inner *text* .gototags (nested, not zip)
+  // Replace in any inner *text* .gototags (not zip)
   const innerOps = Object.values(zip.files).filter(f => !f.dir && f.name.toLowerCase().endsWith('.gototags'));
   for (const f of innerOps) {
     const raw = await zip.file(f.name).async('uint8array');
@@ -91,41 +93,43 @@ async function makeGototagsFromTemplate({lot, qty, product}) {
 }
 
 async function onGenerate() {
-  const lot = document.getElementById('lot').value.trim();
-  const qty = document.getElementById('qty').value.trim();
-  const product = document.getElementById('product').value.trim();
-
-  if (!lot || !qty || !product) {
-    setStatus('Please enter <b>Lot</b>, <b>Quantity</b>, and <b>Product</b>.', 'warn');
-    return;
-  }
   try {
+    setStatus('JavaScript OK. Validating inputs…', '');
+    const lot = document.getElementById('lot').value.trim();
+    const qty = document.getElementById('qty').value.trim();
+    const product = document.getElementById('product').value.trim();
+    if (!lot || !qty || !product) {
+      setStatus('Please enter <b>Lot</b>, <b>Quantity</b>, and <b>Product</b>.', 'warn');
+      return;
+    }
+
     const blob = await makeGototagsFromTemplate({lot, qty, product});
     const name = `encode_run_${nowStamp()}_${lot.replace(/[^A-Za-z0-9_-]/g,'_')}.gototags`;
-    saveAs(blob, name); // triggers browser download
+    setStatus('Downloading file…', '');
+    saveAs(blob, name);
     setStatus(`✅ Downloaded <b>${name}</b>.<br>1) <b>Double‑click</b> it to open GoToTags, 2) press <b>Start ▶</b>, 3) write a tag, 4) click “Read Back”.`, 'ok');
   } catch (err) {
     console.error(err);
     appendLog(String(err.stack || err));
-    setStatus(`❌ Error: ${err.message}.<br>Check: Is <code>${TEMPLATE_URL}</code> present in the same folder?<br>Open DevTools → Network tab for details.`, 'err');
+    setStatus(`❌ Error: ${err.message}.<br>Check that <code>${TEMPLATE_URL}</code> exists in the same folder and is accessible.`, 'err');
   }
 }
 
-// --------------- Web NFC read-back (Chrome/Android) ---------------
+// -------- Web NFC read-back (Chrome/Android, HTTPS) --------
 async function onReadBack() {
   if (!('NDEFReader' in window)) {
     setStatus('This browser does not support Web NFC. Use Chrome on Android over HTTPS.', 'warn');
     return;
   }
+
   const lot = document.getElementById('lot').value.trim();
   const qty = document.getElementById('qty').value.trim();
   const product = document.getElementById('product').value.trim();
 
   const ndef = new NDEFReader();
   try {
-    await ndef.scan(); // requires user gesture; will prompt for permission
+    await ndef.scan(); // must be triggered by a user gesture
     setStatus('Hold the tag near your device…', '');
-
     ndef.onreading = (ev) => {
       const {message, serialNumber} = ev;
       let texts = [], uris = [];
@@ -135,7 +139,7 @@ async function onReadBack() {
           const data = dec.decode(rec.data);
           if (rec.recordType === 'text') texts.push(data);
           else if (rec.recordType === 'url' || rec.recordType === 'uri') uris.push(data);
-          else texts.push(data); // naive fallback for Contact/plain-text
+          else texts.push(data);
         } catch {}
       }
       appendLog(`Serial: ${serialNumber||'(n/a)'}\nTEXT: ${JSON.stringify(texts)}\nURI: ${JSON.stringify(uris)}`);
@@ -151,17 +155,15 @@ async function onReadBack() {
         lotOK && qtyOK && prodOK ? 'ok' : 'warn'
       );
     };
-
-    ndef.onreadingerror = () => {
-      setStatus('Could not read the tag. Move closer and try again.', 'err');
-    };
+    ndef.onreadingerror = () => setStatus('Could not read the tag. Move closer and try again.', 'err');
   } catch (err) {
-    appendLog(String(err.stack || err));
+    console.error(err); appendLog(String(err.stack || err));
     setStatus(`Web NFC error: ${err.message}`, 'err');
   }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  setStatus('Page ready. Enter LOT / QTY / PRODUCT, then click <b>Generate Write File</b>.', '');
   document.getElementById('btnGen').addEventListener('click', onGenerate);
   document.getElementById('btnRead').addEventListener('click', onReadBack);
 });
