@@ -165,6 +165,5 @@ async function onReadBack() {
 window.addEventListener('DOMContentLoaded', () => {
   setStatus('Page ready. Enter LOT / QTY / PRODUCT, then click <b>Generate Write File</b>.', '');
   document.getElementById('btnGen').addEventListener('click', onGenerate);
-  document.getElementById('btnRead').addEventListener('click', onReadBack);
 });
 ``
