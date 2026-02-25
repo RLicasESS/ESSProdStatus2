@@ -17,31 +17,31 @@
     .row { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:.75rem; }
     button { cursor:pointer; border:0; padding:.7rem 1rem; border-radius:.5rem; font-weight:600; }
     .primary { background:var(--accent); color:white; }
-    .secondary { background:#e2e8f0; color:#0f172a; }
     .ok { color:#15803d; font-weight:600; }
     .warn { color:#b45309; font-weight:600; }
     .err { color:#b91c1c; font-weight:600; }
     #log { white-space:pre-wrap; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:.5rem; padding:.75rem; margin-top:1rem; }
-    footer { border-top:1px solid #e2e8f0; padding:1rem 1.25rem; color:#64748b; font-size:.9rem; }
   </style>
 
-  <!-- Correct CDN script tags -->
+  <!-- Correct CDN script tags (only once each) -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-  <!-- Your app code -->
+  <!-- Your app code (only once) -->
   <script defer src="nfctags.js"></script>
 </head>
 <body>
   <header>
     <h1>NFC Encode – LOT / QTY / PRODUCT</h1>
     <p class="note">
-      1) Generate the <code>.gototags</code> file, 2) double‑click it to open GoToTags, 3) press <b>Start ▶</b> then write a tag, 4) Read back to verify.
+      Generate the <code>.gototags</code> file, then double‑click it to open GoToTags, press <b>Start ▶</b>, and write a tag.
     </p>
   </header>
 
   <main>
     <section>
-     for="lot">Lot</label>
+      <div class="grid">
+        <div>
+          <label for="lot">Lot</label>
           <input id="lot" placeholder="e.g., LOT-2026-0001" />
         </div>
         <div>
@@ -55,24 +55,13 @@
       </div>
 
       <div class="row">
-        <button class="primary" id="btnGen">Generate Write File</button>
+        <!-- type="button" prevents any implicit form submit -->
+        <button type="button" class="primary" id="btnGen">Generate Write File</button>
       </div>
 
       <div id="status" class="note" style="margin-top:.75rem;"></div>
       <div id="log" hidden></div>
     </section>
-
-    <section style="margin-top:2rem;">
-      <h3>How this works</h3>
-      <ul>
-        <li>This page reads your template <code>.gototags</code> (a ZIP with JSON inside), rewrites placeholders, and downloads a new operation file you can open in the GoToTags Desktop App.[1](https://oauth.net/2/)</li>
-        <li>“Read Back” uses the Web NFC API (Chrome for Android over HTTPS, user gesture required).[2](https://learn.microsoft.com/en-us/microsoft-edge/extensions/developer-guide/csp)[3](https://developer.chrome.com/docs/privacy-security/permissions-policy)</li>
-      </ul>
-    </section>
   </main>
-
-  <footer>
-    If status stays blank, press F12 → Console: errors will show there.
-  </footer>
 </body>
 </html>
