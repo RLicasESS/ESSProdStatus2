@@ -1,230 +1,199 @@
-/* tags.js  (Web NFC add-on for your existing ESS Tags page)
+/* nfctags.js
+ * Browser-side generator for GoToTags operation files (.gototags) + Web NFC read-back.
+ * Requirements:
+ *   - JSZip (window.JSZip)
+ *   - FileSaver (window.saveAs)
  *
- * What it does:
- * - Adds 3 buttons next to Tag ID: NFC Read / NFC Write / NFC Erase
- * - NFC Read: tap tag with Android Chrome -> fills Tag ID input with NDEF Text (lot/tag text)
- * - NFC Write: writes Lot ID input text to the NFC tag as NDEF Text
- * - NFC Erase: writes blank text to the NFC tag
- *
- * IMPORTANT:
- * - Web NFC works on Android Chrome over HTTPS (GitHub Pages is HTTPS ✅)
- * - Web NFC generally does NOT work on desktop Chrome/Edge/Safari on Windows/macOS
+ * Background:
+ *   - GoToTags "operation files" saved by the Desktop App use the .gototags extension.
+ *   - A .gototags file is a ZIP bundle that contains JSON for the operation. We fetch
+ *     the template, replace placeholders, and re-zip entirely in the browser.  (Ref) gototags op file
+ *     format & behavior.  [3](https://gototags.com/desktop-app/operations/operation-file)
+ *   - Web NFC read-back runs on Chrome for Android (HTTPS, user gesture). [1](https://developer.chrome.com/docs/capabilities/nfc)[2](https://developer.mozilla.org/en-US/docs/Web/API/Web_NFC_API)
  */
 
-(() => {
-  // ---------- helpers ----------
-  const $ = (id) => document.getElementById(id);
+const TEMPLATE_URL = 'encode_lot_template.gototags'; // place your template here
+const statusEl = () => document.getElementById('status');
+const logEl = () => document.getElementById('log');
 
-  function el(tag, props = {}, children = []) {
-    const n = document.createElement(tag);
-    Object.entries(props).forEach(([k, v]) => {
-      if (k === "style") Object.assign(n.style, v);
-      else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
-      else n.setAttribute(k, v);
-    });
-    for (const c of children) n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
-    return n;
+// --- small helpers ---
+const esc = (s='') =>
+  String(s)
+    .replaceAll('\\', '\\\\')
+    .replaceAll('"', '\\"')
+    .replaceAll('\r\n', '\n')
+    .replaceAll('\r', '\n'); // JSON-safe newline
+
+function setStatus(html, cls='') {
+  const el = statusEl();
+  el.className = cls;
+  el.innerHTML = html;
+}
+
+function appendLog(line='') {
+  const el = logEl();
+  el.hidden = false;
+  el.textContent += line + '\n';
+}
+
+async function fetchTemplateBlob() {
+  const res = await fetch(TEMPLATE_URL, {cache: 'no-store'});
+  if (!res.ok) throw new Error(`Failed to fetch template: ${res.status} ${res.statusText}`);
+  return await res.blob();
+}
+
+function nowStamp() {
+  const d = new Date();
+  const pad = (n)=> String(n).padStart(2,'0');
+  return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+}
+
+// Detect if bytes look like ZIP ('PK')
+async function isZipBlob(blob) {
+  const head = await blob.slice(0,2).arrayBuffer();
+  const b = new Uint8Array(head);
+  return b[0] === 0x50 && b[1] === 0x4B;
+}
+
+// Replace in all JSON and all non‑zip .gototags entries
+async function makeGototagsFromTemplate({lot, qty, product}) {
+  const tpl = await fetchTemplateBlob();
+
+  // If the template itself is a text .gototags (not a zip), treat as single file
+  if (!(await isZipBlob(tpl))) {
+    const text = await tpl.text();
+    const replaced = text
+      .replaceAll('LOT_PLACEHOLDER', esc(lot))
+      .replaceAll('QTY_PLACEHOLDER', esc(qty))
+      .replaceAll('PRODUCT_PLACEHOLDER', esc(product));
+
+    // Repackage as a .gototags ZIP with a single inner text op file
+    const zip = new JSZip();
+    zip.file('file.gototags', replaced); // inner text op file name
+    return await zip.generateAsync({type:'blob'});
   }
 
-  function showInlineStatus(msg, isError = false) {
-    let s = $("nfcStatus");
-    if (!s) {
-      // Place status under the row
-      const row = $("lookup")?.closest(".row");
-      s = el("div", { id: "nfcStatus", class: "small", style: { marginTop: "8px" } }, []);
-      row?.parentElement?.appendChild(s);
+  // Template is a zip (.gototags). Load with JSZip.
+  const zip = await JSZip.loadAsync(tpl);
+
+  // Replace in *.json
+  const jsonFiles = Object.values(zip.files).filter(f => !f.dir && f.name.toLowerCase().endsWith('.json'));
+  for (const f of jsonFiles) {
+    const txt = await f.async('string');
+    const rep = txt
+      .replaceAll('LOT_PLACEHOLDER', esc(lot))
+      .replaceAll('QTY_PLACEHOLDER', esc(qty))
+      .replaceAll('PRODUCT_PLACEHOLDER', esc(product));
+    zip.file(f.name, rep);
+  }
+
+  // Replace in any inner text .gototags (nested, not zip)
+  const innerOps = Object.values(zip.files).filter(f => !f.dir && f.name.toLowerCase().endsWith('.gototags'));
+  for (const f of innerOps) {
+    const raw = await zip.file(f.name).async('uint8array');
+    // Check if inner is ZIP; if not, treat as text
+    const isInnerZip = raw[0] === 0x50 && raw[1] === 0x4B;
+    if (!isInnerZip) {
+      const txt = new TextDecoder().decode(raw);
+      const rep = txt
+        .replaceAll('LOT_PLACEHOLDER', esc(lot))
+        .replaceAll('QTY_PLACEHOLDER', esc(qty))
+        .replaceAll('PRODUCT_PLACEHOLDER', esc(product));
+      zip.file(f.name, rep); // overwrite with new text
     }
-    s.textContent = msg;
-    s.style.color = isError ? "#b00020" : "#555";
   }
 
-  function hasWebNfc() {
-    return ("NDEFReader" in window);
+  return await zip.generateAsync({type:'blob'});
+}
+
+async function onGenerate() {
+  const lot = document.getElementById('lot').value.trim();
+  const qty = document.getElementById('qty').value.trim();
+  const product = document.getElementById('product').value.trim();
+
+  if (!lot || !qty || !product) {
+    setStatus('Please enter <b>Lot</b>, <b>Quantity</b>, and <b>Product</b>.', 'warn');
+    return;
   }
 
-  function requireWebNfcOrExplain() {
-    if (!hasWebNfc()) {
-      throw new Error(
-        "Web NFC not supported here. Use Android Chrome over HTTPS (GitHub Pages is OK). Desktop browsers usually won't work."
-      );
-    }
+  setStatus('Generating <code>.gototags</code>…', '');
+
+  try {
+    const blob = await makeGototagsFromTemplate({lot, qty, product});
+    const name = `encode_run_${nowStamp()}_${lot.replace(/[^A-Za-z0-9_-]/g,'_')}.gototags`;
+    saveAs(blob, name); // FileSaver.js
+    setStatus(`Downloaded <b>${name}</b>. <br/>Double‑click it to open GoToTags, press <b>Start ▶</b>, and write a tag.`, 'ok');
+  } catch (err) {
+    console.error(err);
+    setStatus(`Error generating file: ${err.message}`, 'err');
+  }
+}
+
+// ---------------- Web NFC read-back (Chrome/Android) ----------------
+// Ref: Web NFC launched in Chrome 89 for Android; NDEFReader API. [1](https://developer.chrome.com/docs/capabilities/nfc)[2](https://developer.mozilla.org/en-US/docs/Web/API/Web_NFC_API)
+async function onReadBack() {
+  // Feature detection (API presence ≠ hardware presence)
+  if (!('NDEFReader' in window)) {
+    setStatus('This browser does not support Web NFC. Try Chrome on Android over HTTPS.', 'warn');
+    return;
   }
 
-  // ---------- Web NFC core ----------
-  let ndef = null;
-  let scanning = false;
-  let abortCtrl = null;
+  const lot = document.getElementById('lot').value.trim();
+  const qty = document.getElementById('qty').value.trim();
+  const product = document.getElementById('product').value.trim();
 
-  async function stopScan() {
-    if (!scanning) return;
-    try { abortCtrl?.abort(); } catch {}
-    scanning = false;
-  }
+  const ndef = new NDEFReader();
+  try {
+    await ndef.scan(); // triggers permission prompt (must be in response to a user gesture)
+    setStatus('Hold tag near the device…', '');
 
-  function extractFirstTextRecord(message) {
-    for (const rec of message.records) {
-      if (rec.recordType === "text") {
+    ndef.onreading = (event) => {
+      const {message, serialNumber} = event;
+      let texts = [];
+      let uris  = [];
+
+      for (const record of message.records) {
         try {
-          const decoder = new TextDecoder(rec.encoding || "utf-8");
-          const bytes = new Uint8Array(rec.data.buffer, rec.data.byteOffset, rec.data.byteLength);
-          return decoder.decode(bytes).trim();
-        } catch {
-          try {
-            const decoder = new TextDecoder("utf-8");
-            const bytes = new Uint8Array(rec.data.buffer, rec.data.byteOffset, rec.data.byteLength);
-            return decoder.decode(bytes).trim();
-          } catch {
-            return null;
+          if (record.recordType === 'text') {
+            const lang = record.lang || 'en';
+            const dec  = new TextDecoder(record.encoding || 'utf-8');
+            texts.push(dec.decode(record.data));
+          } else if (record.recordType === 'url' || record.recordType === 'uri') {
+            const dec = new TextDecoder('utf-8');
+            uris.push(dec.decode(record.data));
+          } else {
+            // Fallback: try to decode as UTF‑8 text
+            const dec = new TextDecoder('utf-8');
+            const maybe = dec.decode(record.data);
+            if (maybe) texts.push(maybe);
           }
-        }
+        } catch {}
       }
-    }
-    return null;
-  }
 
-  async function nfcReadOnce() {
-    requireWebNfcOrExplain();
-    if (!ndef) ndef = new NDEFReader();
+      appendLog(`Serial: ${serialNumber || '(n/a)'}\nTEXT: ${JSON.stringify(texts)}\nURIs: ${JSON.stringify(uris)}\n`);
 
-    await stopScan();
-    abortCtrl = new AbortController();
-    scanning = true;
+      // Simple match check against current inputs. Adjust if your template’s record order differs.
+      const lotOK = texts.some(t => t === lot);
+      const qtyOK = texts.some(t => t === qty) || uris.some(u => u === `tel:${qty}` || u.endsWith(`tel:${qty}`));
+      const prodOK= texts.some(t => t === product);
 
-    showInlineStatus("NFC READ: Tap and HOLD the tag near your phone…");
-
-    await ndef.scan({ signal: abortCtrl.signal });
-
-    return await new Promise((resolve, reject) => {
-      const cleanup = () => {
-        ndef.onreading = null;
-        ndef.onreadingerror = null;
-        stopScan().catch(() => {});
-      };
-
-      ndef.onreading = (event) => {
-        try {
-          const text = extractFirstTextRecord(event.message);
-          cleanup();
-          resolve({ text, serialNumber: event.serialNumber || "" });
-        } catch (e) {
-          cleanup();
-          reject(e);
-        }
-      };
-
-      ndef.onreadingerror = () => {
-        cleanup();
-        reject(new Error("NFC read error (try holding tag steadier)."));
-      };
-
-      // If user denies permission etc.
-      abortCtrl.signal.addEventListener("abort", () => {
-        cleanup();
-        reject(new Error("NFC scan aborted."));
-      }, { once: true });
-    });
-  }
-
-  async function nfcWriteText(text) {
-    requireWebNfcOrExplain();
-    if (!ndef) ndef = new NDEFReader();
-
-    showInlineStatus("*** KEEP TAG ON PHONE — writing now (do not move) ***");
-    await ndef.write({
-      records: [{ recordType: "text", data: String(text ?? ""), lang: "en" }]
-    });
-    showInlineStatus("*** OK — remove tag ***");
-  }
-
-  // ---------- UI injection into your existing page ----------
-  function injectNfcButtons() {
-    const row = $("lookup")?.closest(".row");
-    if (!row) return;
-
-    // Avoid duplicates if tags.js is reloaded
-    if ($("btnNfcRead")) return;
-
-    const btnRead = el("button", { id: "btnNfcRead", type: "button" }, ["NFC Read"]);
-    const btnWrite = el("button", { id: "btnNfcWrite", type: "button" }, ["NFC Write"]);
-    const btnErase = el("button", { id: "btnNfcErase", type: "button" }, ["NFC Erase"]);
-
-    row.appendChild(btnRead);
-    row.appendChild(btnWrite);
-    row.appendChild(btnErase);
-
-    // Friendly note if not supported
-    if (!hasWebNfc()) {
-      showInlineStatus("Web NFC not supported in this browser. Use Android Chrome.", true);
-      btnRead.disabled = true;
-      btnWrite.disabled = true;
-      btnErase.disabled = true;
-      return;
-    } else {
-      showInlineStatus("Web NFC ready (Android Chrome).");
-    }
-
-    // --- events ---
-    btnRead.addEventListener("click", async () => {
-      try {
-        const { text, serialNumber } = await nfcReadOnce();
-        if (serialNumber) showInlineStatus(`NFC READ OK (UID: ${serialNumber}).`);
-        else showInlineStatus("NFC READ OK.");
-
-        if (text == null) {
-          showInlineStatus("Read OK, but no NDEF Text record found.", true);
-          return;
-        }
-        if (text === "") {
-          showInlineStatus("Read OK: (blank text).", false);
-          return;
-        }
-
-        // Put text into Tag ID box by default (your workflow request)
-        // If you'd rather fill LOT_ID instead, swap $("tag") -> $("lot")
-        const tagInput = $("tag");
-        if (tagInput) {
-          tagInput.value = text;
-          tagInput.dispatchEvent(new Event("input", { bubbles: true }));
-        }
-        showInlineStatus(`Read text: ${text}`);
-      } catch (e) {
-        showInlineStatus(`NFC READ failed: ${e.message}`, true);
+      if (lotOK && qtyOK && prodOK) {
+        setStatus('✅ Read-back success: tag content matches LOT / QTY / PRODUCT.', 'ok');
+      } else {
+        setStatus('⚠️ Read-back mismatch. See log below for records we saw.', 'warn');
       }
-    });
+    };
 
-    btnWrite.addEventListener("click", async () => {
-      try {
-        // Write from Lot ID field if present; otherwise from Tag ID field
-        const lotVal = $("lot")?.value?.trim();
-        const fallback = $("tag")?.value?.trim();
-        const text = lotVal || fallback;
-
-        if (!text) {
-          showInlineStatus("Enter a LOT (Lot ID box) before NFC Write.", true);
-          return;
-        }
-
-        await nfcWriteText(text);
-      } catch (e) {
-        showInlineStatus(`NFC WRITE failed: ${e.message}`, true);
-      }
-    });
-
-    btnErase.addEventListener("click", async () => {
-      try {
-        // Web NFC doesn't guarantee a true "no NDEF TLV" wipe like PC/SC.
-        // This writes a blank Text record, which effectively clears the visible content.
-        await nfcWriteText("");
-      } catch (e) {
-        showInlineStatus(`NFC ERASE failed: ${e.message}`, true);
-      }
-    });
+    ndef.onreadingerror = () => {
+      setStatus('Could not read data from the tag. Move closer and try again.', 'err');
+    };
+  } catch (err) {
+    setStatus(`Web NFC error: ${err.message}`, 'err');
   }
+}
 
-  // Run after DOM is ready
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", injectNfcButtons);
-  } else {
-    injectNfcButtons();
-  }
-})();
+// Wire up buttons
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('btnGen').addEventListener('click', onGenerate);
+  document.getElementById('btnRead').addEventListener('click', onReadBack);
+});
