@@ -25,11 +25,11 @@
     footer { border-top:1px solid #e2e8f0; padding:1rem 1.25rem; color:#64748b; font-size:.9rem; }
   </style>
 
-  <!-- JSZip + FileSaver (correct <script> tags) -->
+  <!-- Correct CDN script tags -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-  <!-- Our app code -->
-  <script src="nfctags.js" defer></script>
+  <!-- Your app code -->
+  <script defer src="nfctags.js"></script>
 </head>
 <body>
   <header>
@@ -41,9 +41,7 @@
 
   <main>
     <section>
-      <div class="grid">
-        <div>
-          <label for="lot">Lot</label>
+     for="lot">Lot</label>
           <input id="lot" placeholder="e.g., LOT-2026-0001" />
         </div>
         <div>
@@ -67,15 +65,15 @@
 
     <section style="margin-top:2rem;">
       <h3>How this works</h3>
-     e>.gototags</code> (a ZIP with JSON inside) and rewrites the data in‑browser, then downloads the new operation file for GoToTags. [1](https://oauth.net/2/)</li>
-        <li>The “Read Back” button uses the <b>Web NFC API</b> (Chrome for Android, HTTPS, user gesture required) to verify LOT/QTY/PRODUCT. [2](https://learn.microsoft.com/en-us/microsoft-edge/extensions/developer-guide/csp)[3](https://developer.chrome.com/docs/privacy-security/permissions-policy)</li>
+      <ul>
+        <li>This page reads your template <code>.gototags</code> (a ZIP with JSON inside), rewrites placeholders, and downloads a new operation file you can open in the GoToTags Desktop App.[1](https://oauth.net/2/)</li>
+        <li>“Read Back” uses the Web NFC API (Chrome for Android over HTTPS, user gesture required).[2](https://learn.microsoft.com/en-us/microsoft-edge/extensions/developer-guide/csp)[3](https://developer.chrome.com/docs/privacy-security/permissions-policy)</li>
       </ul>
     </section>
   </main>
 
   <footer>
-    If you don’t see any status, check your browser console (F12) for errors.
+    If status stays blank, press F12 → Console: errors will show there.
   </footer>
 </body>
 </html>
-``
