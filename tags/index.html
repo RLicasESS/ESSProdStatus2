@@ -4,8 +4,6 @@
   <meta charset="utf-8" />
   <title>NFC Encode (LOT / QTY / PRODUCT)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Minimal styling -->
   <style>
     :root { --fg:#0f172a; --bg:#f8fafc; --accent:#2563eb; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--fg); background:var(--bg); margin:0; }
@@ -27,11 +25,11 @@
     footer { border-top:1px solid #e2e8f0; padding:1rem 1.25rem; color:#64748b; font-size:.9rem; }
   </style>
 
-  <!-- JSZip + FileSaver (CDN) -->
+  <!-- JSZip + FileSaver (correct <script> tags) -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <!-- Our app code -->
-  <script defer src="nfctags.js"></script>
+  <script src="nfctags.js" defer></script>
 </head>
 <body>
   <header>
@@ -69,15 +67,15 @@
 
     <section style="margin-top:2rem;">
       <h3>How this works</h3>
-      <ul>
-        <li>The page loads your template <code>.gototags</code>, replaces the placeholders, and downloads a new operation file you can double‑click in Windows/macOS/Linux to open the GoToTags Desktop App. [3](https://gototags.com/desktop-app/operations/operation-file)</li>
-        <li>The “Read Back” button uses the <b>Web NFC API</b> which works on Chrome for Android (HTTPS, user gesture, NDEF‑formatted tags). [1](https://developer.chrome.com/docs/capabilities/nfc)[2](https://developer.mozilla.org/en-US/docs/Web/API/Web_NFC_API)</li>
+     e>.gototags</code> (a ZIP with JSON inside) and rewrites the data in‑browser, then downloads the new operation file for GoToTags. [1](https://oauth.net/2/)</li>
+        <li>The “Read Back” button uses the <b>Web NFC API</b> (Chrome for Android, HTTPS, user gesture required) to verify LOT/QTY/PRODUCT. [2](https://learn.microsoft.com/en-us/microsoft-edge/extensions/developer-guide/csp)[3](https://developer.chrome.com/docs/privacy-security/permissions-policy)</li>
       </ul>
     </section>
   </main>
 
   <footer>
-    Need help? Make sure this site is served over HTTPS and your Android device supports Web NFC.
+    If you don’t see any status, check your browser console (F12) for errors.
   </footer>
 </body>
 </html>
+``
