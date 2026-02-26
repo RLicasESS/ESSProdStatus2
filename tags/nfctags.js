@@ -121,22 +121,18 @@ async function makeGototagsFromTemplate({ lot, qty, product }) {
 //////////////////////
 // --- Sheets logging (PER‑LOT TAB) ---
 async function logToEssSheet({ lot, product, qty }) {
-  const base = 'https://script.google.com/macros/s/AKfycbx-xOKyk83MF-wnpOdNiNiw7ltbFG9Atdjv5Hy4yp0bqTXKUzLlY15TgaOFX-CeJPa-3A/exec';
-  const u = new URL(base);
-
-  // Always send sheet=<LOT_ID> so the tab name equals the lot id
+  const u = new URL(SHEET_URL_BASE);
   u.searchParams.set('action',  'lot_seed');
   u.searchParams.set('lot_id',  lot);
   u.searchParams.set('product', product);
   u.searchParams.set('qty',     qty);
-  u.searchParams.set('sheet',   lot);     // <<< key line
+  u.searchParams.set('sheet',   lot);  // per-lot tab (LOT_ID)
 
-  // Status + visible target tab
   setStatus(`Logging to <b>ESS Current Lots</b> (tab: <b>${lot}</b>)…`, '');
-  console.info('[Sheets] GET', u.toString());  // verify in DevTools → Network
+  console.info('[Sheets] GET', u.toString());
 
-  const res = await fetch(u.toString(), { method: 'GET', cache: 'no-store' });
-  const ct = (res.headers.get('content-type') || '').toLowerCase();
+  const res = await fetchWithTimeout(u.toString(), { method: 'GET', timeout: REQUEST_TIMEOUT_MS });
+  const ct  = (res.headers.get('content-type') || '').toLowerCase();
   const body = ct.includes('application/json') ? await res.json() : await res.text();
 
   if (!res.ok) {
@@ -144,18 +140,41 @@ async function logToEssSheet({ lot, product, qty }) {
     throw new Error(`Sheets logging failed (${res.status}): ${msg}`);
   }
 
-  // If you added created_tab on the server, surface it; otherwise show generic success
   if (typeof body === 'object' && body !== null) {
     if (body.ok === false) throw new Error(body.error || 'Sheets logging error');
-    const tab = body.tab || lot;
-    const row = body.identity_row ?? body.row ?? 2;
+
+    const tab  = body.tab || lot;
+    const row  = body.identity_row ?? body.row ?? 2;
+    const tsL  = body.ts_local || '';
+    const tsZ  = body.ts_iso   || '';
+    const tz   = body.timezone || '';
+
+    const tsStr = tsL
+      ? `${tsL}${tz ? ' (' + tz + ')' : ''}`
+      : (tsZ ? `${tsZ} (UTC)` : '');
+
+    // Created vs. updated message, now with timestamp
     if (body.created_tab === true) {
-      setStatus(`🆕 Created tab <b>${tab}</b> and wrote identity row (row <b>${row}</b>). Creating .gototags…`, 'ok');
+      setStatus(
+        `🆕 Created tab <b>${tab}</b> and wrote identity row (row <b>${row</b>)<br>` +
+        (tsStr ? `🕒 <b>Server timestamp:</b> ${tsStr}<br>` : '') +
+        `Creating .gototags…`,
+        'ok'
+      );
     } else {
-      setStatus(`✅ Logged to <b>${tab}</b> (row <b>${row}</b>). Creating .gototags…`, 'ok');
+      setStatus(
+        `✅ Logged to <b>${tab}</b> (row <b>${row}</b>)<br>` +
+        (tsStr ? `🕒 <b>Server timestamp:</b> ${tsStr}<br>` : '') +
+        `Creating .gototags…`,
+        'ok'
+      );
     }
+
+    console.debug('[Sheets] JSON:', body);
   } else {
+    // Non-JSON; keep generic success
     setStatus(`✅ Logged to <b>${lot}</b>. Creating .gototags…`, 'ok');
+    console.debug('[Sheets] Text:', body);
   }
 
   return body;
