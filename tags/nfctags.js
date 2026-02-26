@@ -1,44 +1,46 @@
-/* nfctags.js — Generate GoToTags operation file + log to ESS Current Lots
+/* nfctags.js — Generate GoToTags operation + log to ESS Current Lots (VER41 server)
  *
- * - Builds a .gototags (zip) in-browser from your template
- * - Logs each run to Google Sheets via your Apps Script Web App
- * - Clear UI status + console logs for debugging
- * - Single-click guard (no duplicate downloads)
+ * - Logs to Google Sheets via your Apps Script Web App (action=lot_seed)
+ * - Writes to tab = "Lot Number" (configurable)
+ * - Clear status messages (Logging → Creating → Downloading)
+ * - Strict logging (abort on failure) — change STRICT_LOGGING to false for best‑effort
+ * - Builds .gototags in-browser (handles zipped and plain inner .gototags)
+ * - Single-run guard to prevent duplicate downloads
  */
 
-///////////////////////////
-// Configuration
-///////////////////////////
+/* =========================
+ * Configuration
+ * ========================= */
+const TEMPLATE_URL     = 'encode_lot_template.gototags'; // keep next to index.html
+const SHEET_URL_BASE   = 'https://script.google.com/macros/s/AKfycbx-xOKyk83MF-wnpOdNiNiw7ltbFG9Atdjv5Hy4yp0bqTXKUzLlY15TgaOFX-CeJPa-3A/exec';
+const SHEET_TAB        = 'Lot Number';                   // your Code.gs: p.sheet; set fixed tab name here
+const STRICT_LOGGING   = true;                           // true: abort on logging failure; false: warn but continue
+const REQUEST_TIMEOUT_MS = 10000;                        // 10s timeout for web requests
 
-const TEMPLATE_URL   = 'encode_lot_template.gototags'; // must exist alongside index.html
-const STRICT_LOGGING = true; // true = abort download if Sheets logging fails; false = best effort
+/* =========================
+ * DOM helpers
+ * ========================= */
+const $       = (s) => document.querySelector(s);
+const statusEl= ()  => $('#status');
+const logEl   = ()  => $('#log');
 
-///////////////////////////
-// DOM helpers
-///////////////////////////
-
-const $ = (s) => document.querySelector(s);
-const statusEl = () => $('#status');
-const logEl    = () => $('#log');
-
-function setStatus(html, cls = '') {
+function setStatus(html, cls='') {
   const el = statusEl();
   if (!el) return;
   el.className = cls;
   el.innerHTML = html;
 }
-function appendLog(line = '') {
+function appendLog(line='') {
   const el = logEl();
   if (!el) return;
   el.hidden = false;
   el.textContent += line + '\n';
 }
 
-///////////////////////////
-// Utilities
-///////////////////////////
-
-const esc = (s = '') =>
+/* =========================
+ * Utilities
+ * ========================= */
+const esc = (s='') =>
   String(s)
     .replaceAll('\\', '\\\\')
     .replaceAll('"', '\\"')
@@ -47,23 +49,22 @@ const esc = (s = '') =>
 
 function nowStamp() {
   const d = new Date();
-  const z = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}`;
+  const z = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}`;
 }
 
 async function isZipBlob(blob) {
-  const head = await blob.slice(0, 2).arrayBuffer();
+  const head = await blob.slice(0,2).arrayBuffer();
   const b = new Uint8Array(head);
   return b[0] === 0x50 && b[1] === 0x4B; // 'PK'
 }
 
-async function fetchWithTimeout(resource, options = {}) {
-  const { timeout = 8000, ...rest } = options;
+async function fetchWithTimeout(resource, options={}) {
+  const { timeout = REQUEST_TIMEOUT_MS, ...rest } = options;
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   try {
-    const res = await fetch(resource, { signal: controller.signal, ...rest });
-    return res;
+    return await fetch(resource, { signal: controller.signal, ...rest });
   } finally {
     clearTimeout(id);
   }
@@ -72,21 +73,18 @@ async function fetchWithTimeout(resource, options = {}) {
 async function fetchTemplateBlob() {
   setStatus('Fetching template…', '');
   const res = await fetch(TEMPLATE_URL, { cache: 'no-store' });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${TEMPLATE_URL} (${res.status})`);
-  }
+  if (!res.ok) throw new Error(`Failed to fetch ${TEMPLATE_URL} (${res.status})`);
   setStatus('Template loaded. Preparing data…', '');
   return await res.blob();
 }
 
-///////////////////////////
-// Build .gototags from template
-///////////////////////////
-
+/* =========================
+ * Build .gototags from template
+ * ========================= */
 async function makeGototagsFromTemplate({ lot, qty, product }) {
   const tpl = await fetchTemplateBlob();
 
-  // Case A: the template itself is a text operation file (not a zip)
+  // Case A: template is a plain text operation (not a zip)
   if (!(await isZipBlob(tpl))) {
     setStatus('Template is a text operation file. Repacking…', '');
     const text = await tpl.text();
@@ -96,10 +94,9 @@ async function makeGototagsFromTemplate({ lot, qty, product }) {
       .replaceAll('PRODUCT_PLACEHOLDER', esc(product));
 
     const zip = new JSZip();
-    // The inner text op file name used by GoToTags bundles (commonly file.gototags)
-    zip.file('file.gototags', replaced);
+    zip.file('file.gototags', replaced); // inner op file common name
     setStatus('Creating .gototags (zip)…', '');
-    return await zip.generateAsync({ type: 'blob' });
+    return await zip.generateAsync({ type:'blob' });
   }
 
   // Case B: template is a zip .gototags
@@ -107,7 +104,7 @@ async function makeGototagsFromTemplate({ lot, qty, product }) {
   const zip = await JSZip.loadAsync(tpl);
   let replacedCount = 0;
 
-  // Replace placeholders in any *.json entries
+  // Replace in *.json entries
   for (const f of Object.values(zip.files)) {
     if (f.dir || !f.name.toLowerCase().endsWith('.json')) continue;
     const txt = await f.async('string');
@@ -115,55 +112,47 @@ async function makeGototagsFromTemplate({ lot, qty, product }) {
       .replaceAll('LOT_PLACEHOLDER', esc(lot))
       .replaceAll('QTY_PLACEHOLDER', esc(qty))
       .replaceAll('PRODUCT_PLACEHOLDER', esc(product));
-    if (rep !== txt) {
-      zip.file(f.name, rep);
-      replacedCount++;
-    }
+    if (rep !== txt) { zip.file(f.name, rep); replacedCount++; }
   }
 
-  // Replace in any inner *text* .gototags (nested, not zip)
+  // Replace in any inner *text* .gototags (nested, not a zip)
   for (const f of Object.values(zip.files)) {
     if (f.dir || !f.name.toLowerCase().endsWith('.gototags')) continue;
     const raw = await zip.file(f.name).async('uint8array');
-    const innerIsZip = raw[0] === 0x50 && raw[1] === 0x4B; // 'PK'
+    const innerIsZip = raw[0] === 0x50 && raw[1] === 0x4B;
     if (!innerIsZip) {
       const txt = new TextDecoder().decode(raw);
       const rep = txt
         .replaceAll('LOT_PLACEHOLDER', esc(lot))
         .replaceAll('QTY_PLACEHOLDER', esc(qty))
         .replaceAll('PRODUCT_PLACEHOLDER', esc(product));
-      if (rep !== txt) {
-        zip.file(f.name, rep);
-        replacedCount++;
-      }
+      if (rep !== txt) { zip.file(f.name, rep); replacedCount++; }
     }
   }
 
   setStatus(`Creating .gototags (zip)… <small>${replacedCount} file(s) updated</small>`, '');
-  return await zip.generateAsync({ type: 'blob' });
+  return await zip.generateAsync({ type:'blob' });
 }
 
-///////////////////////////
-// Google Sheets logging (Apps Script Web App)
-///////////////////////////
-
+/* =========================
+ * Google Sheets logging (Apps Script Web App — VER41)
+ * ========================= */
 async function logToEssSheet({ lot, product, qty }) {
-  // Your provided endpoint:
-  // https://script.google.com/macros/s/AKfycbx-xOKyk83MF-wnpOdNiNiw7ltbFG9Atdjv5Hy4yp0bqTXKUzLlY15TgaOFX-CeJPa-3A/exec?action=lot_seed&lot_id=<LOT>&product=<PRODUCT>&qty=<QTY>
-  const base = 'https://script.google.com/macros/s/AKfycbx-xOKyk83MF-wnpOdNiNiw7ltbFG9Atdjv5Hy4yp0bqTXKUzLlY15TgaOFX-CeJPa-3A/exec';
-  const url = new URL(base);
-  url.searchParams.set('action',  'lot_seed');
-  url.searchParams.set('lot_id',  lot);
-  url.searchParams.set('product', product);
-  url.searchParams.set('qty',     qty);
+  // Build the URL your Code.gs expects:
+  // action=lot_seed, lot_id, product, qty, sheet=TAB
+  const u = new URL(SHEET_URL_BASE);
+  u.searchParams.set('action',  'lot_seed');
+  u.searchParams.set('lot_id',  lot);
+  u.searchParams.set('product', product);
+  u.searchParams.set('qty',     qty);
+  u.searchParams.set('sheet',   SHEET_TAB); // write to a fixed tab named "Lot Number"
 
   setStatus('Logging to <b>ESS Current Lots → Lot Number</b>…', '');
-  console.debug('[Sheets] GET', url.toString());
+  console.debug('[Sheets] GET', u.toString());
 
-  // 8s timeout; adjust as needed
-  const res = await fetchWithTimeout(url.toString(), { method: 'GET', timeout: 8000 });
+  const res = await fetchWithTimeout(u.toString(), { method:'GET', timeout: REQUEST_TIMEOUT_MS });
 
-  // Try to parse as JSON; fall back to text
+  // Parse JSON if possible; fallback to text
   const ct = (res.headers.get('content-type') || '').toLowerCase();
   let body;
   if (ct.includes('application/json')) {
@@ -173,19 +162,28 @@ async function logToEssSheet({ lot, product, qty }) {
   }
 
   if (!res.ok) {
-    const msg = typeof body === 'string' ? body.slice(0, 200) : JSON.stringify(body).slice(0, 200);
+    const msg = typeof body === 'string' ? body.slice(0,200) : JSON.stringify(body).slice(0,200);
     throw new Error(`Sheets logging failed (${res.status}): ${msg}`);
   }
 
-  console.debug('[Sheets] Response:', body);
-  setStatus('✅ Logged to <b>ESS Current Lots</b>. Creating .gototags…', 'ok');
+  if (typeof body === 'object' && body !== null) {
+    if (body.ok === false) throw new Error(body.error || 'Sheets logging error');
+    // Code.gs returns: { ok:true, tab, identity_row:2, lot_id, product, in_qty, ... }
+    const tab = body.tab || SHEET_TAB;
+    const row = body.identity_row ?? body.row ?? 2;
+    setStatus(`✅ Logged to <b>ESS Current Lots</b> (tab: <b>${tab}</b>, row: <b>${row}</b>). Creating .gototags…`, 'ok');
+    console.debug('[Sheets] JSON response:', body);
+  } else {
+    setStatus('✅ Logged to <b>ESS Current Lots</b>. Creating .gototags…', 'ok');
+    console.debug('[Sheets] Text response:', body);
+  }
+
   return body;
 }
 
-///////////////////////////
-// Click handler (single-run; prevents duplicates)
-///////////////////////////
-
+/* =========================
+ * Click handler (single-run; prevents duplicates)
+ * ========================= */
 let generating = false;
 
 async function onGenerate() {
@@ -196,10 +194,7 @@ async function onGenerate() {
   generating = true;
 
   const btn = $('#btnGen');
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = 'Generating…';
-  }
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
 
   try {
     setStatus('Validating inputs…', '');
@@ -211,23 +206,26 @@ async function onGenerate() {
       setStatus('Please enter <b>Lot</b>, <b>Quantity</b>, and <b>Product</b>.', 'warn');
       return;
     }
+    if (!/^\d+$/.test(qty)) {
+      setStatus('Quantity must be a whole number.', 'warn');
+      return;
+    }
 
-    // 1) Log to Google Sheets (strict or best-effort)
+    // 1) Log to Sheets (strict by default)
     try {
       await logToEssSheet({ lot, product, qty });
     } catch (e) {
       console.warn('[Sheets] logging error:', e);
       appendLog('Sheets logging error: ' + e.message);
-      const warn = '⚠️ Could not log to <b>ESS Current Lots</b>.';
       if (STRICT_LOGGING) {
-        setStatus(`${warn} Download aborted.`, 'err');
-        return; // Stop here if logging is required
+        setStatus('❌ Could not log to <b>ESS Current Lots</b>. Download aborted.', 'err');
+        return;
       } else {
-        setStatus(`${warn} Continuing to create .gototags…`, 'warn');
+        setStatus('⚠️ Could not log to ESS (continuing). Creating .gototags…', 'warn');
       }
     }
 
-    // 2) Create and download the .gototags
+    // 2) Build and download the .gototags
     const blob = await makeGototagsFromTemplate({ lot, qty, product });
     const safeLot = lot.replace(/[^A-Za-z0-9_-]/g, '_');
     const name = `encode_run_${nowStamp()}_${safeLot}.gototags`;
@@ -235,10 +233,9 @@ async function onGenerate() {
     setStatus('Downloading file…', '');
     saveAs(blob, name);
 
-    // 3) Final message
     setStatus(
       `✅ Downloaded <b>${name}</b>${STRICT_LOGGING ? ' and logged to ESS.' : '.'} ` +
-      `Double‑click it to open GoToTags → press <b>Start ▶</b> → write the tag.`,
+      `Double‑click to open GoToTags → press <b>Start ▶</b> → write the tag.`,
       'ok'
     );
   } catch (err) {
@@ -246,26 +243,20 @@ async function onGenerate() {
     appendLog(String(err.stack || err));
     setStatus(`❌ Error: ${err.message}`, 'err');
   } finally {
-    setTimeout(() => {
-      generating = false;
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = 'Generate Write File';
-      }
-    }, 900);
+    if (btn) { btn.disabled = false; btn.textContent = 'Generate Write File'; }
+    generating = false;
   }
 }
 
-///////////////////////////
-// Bind once
-///////////////////////////
-
+/* =========================
+ * Bind once
+ * ========================= */
 if (!window.__NFCTAGS_BOUND__) {
   window.__NFCTAGS_BOUND__ = true;
   window.addEventListener('DOMContentLoaded', () => {
     const btn = $('#btnGen');
     if (btn) {
-      btn.addEventListener('click', onGenerate, { once: false });
+      btn.addEventListener('click', onGenerate, { once:false });
       setStatus('Page ready. Enter LOT / QTY / PRODUCT, then click <b>Generate Write File</b>.', '');
       console.debug('[nfctags] bound click handler once');
     } else {
