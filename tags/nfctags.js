@@ -156,7 +156,7 @@ async function logToEssSheet({ lot, product, qty }) {
     // Created vs. updated message, now with timestamp
     if (body.created_tab === true) {
       setStatus(
-        `🆕 Created tab <b>${tab}</b> and wrote identity row (row}<b>${row</b>)<br>` +
+        `🆕 Created tab <b>${tab}</b> and wrote identity row (row <b>${row}</b>)<br>` +
         (tsStr ? `🕒 <b>Server timestamp:</b> ${tsStr}<br>` : '') +
         `Creating .gototags…`,
         'ok'
