@@ -223,7 +223,9 @@ async function onGenerate() {
 
     // 2) Build + download operation file
     const blob = await makeGototagsFromTemplate({ lot, qty, product });
-    const safeLot = lot.replace(/[^A-Za-z0-9_-]/g,'_');
+    const safeLot = lot.replace(/[^A-Za-z0-9_\-]/g,'_');
+    //const safeLot = lot.replace(/[^A-Za-z0-9_\-]/g,'_');
+    //const safeLot = lot.replace(/[^A-Za-z0-9_-]/g,'_');
     const name = `encode_run_${nowStamp()}_${safeLot}.gototags`;
 
     setStatus('Downloading file…','');
