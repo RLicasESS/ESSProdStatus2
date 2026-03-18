@@ -755,14 +755,8 @@
         const idxTotalIn = rows.findIndex(r => norm(r[0]) === "TOTAL IN");
         rows.splice(idxTotalIn >= 0 ? idxTotalIn + 1 : rows.length, 0, estFinishRow);
 
-
         const minUpDownRow = buildMinUpDownRow(rows);
         rows.push(minUpDownRow);
-
-        
-        const idxStatus = rows.findIndex(r => norm(r[0]) === "STATUS");
-        rows.splice(idxStatus >= 0 ? idxStatus + 1 : rows.length, 0, minUpDownRow);
-
         
         const table = document.createElement("table");
 
