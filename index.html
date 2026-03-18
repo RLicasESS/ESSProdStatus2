@@ -173,61 +173,6 @@
       return Number.isNaN(d.getTime()) ? null : d;
     }
 
-
-    function minutesDiffFromNow(dt) {
-      if (!dt) return null;
-      const ms = Date.now() - dt.getTime();
-      if (!Number.isFinite(ms)) return null;
-      return Math.max(0, Math.floor(ms / 60000));
-    }
-
-    function getStatusMinutesSince(rows, colIndex) {
-      // Prefer a dedicated status-change row if it exists
-      const sinceRow =
-        findRowByLabel(rows, "STATUS SINCE") ||
-        findRowByLabel(rows, "LAST STATUS CHANGE") ||
-        findRowByLabel(rows, "STATUS TIME");
-
-      if (sinceRow && sinceRow[colIndex]) {
-        const dt = parseDateTimeLocal(sinceRow[colIndex]);
-        const mins = minutesDiffFromNow(dt);
-        if (mins !== null) return mins;
-      }
-
-      // Fallback: use LAST UPDATE if no dedicated row exists
-      const lastUpdRow = findLastRow(rows, "LAST UPDATE") || [];
-      if (lastUpdRow[colIndex]) {
-        const dt = parseDateTimeLocal(lastUpdRow[colIndex]);
-        const mins = minutesDiffFromNow(dt);
-        if (mins !== null) return mins;
-      }
-
-      return null;
-    }
-
-    function buildMinUpDownRow(rows) {
-      const statusRow = findRowByLabel(rows, "STATUS") || [];
-      const maxCols = Math.max(...rows.map(r => r.length));
-      const out = [];
-      out[0] = "MIN UP / MIN DOWN";
-
-      for (let c = 1; c < maxCols; c++) {
-        const st = (statusRow[c] || "").toString().trim().toLowerCase();
-        const mins = getStatusMinutesSince(rows, c);
-
-        if (mins === null) {
-          out[c] = "";
-        } else if (st === "running") {
-          out[c] = `MIN UP|${mins}`;
-        } else {
-          out[c] = `MIN DOWN|${mins}`;
-        }
-      }
-      return out;
-    }
-
-
-    
     function parseCSV(text) {
       const lines = text.replace(/\r/g, "").trim().split(/\n/);
       if (!lines.length) return [];
@@ -268,6 +213,7 @@
       const want = norm(label);
       return (rows || []).find(r => norm(r[0]) === want) || null;
     }
+    
     function findLastRow(rows, label) {
       const want = norm(label);
       for (let i = rows.length - 1; i >= 0; i--) {
@@ -275,6 +221,54 @@
       }
       return null;
     }
+
+    
+    function minutesDiffFromNow(dt) {
+      if (!dt) return null;
+      const ms = Date.now() - dt.getTime();
+      if (!Number.isFinite(ms)) return null;
+      return Math.max(0, Math.floor(ms / 60000));
+    }
+
+    function getStatusMinutesSince(rows, colIndex) {
+      const sinceRow =
+        findRowByLabel(rows, "STATUS SINCE") ||
+        findRowByLabel(rows, "LAST STATUS CHANGE") ||
+        findRowByLabel(rows, "STATUS TIME");
+
+      if (sinceRow && sinceRow[colIndex]) {
+        const dt = parseDateTimeLocal(sinceRow[colIndex]);
+        const mins = minutesDiffFromNow(dt);
+        if (mins !== null) return mins;
+      }
+
+      const lastUpdRow = findLastRow(rows, "LAST UPDATE") || [];
+      if (lastUpdRow[colIndex]) {
+        const dt = parseDateTimeLocal(lastUpdRow[colIndex]);
+        const mins = minutesDiffFromNow(dt);
+        if (mins !== null) return mins;
+      }
+
+      return null;
+    }
+
+    function buildMinUpDownRow(rows) {
+      const statusRow = findRowByLabel(rows, "STATUS") || [];
+      const maxCols = Math.max(...rows.map(r => r.length));
+      const out = [];
+      out[0] = "MIN UP / MIN DOWN";
+
+      for (let c = 1; c < maxCols; c++) {
+        const st = (statusRow[c] || "").toString().trim().toLowerCase();
+        const mins = getStatusMinutesSince(rows, c);
+
+        if (mins === null) out[c] = "";
+        else out[c] = String(mins);
+      }
+      return out;
+    }
+
+    
     function getStepForCol(rows, colIndex) {
       const stepRow = findRowByLabel(rows, "TEST STEP");
       return stepRow ? (stepRow[colIndex] || "").toString().trim() : "";
@@ -763,7 +757,9 @@
 
 
         const minUpDownRow = buildMinUpDownRow(rows);
+        rows.push(minUpDownRow);
 
+        
         const idxStatus = rows.findIndex(r => norm(r[0]) === "STATUS");
         rows.splice(idxStatus >= 0 ? idxStatus + 1 : rows.length, 0, minUpDownRow);
 
@@ -911,16 +907,19 @@
             }
 
 
-            if (!isHeader && rowLabel === "MIN UP / MIN DOWN" && colIndex > 0) {
-              const raw = (cell ?? "").toString();
-              const parts = raw.split("|");
-              const label = (parts[0] || "").trim();
-              const mins = (parts[1] || "").trim();
+            if (!isHeader && rowLabel === "MIN UP / MIN DOWN") {
+              if (colIndex === 0) {
+                const anyRunning = row.slice(1).some((_, idx) => {
+                  const statusRow = findRowByLabel(rows, "STATUS") || [];
+                  const st = (statusRow[idx + 1] || "").toString().trim().toLowerCase();
+                  return st === "running";
+                });
 
-              if (label === "MIN UP") {
-                cellContent = `<span style="color:green; font-weight:bold;">MIN UP ${mins}</span>`;
-              } else if (label === "MIN DOWN") {
-                cellContent = `<span style="color:red; font-weight:bold;">MIN DOWN ${mins}</span>`;
+                const left  = `<span style="color:green; font-weight:bold;">MIN UP</span>`;
+                const right = `<span style="color:red; font-weight:bold;">MIN DOWN</span>`;
+                cellContent = `${left} / ${right}`;
+              } else {
+                cellContent = (cell ?? "").toString().trim();
               }
             }
 
@@ -953,6 +952,19 @@
               if (st === "maint")   { cellEl.style.color="blue";  cellEl.style.fontWeight="bold"; cellEl.style.backgroundColor="#d6e6ff"; }
             }
 
+            if (!isHeader && rowLabel === "MIN UP / MIN DOWN" && colIndex > 0) {
+              const statusRow = findRowByLabel(rows, "STATUS") || [];
+              const st = (statusRow[colIndex] || "").toString().trim().toLowerCase();
+
+              if (st === "running") {
+                cellEl.style.color = "green";
+                cellEl.style.fontWeight = "bold";
+              } else {
+                cellEl.style.color = "red";
+                cellEl.style.fontWeight = "bold";
+              }
+            }
+            
             tr.appendChild(cellEl);
           });
 
