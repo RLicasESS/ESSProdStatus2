@@ -692,6 +692,54 @@
         // Estimated finish row (display only)
         const startRow = rows.find(r => norm(r[0]) === "DATE LOT STARTED") || [];
         const statusSinceRow = rows.find(r => norm(r[0]) === "STATUS SINCE") || [];
+
+        // -------------------- INSERT HERE --------------------
+        const table = document.createElement("table");
+        
+        // Loop through each CSV row
+        for (let r = 0; r < rows.length; r++) {
+          const row = rows[r];
+          const tr = document.createElement("tr");
+          const label = norm(row[0] || "");
+        
+          for (let c = 0; c < row.length; c++) {
+            const td = document.createElement("td");
+            const val = row[c] || "";
+        
+            // ===== STATUS coloring =====
+            if (label === "STATUS" && c > 0) {
+              const status = statusByCol[c] || "";
+              td.className = "status-" + status;
+              td.textContent = status;
+            } 
+            // ===== STATUS SINCE display =====
+            else if (label === "STATUS SINCE" && c > 0) {
+              td.textContent = val;
+              td.className = "status-" + (statusByCol[c] || "");
+            } 
+            // ===== Yield hover for AUTO1 / AUTO2 =====
+            else if ((label === "AUTO1" || label === "AUTO2") && c > 0) {
+              const lot  = getLotForCol(rows, c);
+              const step = getStepForCol(rows, c);
+              td.innerHTML = yieldHoverHtml(label, lot, step, label);
+            } 
+            // ===== normal cells =====
+            else {
+              td.textContent = val;
+            }
+        
+            tr.appendChild(td);
+          }
+        
+          table.appendChild(tr);
+        }
+        
+        // After table is ready, bind hover delegation for charts
+        bindYieldHoverDelegation(rows);
+        document.body.appendChild(table);
+        // -------------------- END INSERT --------------------
+        
+        
         const lastUpdRow = findLastRow(rows, "LAST UPDATE") || [];
         const loadingRow = rows.find(r => norm(r[0]) === "LOADING COUNTS") || [];
 
