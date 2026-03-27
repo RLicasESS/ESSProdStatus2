@@ -21,11 +21,19 @@
 <table id="statusTable"></table>
 
 <script>
-const CSV_URL = 'https://rlicasess.github.io/ESSProdStatus2/essstatus.csv'; // replace with your CSV path
+const CSV_URL = 'https://rlicasess.github.io/ESSProdStatus2/essstatus.csv';
 
-function parseDateTimeLocal(str) {
+function parseDate(str) {
     if (!str) return null;
     return new Date(str);
+}
+
+function formatDuration(ms) {
+    if (!ms || ms < 0) return "";
+    const totalMinutes = Math.floor(ms / 60000);
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    return `${h}h ${m}m`;
 }
 
 async function loadCSV() {
@@ -33,56 +41,43 @@ async function loadCSV() {
     const text = await res.text();
     const rows = text.trim().split('\n').map(r => r.split(','));
 
-    // Identify key rows
+    // Identify row indices
     const headerRow = rows[0];
-    let statusRow = rows.find(r => r[0].trim().toUpperCase() === "STATUS");
-    let lastUpdRow = rows.find(r => r[0].trim().toUpperCase() === "LAST UPDATE");
-    let statusSinceRow = rows.find(r => r[0].trim().toUpperCase() === "STATUS SINCE");
+    const statusIndex = rows.findIndex(r => r[0].trim().toUpperCase() === "STATUS");
+    const lastUpdateIndex = rows.findIndex(r => r[0].trim().toUpperCase() === "LAST UPDATE");
+    const statusSinceIndex = rows.findIndex(r => r[0].trim().toUpperCase() === "STATUS SINCE");
 
-    // --- Insert DURATION row after STATUS ---
-    const durationRow = [];
-    durationRow[0] = "DURATION";
+    if (statusIndex === -1 || lastUpdateIndex === -1) {
+        alert("CSV missing STATUS or LAST UPDATE rows");
+        return;
+    }
 
+    // Compute DURATION row
+    const durationRow = ["DURATION"];
     const now = new Date();
 
-    for (let c = 1; c < statusRow.length; c++) {
-        const status = (statusRow[c] || "").toString().trim().toLowerCase();
-        const lastUpdateStr = lastUpdRow[c] || "";
-        const lastUpdateDate = parseDateTimeLocal(lastUpdateStr);
-
+    for (let c = 1; c < rows[0].length; c++) {
+        const status = (rows[statusIndex][c] || "").trim().toLowerCase();
+        const lastUpdateDate = parseDate(rows[lastUpdateIndex][c]);
         let diffMs = 0;
 
-        if (status === "running") {
-            const statusSinceStr = statusSinceRow ? statusSinceRow[c] || "" : "";
-            const statusSinceDate = parseDateTimeLocal(statusSinceStr);
-            if (statusSinceDate && lastUpdateDate) {
-                diffMs = lastUpdateDate - statusSinceDate;
-            }
+        if (status === "running" && statusSinceIndex !== -1) {
+            const statusSinceDate = parseDate(rows[statusSinceIndex][c]);
+            if (statusSinceDate && lastUpdateDate) diffMs = lastUpdateDate - statusSinceDate;
         } else {
-            if (lastUpdateDate) {
-                diffMs = now - lastUpdateDate;
-            }
+            if (lastUpdateDate) diffMs = now - lastUpdateDate;
         }
 
-        let display = "";
-        if (diffMs && diffMs > 0) {
-            const totalMinutes = Math.floor(diffMs / 60000);
-            const h = Math.floor(totalMinutes / 60);
-            const m = totalMinutes % 60;
-            display = `${h}h ${m}m`;
-        }
-
-        durationRow[c] = display;
+        durationRow[c] = formatDuration(diffMs);
     }
 
     // Insert DURATION row right after STATUS
-    const statusRowIndex = rows.indexOf(statusRow);
-    rows.splice(statusRowIndex + 1, 0, durationRow);
+    rows.splice(statusIndex + 1, 0, durationRow);
 
-    renderTable(rows);
+    renderTable(rows, statusIndex);
 }
 
-function renderTable(rows) {
+function renderTable(rows, statusIndex) {
     const table = document.getElementById('statusTable');
     table.innerHTML = "";
 
@@ -92,14 +87,14 @@ function renderTable(rows) {
             const td = document.createElement(rIndex === 0 ? 'th' : 'td');
             td.textContent = cell;
 
-            // Apply STATUS colors
-            if (rIndex === rows.indexOf(rows.find(r => r[0].trim().toUpperCase() === "STATUS"))) {
+            // STATUS colors
+            if (rIndex === statusIndex) {
                 td.classList.add(cell.toLowerCase());
             }
 
-            // Apply same color to DURATION row
-            if (rIndex === rows.indexOf(rows.find(r => r[0].trim().toUpperCase() === "DURATION"))) {
-                const statusCell = rows[rows.indexOf(rows.find(r => r[0].trim().toUpperCase() === "STATUS"))][cIndex] || "";
+            // DURATION gets same color as STATUS
+            if (rIndex === statusIndex + 1 && cIndex > 0) {
+                const statusCell = rows[statusIndex][cIndex] || "";
                 td.classList.add(statusCell.toLowerCase());
                 td.classList.add('duration');
             }
