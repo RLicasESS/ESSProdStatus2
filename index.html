@@ -668,13 +668,13 @@
               const status = (statusRow[c] || "").toLowerCase();
               let lastUpdate = null;
         
-              // find bottom-most valid LAST UPDATE for this column
+              // bottom-most LAST UPDATE
               for (let luRow of lastUpdateRows) {
                 if (luRow[c]) lastUpdate = new Date(luRow[c]);
               }
         
               if (!lastUpdate || isNaN(lastUpdate)) {
-                rows[r][c] = ""; // leave blank if no valid date
+                rows[r][c] = "";
                 continue;
               }
         
@@ -695,10 +695,15 @@
                 continue;
               }
         
-              const h = Math.floor(diffMs / 3600000);
-              const m = Math.floor((diffMs % 3600000) / 60000);
+              const days = Math.floor(diffMs / 86400000); // 24*60*60*1000
+              const hours = Math.floor((diffMs % 86400000) / 3600000);
+              const minutes = Math.floor((diffMs % 3600000) / 60000);
         
-              rows[r][c] = `${h}h ${m}m`;
+              let text = "";
+              if (days) text += `${days}d `;
+              text += `${hours}h ${minutes}m`;
+        
+              rows[r][c] = text;
             }
           }
         }
