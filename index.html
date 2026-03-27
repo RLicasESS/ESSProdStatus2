@@ -1,4 +1,4 @@
-<!-- MARKER: INDEX_YIELD_V20260326_FULL_REWRITE -->
+<!-- MARKER: INDEX_YIELD_V20260211_FIX_STATUS_TIME_DIFF -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,10 +12,14 @@
     a { color: #007bff; font-weight: bold; text-decoration: none; }
     a:hover { text-decoration: underline; }
     a.statusLink, a.statusLink:visited, a.statusLink:hover, a.statusLink:active {
-      color: inherit !important; font-weight: inherit !important; text-decoration: underline; cursor: pointer;
+      color: inherit !important;
+      font-weight: inherit !important;
+      text-decoration: underline;
+      cursor: pointer;
     }
 
-    #dbg { width: 60%; margin: 6px auto 0 auto; font-family: Arial, sans-serif; font-size: 13px; color: #555; display: none; white-space: pre-wrap; }
+    #dbg { width: 60%; margin: 6px auto 0 auto; font-family: Arial; font-size: 13px; color: #555; display: none; white-space: pre-wrap; }
+
     .lc-wrap { display: flex; flex-direction: column; gap: 6px; }
     .lc-num  { font-weight: 600; }
     .prog { height: 12px; border: 1px solid #bbb; border-radius: 8px; background: #f2f2f2; overflow: hidden; }
@@ -26,11 +30,8 @@
     .yieldHover { position: relative; display: inline-block; cursor: help; }
     .yieldTip { display: none; }
     .yieldHover.isOpen .yieldTip { display: block; }
-    .yieldTip {
-      position: absolute; left: 0; top: 110%; min-width: 240px; max-width: 260px;
-      background: #fff; border: 1px solid #aaa; border-radius: 10px;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.18); padding: 10px 10px 8px 10px; z-index: 9999;
-    }
+
+    .yieldTip { position: absolute; left: 0; top: 110%; min-width: 240px; max-width: 260px; background: #fff; border: 1px solid #aaa; border-radius: 10px; box-shadow: 0 10px 22px rgba(0,0,0,0.18); padding: 10px 10px 8px 10px; z-index: 9999; }
     .yieldTipTitle { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #222; }
     .yieldTipSub   { font-size: 12px; color: #555; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .yieldCanvas { width: 220px; height: 70px; border: 1px solid #ddd; border-radius: 8px; display: block; background: #fafafa; touch-action: none; }
@@ -43,98 +44,89 @@
     }
   </style>
 </head>
+
 <body>
 <h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION STATUS</h2>
 <div id="dbg"></div>
+
 <script>
-const params = new URLSearchParams(window.location.search);
-const showLinks = params.get("links")==="1";
-const debug = params.get("debug")==="1";
-const TESTER_URL = "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0";
-const yieldMode = (params.get("yield")||"real").toLowerCase();
-const useYieldForBars = (params.get("yieldbar")||"1")!=="0";
-const smoothWin = (() => { const raw=(params.get("smooth")||"").toLowerCase().trim(); if(!raw) return 0; if(raw==="auto") return 5; const n=parseInt(raw,10); return Number.isFinite(n)&&n>=3?n:0; })();
-const yScale = (params.get("yScale")||"auto").toLowerCase();
-const yZoom = (yScale!=="full");
-document.title="ESS PRODUCTION STATUS";
-const dbgEl=document.getElementById("dbg"); if(debug) dbgEl.style.display="block"; function dbg(msg){ if(debug) dbgEl.textContent=msg; }
-if(showLinks){ document.getElementById("pageTitle").innerHTML=`<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION STATUS`; }
+  const params = new URLSearchParams(window.location.search);
+  const showLinks = params.get("links") === "1";
+  const debug = params.get("debug") === "1";
+  const TESTER_URL = "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0";
 
-const CSV_URL="https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
-const YIELD_URL="https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
+  document.title = "ESS PRODUCTION STATUS";
+  const dbgEl = document.getElementById("dbg");
+  if (debug) dbgEl.style.display = "block";
+  function dbg(msg){ if(debug) dbgEl.textContent = msg; }
 
-const HANDLER_IP={"NS-3":"10.20.10.187","NS-4":"10.20.10.238","NS-5":"10.20.10.98","NS-6":"10.20.10.99","CHROMA":"10.20.10.38"};
+  if (showLinks) {
+    document.getElementById("pageTitle").innerHTML =
+      `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION STATUS`;
+  }
 
-function norm(s){return (s||"").toString().replace(/\r/g,"").trim().toUpperCase();}
-function toInt(x){const v=parseInt((x||"").toString().replace(/,/g,"").trim(),10);return Number.isNaN(v)?null:v;}
-function pad2(n){return String(n).padStart(2,"0");}
-function fmtDateTime(d){return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;}
-function parseDateTimeLocal(s){const raw=(s||"").toString().trim(); if(!raw) return null; let x=raw.replace(" ","T"); x=x.replace(/\.(\d{3})\d+/,".$1"); const d=new Date(x); return Number.isNaN(d.getTime())?null:d;}
-function parseCSV(text){const lines=text.replace(/\r/g,"").trim().split(/\n/); if(!lines.length) return []; const first=lines[0]; const delim=first.includes("\t")?"\t":","; return lines.map(line=>line.split(delim)); }
-function nowIsoNoMs(){const d=new Date(); const pad=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;}
-function clamp01(v){return Math.max(0,Math.min(1,v));}
+  function norm(s){ return (s||"").toString().replace(/\r/g,"").trim().toUpperCase(); }
+  function toInt(x){ const v=parseInt((x||"").toString().replace(/,/g,"").trim(),10); return Number.isNaN(v)?null:v; }
+  function parseDateTimeLocal(s){
+    const raw = (s||"").toString().trim(); if(!raw) return null;
+    let x = raw.replace(" ","T").replace(/\.(\d{3})\d+/,".$1");
+    const d = new Date(x);
+    return Number.isNaN(d.getTime())?null:d;
+  }
 
-// =================== LOAD CSV ===================
-let prevRowsByLabel=null;
+  const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
 
-async function loadCSV(){
-  try{
-    dbg(`Loading CSV…\nYield mode: ${yieldMode}\nYield URL: ${YIELD_URL}\nuseYieldForBars: ${useYieldForBars}\n smooth: ${smoothWin}\nyScale: ${yScale}\nyZoom: ${yZoom}\nTESTER_URL: ${TESTER_URL}`);
-    const resp=await fetch(CSV_URL+(CSV_URL.includes("?")?"&":"?")+"v="+Date.now(),{cache:"no-store"});
-    if(!resp.ok){dbg(`CSV fetch failed: ${resp.status} ${resp.statusText}`); return;}
-    const text=await resp.text();
-    const rows=parseCSV(text); if(!rows.length){dbg("CSV parsed but empty."); return;}
+  async function loadCSV() {
+    try {
+      const resp = await fetch(CSV_URL + (CSV_URL.includes("?")?"&":"?")+"v="+Date.now(), { cache:"no-store" });
+      if(!resp.ok){ dbg(`CSV fetch failed: ${resp.status}`); return; }
+      const text = await resp.text();
+      const rows = text.replace(/\r/g,"").trim().split(/\n").map(l=>l.split(/,|\t/));
 
-    // Store prev rows for freeze-on-error
-    const rowsByLabel={}; for(const r of rows) rowsByLabel[norm(r[0])]=r;
-    const yj=await loadYieldCache(rows);
+      const statusRow = rows.find(r=>norm(r[0])==="STATUS")||[];
+      const statusSinceRow = rows.find(r=>norm(r[0])==="STATUS SINCE")||[];
+      const lastUpdRow = rows.find(r=>norm(r[0])==="LAST UPDATE")||[];
 
-    const handlerRow=rows.find(r=>norm(r[0])==="HANDLER")||[];
-    const statusRow=rows.find(r=>norm(r[0])==="STATUS")||[];
-    const totalInRow=findLastRow(rows,"TOTAL IN")||[];
-    const totalRow=findLastRow(rows,"TOTAL")||[];
+      const now = new Date();
+      for(let c=1;c<statusRow.length;c++){
+        const st = (statusRow[c]||"").toString().trim();
+        const lastUpdVal = lastUpdRow[c]||"";
+        const lastDate = parseDateTimeLocal(lastUpdVal);
+        if(!lastDate) continue;
 
-    const freezeLabels=new Set(["TOTAL IN","LOADING COUNTS","TOTAL","AUTO1","AUTO2","AUTO3"]);
-    if(prevRowsByLabel){
-      for(const r of rows){
-        const label=norm(r[0]);
-        if(!freezeLabels.has(label)) continue;
-        const prevRow=prevRowsByLabel[label]; if(!prevRow) continue;
-        for(let c=1;c<r.length;c++){ if((statusRow[c]||"").toLowerCase()==="error"){ const prevVal=prevRow[c]; if(prevVal!==undefined && String(prevVal).trim()!=="") r[c]=prevVal; } }
-      }
-    }
-    prevRowsByLabel=rowsByLabel;
-
-    // Build table
-    const tbl=document.createElement("table");
-    const hdr=document.createElement("tr"); hdr.innerHTML=`<th>LABEL</th>`; for(let c=1;c<rows[0].length;c++){ hdr.innerHTML+=`<th>${c}</th>`; } tbl.appendChild(hdr);
-
-    for(const r of rows){
-      const tr=document.createElement("tr"); const label=norm(r[0]);
-      tr.innerHTML=`<td>${label}</td>`;
-      for(let c=1;c<r.length;c++){
-        let val=r[c]||"";
-        // STATUS non-running time diff
-        if(label==="STATUS" && (val||"").toLowerCase()!=="running"){
-          const lastUpdate=parseDateTimeLocal(val);
-          if(lastUpdate){
-            const diffMs=Date.now()-lastUpdate.getTime();
-            val=`${val} (${Math.floor(diffMs/60000)} min ago)`;
-          }
+        let diffMs = 0;
+        if((st||"").toLowerCase()==="running"){
+          const statusSinceVal = statusSinceRow[c]||"";
+          const statusSinceDate = parseDateTimeLocal(statusSinceVal);
+          if(statusSinceDate) diffMs = lastDate - statusSinceDate;
+        } else {
+          diffMs = now - lastDate;
         }
-        tr.innerHTML+=`<td>${val}</td>`;
+        const diffMin = Math.round(diffMs/60000);
+        const diffText = `${diffMin} min`;
+
+        // Add line below STATUS
+        if(!statusRow[c]) statusRow[c] = "";
+        statusRow[c] = `${st}<div style="font-size:11px;color:inherit;margin-top:2px;">${diffText}</div>`;
       }
-      tbl.appendChild(tr);
-    }
-    document.body.appendChild(tbl);
-  }catch(e){dbg("loadCSV error: "+e);}
-}
 
-// ===== Helper functions reused =====
-function findLastRow(rows,label){const want=norm(label);for(let i=rows.length-1;i>=0;i--){if(norm(rows[i]?.[0])===want) return rows[i];}return null;}
-function loadYieldCache(rowsForMock){return Promise.resolve({});} // stub for now
+      // Build table
+      const tbl = document.createElement("table");
+      rows.forEach(r=>{
+        const tr = document.createElement("tr");
+        r.forEach(cell=>{
+          const td = document.createElement("td");
+          td.innerHTML = cell || "";
+          tr.appendChild(td);
+        });
+        tbl.appendChild(tr);
+      });
+      document.body.appendChild(tbl);
 
-window.addEventListener("load",()=>{loadCSV();});
+    } catch(e){ dbg("Error loading CSV: "+e); }
+  }
+
+  loadCSV();
 </script>
 </body>
 </html>
