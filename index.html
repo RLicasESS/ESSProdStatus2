@@ -653,36 +653,39 @@
           }
         }
 
-        // --- fill DURATION row ---
-        const now = new Date(); // current date & time
+        
+        // assume rows already contains the table
+        const now = new Date();
         
         for (let r = 0; r < rows.length; r++) {
           if (norm(rows[r][0]) === "DURATION") {
-            // find the STATUS row just above
-            const statusRow = rows[r - 1];
-            const status = statusRow[1].toLowerCase(); // adjust index to STATUS column
-            const lastRow = rows[rows.length - 1]; // bottom row
-            const lastUpdateStr = lastRow[2]; // adjust index to LAST UPDATE column
-            const statusSinceStr = statusRow[2]; // adjust index to STATUS SINCE column
+            const statusRow = rows[r-1]; // STATUS row above
+            const lastUpdateRow = rows.find(row => norm(row[0]) === "LAST UPDATE");
+            const statusSinceRow = rows.find(row => norm(row[0]) === "STATUS SINCE");
         
-            let durationMs = 0;
+            for (let c = 1; c < rows[r].length; c++) {
+              const status = statusRow[c].toLowerCase();
+              const lastUpdate = new Date(lastUpdateRow[c]);
+              const statusSince = new Date(statusSinceRow[c]);
         
-            if (status === "running") {
-              // running: LAST UPDATE (bottom) - STATUS SINCE
-              durationMs = new Date(lastUpdateStr) - new Date(statusSinceStr);
-            } else {
-              // not running: CURRENT DATE - LAST UPDATE (bottom)
-              durationMs = now - new Date(lastUpdateStr);
+              let diffMs;
+              if (status === "running") {
+                diffMs = lastUpdate - statusSince;
+              } else {
+                diffMs = now - lastUpdate;
+              }
+        
+              if (isNaN(diffMs)) {
+                rows[r][c] = "";
+              } else {
+                const h = Math.floor(diffMs / 3600000);
+                const m = Math.floor((diffMs % 3600000) / 60000);
+                const s = Math.floor((diffMs % 60000) / 1000);
+                rows[r][c] = `${h}h ${m}m ${s}s`;
+              }
             }
-        
-            // convert ms to hh:mm:ss
-            const sec = Math.floor(durationMs / 1000) % 60;
-            const min = Math.floor(durationMs / (1000 * 60)) % 60;
-            const hr = Math.floor(durationMs / (1000 * 60 * 60));
-        
-            rows[r][1] = `${hr}h ${min}m ${sec}s`; // fill first column after DURATION title
           }
-        }        
+        }
         
         const yj = await loadYieldCache(rows);
 
