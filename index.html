@@ -707,6 +707,15 @@
             }
           }
         }
+
+        // --- remove STATUS SINCE row after calculating DURATION ---
+        for (let r = 0; r < rows.length; r++) {
+          if (norm(rows[r][0]) === "STATUS SINCE") {
+            rows.splice(r, 1); // remove that row
+            break; // only the first match, there should be only one
+          }
+        }
+        
         
         const yj = await loadYieldCache(rows);
 
