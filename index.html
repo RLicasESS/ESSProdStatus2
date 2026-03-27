@@ -1,125 +1,89 @@
-<!-- MARKER: INDEX_YIELD_V20260326 -->
+<!-- MARKER: INDEX_YIELD_V20260326_STATUS_TIMEDIFF -->
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ESS PRODUCTION STATUS</title>
-<style>
-  table { border-collapse: collapse; width: 60%; margin: 20px auto; font-family: Arial, sans-serif; }
-  th, td { border: 1px solid #aaa; padding: 8px 12px; text-align: left; vertical-align: top; }
-  th { background-color: #2c3e50; color: white; font-weight: bold; }
-  a { color: #007bff; font-weight: bold; text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  a.statusLink, a.statusLink:visited, a.statusLink:hover, a.statusLink:active {
-    color: inherit !important; font-weight: inherit !important; text-decoration: underline; cursor: pointer;
-  }
-  #dbg { width: 60%; margin: 6px auto 0 auto; font-family: Arial, sans-serif; font-size: 13px; color: #555; display: none; white-space: pre-wrap; }
-  .lc-wrap { display: flex; flex-direction: column; gap: 6px; }
-  .lc-num { font-weight: 600; }
-  .prog { height: 12px; border: 1px solid #bbb; border-radius: 8px; background: #f2f2f2; overflow: hidden; }
-  .prog > .bar { height: 100%; width: 0%; background: #2e7d32; }
-  .lc-pct { font-size: 12px; color: #444; }
-  .yieldHover { position: relative; display: inline-block; cursor: help; }
-  .yieldTip { display: none; }
-  .yieldHover.isOpen .yieldTip { display: block; }
-  .yieldTip { position: absolute; left: 0; top: 110%; min-width: 240px; max-width: 260px; background: #fff; border: 1px solid #aaa; border-radius: 10px; box-shadow: 0 10px 22px rgba(0,0,0,0.18); padding: 10px 10px 8px 10px; z-index: 9999; }
-  .yieldTipTitle { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #222; }
-  .yieldTipSub { font-size: 12px; color: #555; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .yieldCanvas { width: 220px; height: 70px; border: 1px solid #ddd; border-radius: 8px; display: block; background: #fafafa; touch-action: none; }
-  .yieldLegend { margin-top: 6px; font-size: 11px; color: #666; display: flex; justify-content: space-between; }
-  .yieldNote { margin-top: 6px; font-size: 11px; color: #777; }
-  @media (max-width: 800px) { table, #dbg { width: 96%; } .yieldTip { left: 50%; transform: translateX(-50%); } }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ESS PRODUCTION STATUS</title>
+  <style>
+    table { border-collapse: collapse; width: 60%; margin: 20px auto; font-family: Arial, sans-serif; }
+    th, td { border: 1px solid #aaa; padding: 8px 12px; text-align: left; vertical-align: top; }
+    th { background-color: #2c3e50; color: white; font-weight: bold; }
+    a { color: #007bff; font-weight: bold; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a.statusLink, a.statusLink:visited, a.statusLink:hover, a.statusLink:active {
+      color: inherit !important;
+      font-weight: inherit !important;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .statusCell { font-weight: bold; display: flex; flex-direction: column; }
+    .statusDiff { font-size: 11px; font-weight: normal; }
+  </style>
 </head>
 <body>
-<h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION STATUS</h2>
-<div id="dbg"></div>
+  <h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION STATUS</h2>
 
-<script>
-// ----------------- CONFIG -----------------
-const CSV_URL   = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
-const YIELD_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
-const TESTER_URL = "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0";
+  <script>
+    const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
 
-// yield / smoothing / yScale
-const params = new URLSearchParams(window.location.search);
-const yieldMode = (params.get("yield") || "real").toLowerCase();
-const smoothWin = (()=>{ const r = (params.get("smooth")||"").toLowerCase().trim(); if(r==="auto") return 5; const n=parseInt(r,10); return n>=3?n:0; })();
-const yScale = (params.get("yScale")||"auto").toLowerCase();
-const yZoom = (yScale!=="full");
+    function norm(s) { return (s || "").toString().replace(/\r/g, "").trim().toUpperCase(); }
+    function toInt(x) { const v=parseInt((x||"").toString().replace(/,/g,"").trim(),10); return Number.isNaN(v)?null:v; }
+    function parseCSV(text){ const lines=text.replace(/\r/g,"").trim().split(/\n/); const delim=lines[0].includes("\t")? "\t":","; return lines.map(l=>l.split(delim)); }
+    function parseDateTimeLocal(s){ if(!s) return null; let x=s.replace(" ","T").replace(/\.(\d{3})\d+/,".$1"); const d=new Date(x); return isNaN(d.getTime())?null:d; }
+    function fmtTimeDiff(ms){ if(ms<0) ms=0; const sec=Math.floor(ms/1000); const min=Math.floor(sec/60); const h=Math.floor(min/60); const m=min%60; const s=sec%60; return h>0?`${h}h ${m}m ${s}s`:`${m}m ${s}s`; }
 
-// DEBUG
-const debug = params.get("debug")==="1";
-const dbgEl = document.getElementById("dbg"); if(debug) dbgEl.style.display="block";
-function dbg(msg){ if(debug) dbgEl.textContent=msg; }
-function norm(s){return (s||"").toString().trim().toUpperCase();}
-function toInt(x){ const v=parseInt((x||"").toString().replace(/,/g,"").trim(),10); return Number.isNaN(v)?null:v; }
-function pad2(n){return String(n).padStart(2,"0");}
-function nowIsoNoMs(){ const d=new Date(); const pad=pad2; return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; }
+    async function loadCSV(){
+      const resp = await fetch(CSV_URL + "?v="+Date.now(), {cache:"no-store"});
+      if(!resp.ok){ console.error("CSV fetch failed", resp.status); return; }
+      const rows=parseCSV(await resp.text());
+      if(!rows.length) return;
 
-// ----------------- CSV -----------------
-async function loadCSV(){
-  dbg("Loading CSV...");
-  const resp = await fetch(CSV_URL+"?v="+Date.now(),{cache:"no-store"});
-  if(!resp.ok){ dbg(`CSV fetch failed: ${resp.status}`); return; }
-  const text = await resp.text();
-  const rows = text.replace(/\r/g,"").trim().split(/\n/).map(r=>r.split(/,|\t/));
+      const statusRow = rows.find(r=>norm(r[0])==="STATUS")||[];
+      const lastUpdateRow = rows.find(r=>norm(r[0])==="LAST UPDATE")||[];
+      const statusSinceRow = rows.find(r=>norm(r[0])==="STATUS SINCE")||[];
 
-  // Build table
-  const table = document.createElement("table");
-  rows.forEach(r=>{
-    const tr = document.createElement("tr");
-    r.forEach(c=>{ const td=document.createElement("td"); td.textContent=c; tr.appendChild(td); });
-    table.appendChild(tr);
-  });
-  document.body.appendChild(table);
+      const table=document.createElement("table");
+      const header=document.createElement("tr");
+      for(let c=0;c<statusRow.length;c++){ const th=document.createElement("th"); th.textContent=statusRow[c]||""; header.appendChild(th); }
+      table.appendChild(header);
 
-  addStatusTimeDiff(table, rows);
-}
-loadCSV();
+      for(let r=1;r<rows.length;r++){
+        const tr=document.createElement("tr");
+        for(let c=0;c<rows[r].length;c++){
+          const td=document.createElement("td");
+          if(norm(rows[r][0])==="STATUS" && c>0){
+            const st=(rows[r][c]||"").toLowerCase();
+            td.className="statusCell";
+            td.textContent=st.charAt(0).toUpperCase()+st.slice(1);
 
-// ----------------- STATUS TIME DIFF -----------------
-function addStatusTimeDiff(table, rows){
-  const now = new Date();
-  const headerCells = table.querySelector("tr").querySelectorAll("td,th");
-  let statusIdx=-1,lastIdx=-1,sinceIdx=-1;
-  headerCells.forEach((h,i)=>{
-    const txt = (h.textContent||"").trim().toUpperCase();
-    if(txt==="STATUS") statusIdx=i;
-    else if(txt==="LAST UPDATE") lastIdx=i;
-    else if(txt==="STATUS SINCE") sinceIdx=i;
-  });
-  if(statusIdx<0 || lastIdx<0) return;
+            // Calculate time diff
+            const lastUpd=parseDateTimeLocal(lastUpdateRow[c]);
+            const statusSince=parseDateTimeLocal(statusSinceRow[c]);
+            let diffMs=0;
+            if(st==="running" && lastUpd && statusSince) diffMs=lastUpd-statusSince;
+            else if(st!=="running" && lastUpd) diffMs=Date.now()-lastUpd;
 
-  // Hide STATUS SINCE column
-  if(sinceIdx>=0){
-    table.querySelectorAll("tr").forEach(tr=>{ const c=tr.children[sinceIdx]; if(c) c.style.display="none"; });
-  }
+            const diffSpan=document.createElement("span");
+            diffSpan.className="statusDiff";
+            diffSpan.textContent=fmtTimeDiff(diffMs);
+            td.appendChild(diffSpan);
 
-  for(let r=1;r<table.rows.length;r++){
-    const cells = table.rows[r].children;
-    const statusCell = cells[statusIdx];
-    const lastCell = cells[lastIdx];
-    const sinceCell = sinceIdx>=0?cells[sinceIdx]:null;
-    if(!statusCell || !lastCell) continue;
-    const st=statusCell.textContent.trim().toLowerCase();
-    const lastDate=new Date(lastCell.textContent.trim());
-    if(isNaN(lastDate)) continue;
-    let diffMs=0;
-    if(st==="running" && sinceCell){
-      const sinceDate=new Date(sinceCell.textContent.trim());
-      if(!isNaN(sinceDate)) diffMs=lastDate-sinceDate;
-    } else { diffMs=now-lastDate; }
-    const diffMin=Math.round(diffMs/60000);
-    const div=document.createElement("div");
-    div.style.fontSize="11px";
-    div.style.marginTop="2px";
-    div.style.color="inherit";
-    div.textContent=diffMin+" min";
-    statusCell.appendChild(div);
-  }
-}
-</script>
+            // color
+            if(st==="running") td.style.color="#2e7d32";
+            else if(st==="paused") td.style.color="#f39c12";
+            else if(st==="error") td.style.color="#b00020";
+            else td.style.color="#444";
+          } else td.textContent=rows[r][c]||"";
+          tr.appendChild(td);
+        }
+        table.appendChild(tr);
+      }
+
+      document.body.appendChild(table);
+    }
+
+    loadCSV();
+  </script>
 </body>
 </html>
