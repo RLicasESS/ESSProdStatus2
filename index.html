@@ -655,38 +655,42 @@
 
         
         // assume rows already contains the table
+
         const now = new Date();
         
         for (let r = 0; r < rows.length; r++) {
           if (norm(rows[r][0]) === "DURATION") {
-            const statusRow = rows[r-1]; // STATUS row above
-            const lastUpdateRow = rows.find(row => norm(row[0]) === "LAST UPDATE");
+            const statusRow = rows[r - 1]; // STATUS row just above
+            const lastUpdateRows = rows.filter(row => norm(row[0]) === "LAST UPDATE");
             const statusSinceRow = rows.find(row => norm(row[0]) === "STATUS SINCE");
         
             for (let c = 1; c < rows[r].length; c++) {
-              const status = statusRow[c].toLowerCase();
+              const status = (statusRow[c] || "").toLowerCase();
+              let lastUpdate = null;
         
-              // find the bottom-most LAST UPDATE in this column
-              let lastUpdateText = lastUpdateRow[c];
-              let lastUpdate = new Date(lastUpdateText);
-              if (isNaN(lastUpdate)) {
-                rows[r][c] = "";
+              // find bottom-most valid LAST UPDATE for this column
+              for (let luRow of lastUpdateRows) {
+                if (luRow[c]) lastUpdate = new Date(luRow[c]);
+              }
+        
+              if (!lastUpdate || isNaN(lastUpdate)) {
+                rows[r][c] = ""; // leave blank if no valid date
                 continue;
               }
         
-              let diffMs;
+              let diffMs = null;
+        
               if (status === "running") {
-                const statusSince = new Date(statusSinceRow[c]);
-                if (isNaN(statusSince)) {
-                  rows[r][c] = "";
-                  continue;
+                const statusSinceText = statusSinceRow[c] || "";
+                const statusSince = new Date(statusSinceText);
+                if (!isNaN(statusSince)) {
+                  diffMs = lastUpdate - statusSince;
                 }
-                diffMs = lastUpdate - statusSince; // running: bottom LAST UPDATE - STATUS SINCE
-              } else {
-                diffMs = now - lastUpdate;        // non-running: CURRENT - bottom LAST UPDATE
+              } else if (status) { // non-running
+                diffMs = now - lastUpdate;
               }
         
-              if (diffMs < 0 || isNaN(diffMs)) {
+              if (diffMs === null || diffMs < 0) {
                 rows[r][c] = "";
                 continue;
               }
