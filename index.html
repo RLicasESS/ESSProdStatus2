@@ -665,24 +665,36 @@
         
             for (let c = 1; c < rows[r].length; c++) {
               const status = statusRow[c].toLowerCase();
-              const lastUpdate = new Date(lastUpdateRow[c]);
-              const statusSince = new Date(statusSinceRow[c]);
+        
+              // find the bottom-most LAST UPDATE in this column
+              let lastUpdateText = lastUpdateRow[c];
+              let lastUpdate = new Date(lastUpdateText);
+              if (isNaN(lastUpdate)) {
+                rows[r][c] = "";
+                continue;
+              }
         
               let diffMs;
               if (status === "running") {
-                diffMs = lastUpdate - statusSince;
+                const statusSince = new Date(statusSinceRow[c]);
+                if (isNaN(statusSince)) {
+                  rows[r][c] = "";
+                  continue;
+                }
+                diffMs = lastUpdate - statusSince; // running: bottom LAST UPDATE - STATUS SINCE
               } else {
-                diffMs = now - lastUpdate;
+                diffMs = now - lastUpdate;        // non-running: CURRENT - bottom LAST UPDATE
               }
         
-              if (isNaN(diffMs)) {
+              if (diffMs < 0 || isNaN(diffMs)) {
                 rows[r][c] = "";
-              } else {
-                const h = Math.floor(diffMs / 3600000);
-                const m = Math.floor((diffMs % 3600000) / 60000);
-                const s = Math.floor((diffMs % 60000) / 1000);
-                rows[r][c] = `${h}h ${m}m ${s}s`;
+                continue;
               }
+        
+              const h = Math.floor(diffMs / 3600000);
+              const m = Math.floor((diffMs % 3600000) / 60000);
+        
+              rows[r][c] = `${h}h ${m}m`;
             }
           }
         }
