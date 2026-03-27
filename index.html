@@ -1,132 +1,125 @@
-<!-- MARKER: INDEX_YIELD_V20260211_FIX_STATUS_TIME_DIFF -->
+<!-- MARKER: INDEX_YIELD_V20260326 -->
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ESS PRODUCTION STATUS</title>
-  <style>
-    table { border-collapse: collapse; width: 60%; margin: 20px auto; font-family: Arial, sans-serif; }
-    th, td { border: 1px solid #aaa; padding: 8px 12px; text-align: left; vertical-align: top; }
-    th { background-color: #2c3e50; color: white; font-weight: bold; }
-    a { color: #007bff; font-weight: bold; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    a.statusLink, a.statusLink:visited, a.statusLink:hover, a.statusLink:active {
-      color: inherit !important;
-      font-weight: inherit !important;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-
-    #dbg { width: 60%; margin: 6px auto 0 auto; font-family: Arial; font-size: 13px; color: #555; display: none; white-space: pre-wrap; }
-
-    .lc-wrap { display: flex; flex-direction: column; gap: 6px; }
-    .lc-num  { font-weight: 600; }
-    .prog { height: 12px; border: 1px solid #bbb; border-radius: 8px; background: #f2f2f2; overflow: hidden; }
-    .prog > .bar { height: 100%; width: 0%; background: #2e7d32; }
-    .lc-pct { font-size: 12px; color: #444; }
-
-    /* Yield tooltip */
-    .yieldHover { position: relative; display: inline-block; cursor: help; }
-    .yieldTip { display: none; }
-    .yieldHover.isOpen .yieldTip { display: block; }
-
-    .yieldTip { position: absolute; left: 0; top: 110%; min-width: 240px; max-width: 260px; background: #fff; border: 1px solid #aaa; border-radius: 10px; box-shadow: 0 10px 22px rgba(0,0,0,0.18); padding: 10px 10px 8px 10px; z-index: 9999; }
-    .yieldTipTitle { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #222; }
-    .yieldTipSub   { font-size: 12px; color: #555; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .yieldCanvas { width: 220px; height: 70px; border: 1px solid #ddd; border-radius: 8px; display: block; background: #fafafa; touch-action: none; }
-    .yieldLegend { margin-top: 6px; font-size: 11px; color: #666; display: flex; justify-content: space-between; }
-    .yieldNote   { margin-top: 6px; font-size: 11px; color: #777; }
-
-    @media (max-width: 800px) {
-      table, #dbg { width: 96%; }
-      .yieldTip { left: 50%; transform: translateX(-50%); }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ESS PRODUCTION STATUS</title>
+<style>
+  table { border-collapse: collapse; width: 60%; margin: 20px auto; font-family: Arial, sans-serif; }
+  th, td { border: 1px solid #aaa; padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background-color: #2c3e50; color: white; font-weight: bold; }
+  a { color: #007bff; font-weight: bold; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a.statusLink, a.statusLink:visited, a.statusLink:hover, a.statusLink:active {
+    color: inherit !important; font-weight: inherit !important; text-decoration: underline; cursor: pointer;
+  }
+  #dbg { width: 60%; margin: 6px auto 0 auto; font-family: Arial, sans-serif; font-size: 13px; color: #555; display: none; white-space: pre-wrap; }
+  .lc-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .lc-num { font-weight: 600; }
+  .prog { height: 12px; border: 1px solid #bbb; border-radius: 8px; background: #f2f2f2; overflow: hidden; }
+  .prog > .bar { height: 100%; width: 0%; background: #2e7d32; }
+  .lc-pct { font-size: 12px; color: #444; }
+  .yieldHover { position: relative; display: inline-block; cursor: help; }
+  .yieldTip { display: none; }
+  .yieldHover.isOpen .yieldTip { display: block; }
+  .yieldTip { position: absolute; left: 0; top: 110%; min-width: 240px; max-width: 260px; background: #fff; border: 1px solid #aaa; border-radius: 10px; box-shadow: 0 10px 22px rgba(0,0,0,0.18); padding: 10px 10px 8px 10px; z-index: 9999; }
+  .yieldTipTitle { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: #222; }
+  .yieldTipSub { font-size: 12px; color: #555; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .yieldCanvas { width: 220px; height: 70px; border: 1px solid #ddd; border-radius: 8px; display: block; background: #fafafa; touch-action: none; }
+  .yieldLegend { margin-top: 6px; font-size: 11px; color: #666; display: flex; justify-content: space-between; }
+  .yieldNote { margin-top: 6px; font-size: 11px; color: #777; }
+  @media (max-width: 800px) { table, #dbg { width: 96%; } .yieldTip { left: 50%; transform: translateX(-50%); } }
+</style>
 </head>
-
 <body>
 <h2 id="pageTitle" style="text-align:center;">ESS PRODUCTION STATUS</h2>
 <div id="dbg"></div>
 
 <script>
-  const params = new URLSearchParams(window.location.search);
-  const showLinks = params.get("links") === "1";
-  const debug = params.get("debug") === "1";
-  const TESTER_URL = "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0";
+// ----------------- CONFIG -----------------
+const CSV_URL   = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
+const YIELD_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
+const TESTER_URL = "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0";
 
-  document.title = "ESS PRODUCTION STATUS";
-  const dbgEl = document.getElementById("dbg");
-  if (debug) dbgEl.style.display = "block";
-  function dbg(msg){ if(debug) dbgEl.textContent = msg; }
+// yield / smoothing / yScale
+const params = new URLSearchParams(window.location.search);
+const yieldMode = (params.get("yield") || "real").toLowerCase();
+const smoothWin = (()=>{ const r = (params.get("smooth")||"").toLowerCase().trim(); if(r==="auto") return 5; const n=parseInt(r,10); return n>=3?n:0; })();
+const yScale = (params.get("yScale")||"auto").toLowerCase();
+const yZoom = (yScale!=="full");
 
-  if (showLinks) {
-    document.getElementById("pageTitle").innerHTML =
-      `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION STATUS`;
+// DEBUG
+const debug = params.get("debug")==="1";
+const dbgEl = document.getElementById("dbg"); if(debug) dbgEl.style.display="block";
+function dbg(msg){ if(debug) dbgEl.textContent=msg; }
+function norm(s){return (s||"").toString().trim().toUpperCase();}
+function toInt(x){ const v=parseInt((x||"").toString().replace(/,/g,"").trim(),10); return Number.isNaN(v)?null:v; }
+function pad2(n){return String(n).padStart(2,"0");}
+function nowIsoNoMs(){ const d=new Date(); const pad=pad2; return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; }
+
+// ----------------- CSV -----------------
+async function loadCSV(){
+  dbg("Loading CSV...");
+  const resp = await fetch(CSV_URL+"?v="+Date.now(),{cache:"no-store"});
+  if(!resp.ok){ dbg(`CSV fetch failed: ${resp.status}`); return; }
+  const text = await resp.text();
+  const rows = text.replace(/\r/g,"").trim().split(/\n/).map(r=>r.split(/,|\t/));
+
+  // Build table
+  const table = document.createElement("table");
+  rows.forEach(r=>{
+    const tr = document.createElement("tr");
+    r.forEach(c=>{ const td=document.createElement("td"); td.textContent=c; tr.appendChild(td); });
+    table.appendChild(tr);
+  });
+  document.body.appendChild(table);
+
+  addStatusTimeDiff(table, rows);
+}
+loadCSV();
+
+// ----------------- STATUS TIME DIFF -----------------
+function addStatusTimeDiff(table, rows){
+  const now = new Date();
+  const headerCells = table.querySelector("tr").querySelectorAll("td,th");
+  let statusIdx=-1,lastIdx=-1,sinceIdx=-1;
+  headerCells.forEach((h,i)=>{
+    const txt = (h.textContent||"").trim().toUpperCase();
+    if(txt==="STATUS") statusIdx=i;
+    else if(txt==="LAST UPDATE") lastIdx=i;
+    else if(txt==="STATUS SINCE") sinceIdx=i;
+  });
+  if(statusIdx<0 || lastIdx<0) return;
+
+  // Hide STATUS SINCE column
+  if(sinceIdx>=0){
+    table.querySelectorAll("tr").forEach(tr=>{ const c=tr.children[sinceIdx]; if(c) c.style.display="none"; });
   }
 
-  function norm(s){ return (s||"").toString().replace(/\r/g,"").trim().toUpperCase(); }
-  function toInt(x){ const v=parseInt((x||"").toString().replace(/,/g,"").trim(),10); return Number.isNaN(v)?null:v; }
-  function parseDateTimeLocal(s){
-    const raw = (s||"").toString().trim(); if(!raw) return null;
-    let x = raw.replace(" ","T").replace(/\.(\d{3})\d+/,".$1");
-    const d = new Date(x);
-    return Number.isNaN(d.getTime())?null:d;
+  for(let r=1;r<table.rows.length;r++){
+    const cells = table.rows[r].children;
+    const statusCell = cells[statusIdx];
+    const lastCell = cells[lastIdx];
+    const sinceCell = sinceIdx>=0?cells[sinceIdx]:null;
+    if(!statusCell || !lastCell) continue;
+    const st=statusCell.textContent.trim().toLowerCase();
+    const lastDate=new Date(lastCell.textContent.trim());
+    if(isNaN(lastDate)) continue;
+    let diffMs=0;
+    if(st==="running" && sinceCell){
+      const sinceDate=new Date(sinceCell.textContent.trim());
+      if(!isNaN(sinceDate)) diffMs=lastDate-sinceDate;
+    } else { diffMs=now-lastDate; }
+    const diffMin=Math.round(diffMs/60000);
+    const div=document.createElement("div");
+    div.style.fontSize="11px";
+    div.style.marginTop="2px";
+    div.style.color="inherit";
+    div.textContent=diffMin+" min";
+    statusCell.appendChild(div);
   }
-
-  const CSV_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
-
-  async function loadCSV() {
-    try {
-      const resp = await fetch(CSV_URL + (CSV_URL.includes("?")?"&":"?")+"v="+Date.now(), { cache:"no-store" });
-      if(!resp.ok){ dbg(`CSV fetch failed: ${resp.status}`); return; }
-      const text = await resp.text();
-      const rows = text.replace(/\r/g,"").trim().split(/\n").map(l=>l.split(/,|\t/));
-
-      const statusRow = rows.find(r=>norm(r[0])==="STATUS")||[];
-      const statusSinceRow = rows.find(r=>norm(r[0])==="STATUS SINCE")||[];
-      const lastUpdRow = rows.find(r=>norm(r[0])==="LAST UPDATE")||[];
-
-      const now = new Date();
-      for(let c=1;c<statusRow.length;c++){
-        const st = (statusRow[c]||"").toString().trim();
-        const lastUpdVal = lastUpdRow[c]||"";
-        const lastDate = parseDateTimeLocal(lastUpdVal);
-        if(!lastDate) continue;
-
-        let diffMs = 0;
-        if((st||"").toLowerCase()==="running"){
-          const statusSinceVal = statusSinceRow[c]||"";
-          const statusSinceDate = parseDateTimeLocal(statusSinceVal);
-          if(statusSinceDate) diffMs = lastDate - statusSinceDate;
-        } else {
-          diffMs = now - lastDate;
-        }
-        const diffMin = Math.round(diffMs/60000);
-        const diffText = `${diffMin} min`;
-
-        // Add line below STATUS
-        if(!statusRow[c]) statusRow[c] = "";
-        statusRow[c] = `${st}<div style="font-size:11px;color:inherit;margin-top:2px;">${diffText}</div>`;
-      }
-
-      // Build table
-      const tbl = document.createElement("table");
-      rows.forEach(r=>{
-        const tr = document.createElement("tr");
-        r.forEach(cell=>{
-          const td = document.createElement("td");
-          td.innerHTML = cell || "";
-          tr.appendChild(td);
-        });
-        tbl.appendChild(tr);
-      });
-      document.body.appendChild(tbl);
-
-    } catch(e){ dbg("Error loading CSV: "+e); }
-  }
-
-  loadCSV();
+}
 </script>
 </body>
 </html>
