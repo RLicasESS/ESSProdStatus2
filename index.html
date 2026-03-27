@@ -652,6 +652,37 @@
             r++; // skip the row we just added
           }
         }
+
+        // --- fill DURATION row ---
+        const now = new Date(); // current date & time
+        
+        for (let r = 0; r < rows.length; r++) {
+          if (norm(rows[r][0]) === "DURATION") {
+            // find the STATUS row just above
+            const statusRow = rows[r - 1];
+            const status = statusRow[1].toLowerCase(); // adjust index to STATUS column
+            const lastRow = rows[rows.length - 1]; // bottom row
+            const lastUpdateStr = lastRow[2]; // adjust index to LAST UPDATE column
+            const statusSinceStr = statusRow[2]; // adjust index to STATUS SINCE column
+        
+            let durationMs = 0;
+        
+            if (status === "running") {
+              // running: LAST UPDATE (bottom) - STATUS SINCE
+              durationMs = new Date(lastUpdateStr) - new Date(statusSinceStr);
+            } else {
+              // not running: CURRENT DATE - LAST UPDATE (bottom)
+              durationMs = now - new Date(lastUpdateStr);
+            }
+        
+            // convert ms to hh:mm:ss
+            const sec = Math.floor(durationMs / 1000) % 60;
+            const min = Math.floor(durationMs / (1000 * 60)) % 60;
+            const hr = Math.floor(durationMs / (1000 * 60 * 60));
+        
+            rows[r][1] = `${hr}h ${min}m ${sec}s`; // fill first column after DURATION title
+          }
+        }        
         
         const yj = await loadYieldCache(rows);
 
