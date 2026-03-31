@@ -263,7 +263,8 @@
     let yieldKeyMap = null; // normalizedKey -> realKey
 
     async function fetchJson(url) {
-      const res = await fetch(url + (url.includes("?") ? "&" : "?") + "v=" + Date.now(), { cache: "no-store" });
+      //const res = await fetch(url + (url.includes("?") ? "&" : "?") + "v=" + Date.now(), { cache: "no-store" });
+      const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const txt = await res.text();
       return JSON.parse(txt);
@@ -630,10 +631,13 @@
           `smooth: ${smoothWin}\nyScale: ${yScale}\nyZoom: ${yZoom}\nTESTER_URL: ${TESTER_URL}`
         );
 
-        const resp = await fetch(
-          CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "v=" + Date.now(),
-          { cache: "no-store" }
-        );
+        //const resp = await fetch(
+        //  CSV_URL + (CSV_URL.includes("?") ? "&" : "?") + "v=" + Date.now(),
+        //  { cache: "no-store" }
+        //);
+
+        cost resp = await fetch(CSV_URL);
+        
         if (!resp.ok) { dbg(`CSV fetch failed: ${resp.status} ${resp.statusText}`); return; }
 
         const text = await resp.text();
