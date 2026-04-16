@@ -1,1 +1,1 @@
-{"meta":{"updated":"2026-04-16T10:04:41","denom":"TOTAL","max_points_per_key":30,"active_keys":0},"data":{}}
+{"meta":{"updated":"2026-04-16T10:07:41","denom":"TOTAL","max_points_per_key":30,"active_keys":2},"data":{"TGWAS08T65|FT|AUTO1":[{"t":"2026-04-16T10:05:41","tester":"HP-1","good":0,"total":3,"yield":0.0}],"TGWAS08T65|FT|AUTO2":[{"t":"2026-04-16T10:05:41","tester":"HP-1","good":3,"total":3,"yield":1.0}]}}
