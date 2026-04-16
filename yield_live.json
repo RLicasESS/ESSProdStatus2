@@ -1,1 +1,1 @@
-{"meta":{"updated":"2026-04-16T13:15:46","denom":"TOTAL","max_points_per_key":30,"active_keys":0},"data":{}}
+{"meta":{"updated":"2026-04-16T13:18:46","denom":"TOTAL","max_points_per_key":30,"active_keys":2},"data":{"TGWBS0UT66|25C_FT1|AUTO1":[{"t":"2026-04-16T13:16:46","tester":"S100_2","good":15,"total":36,"yield":0.4166666666666667}],"TGWBS0UT66|25C_FT1|AUTO2":[{"t":"2026-04-16T13:16:46","tester":"S100_2","good":3,"total":36,"yield":0.08333333333333333}]}}
