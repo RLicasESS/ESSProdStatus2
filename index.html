@@ -626,6 +626,10 @@
 
     let prevRowsByLabel = null;
 
+    function openVNC(ip) {
+      window.open(`http://localhost:9000/vnc?ip=${ip}`, "_blank");
+    }
+    
     async function loadCSV() {
       try {
         dbg(
@@ -824,27 +828,27 @@
 
             if (showLinks && c === "AP-1")
               cellContent = usePiLinks
-                ? `<a href="vncviewer://172.18.179.10">AP-1</a>`
+                ? `<a href="#" onclick="openVNC('172.18.179.10')">AP-1</a>'
                 : `<a href="vnc://AP-1">AP-1</a>`;
             
             if (showLinks && c === "AP-2")
               cellContent = usePiLinks
-                ? `<a href="vncviewer://172.18.234.51">AP-2</a>`
+                ? `<a href="#" onclick="openVNC('172.18.234.51')">AP-2</a>`
                 : `<a href="vnc://AP-2">AP-2</a>`;
             
             if (showLinks && c === "S100_1")
               cellContent = usePiLinks
-                ? `<a href="vncviewer://172.18.164.42">S100_1</a>`
+                ? `<a href="#" onclick="openVNC('172.18.164.42')">S100_1</a>`
                 : `<a href="vnc://S100-1">S100_1</a>`;
             
             if (showLinks && c === "S100_2")
               cellContent = usePiLinks
-                ? `<a href="vncviewer://172.18.234.51">S100_2</a>`
+                ? `<a href="#" onclick="openVNC('172.18.234.51')">S100_2</a>`
                 : `<a href="vnc://S100-2">S100_2</a>`;
             
             if (showLinks && c === "S100_4")
               cellContent = usePiLinks
-                ? `<a href="vncviewer://172.18.179.225">S100_4</a>`
+                ? `<a href="#" onclick="openVNC('172.18.179.225')">S100_4</a>`
                 : `<a href="vnc://S100-4">S100_4</a>`;
                         
             if (!isHeader && rowLabel === "LOADING COUNTS" && colIndex > 0) {
