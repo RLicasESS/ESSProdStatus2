@@ -2,42 +2,32 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ESS LINK DASHBOARD</title>
+  <title>ESS DASHBOARD</title>
 
   <style>
-    body { font-family: Arial, sans-serif; margin: 16px; }
-    h2 { text-align: center; margin-bottom: 6px; }
+    body { font-family: Arial; margin: 16px; }
+    h2 { text-align: center; }
 
     #mode {
       text-align: center;
-      font-size: 13px;
-      margin-bottom: 12px;
-      color: #333;
+      margin-bottom: 10px;
       font-weight: bold;
     }
 
     table {
       border-collapse: collapse;
-      width: 94%;
-      margin: 0 auto;
+      width: 85%;
+      margin: auto;
     }
 
     th, td {
       border: 1px solid #aaa;
       padding: 10px;
-      vertical-align: top;
     }
 
     th {
       background: #2c3e50;
       color: white;
-    }
-
-    .section {
-      background: #f2f2f2;
-      font-weight: bold;
-      text-align: center;
     }
 
     a {
@@ -47,133 +37,120 @@
     }
 
     .muted {
-      color: #777;
-      font-size: 12px;
+      color: #888;
     }
   </style>
 </head>
 
 <body>
 
-<h2>ESS LINK DASHBOARD</h2>
+<h2>ESS DASHBOARD</h2>
 <div id="mode"></div>
 
 <table id="tbl"></table>
 
 <script>
 
-// ================= SAFE MODE PARSING =================
-const params = new URLSearchParams(window.location.search);
+// ================= MODE =================
+const mode = (new URLSearchParams(location.search).get("links") || "").toLowerCase();
 
-// HARD FIX: trim + normalize + fallback-safe
-const raw = (params.get("links") || "").trim().toLowerCase();
+const isPI = mode === "pi";
+const isPC = mode === "pc";
 
-// ONLY VALID VALUES
-const isPC = raw === "pc";
-const isPI = raw === "pi";
-
-// ================= DEBUG (visible on page) =================
 document.getElementById("mode").innerText =
-  `MODE: ${raw || "none"} | PC=${isPC} | PI=${isPI}`;
+  mode ? `MODE: ${mode.toUpperCase()}` : "MODE: VIEW ONLY";
 
-// ================= DATA =================
-const TESTER = {
-  name: "TESTER",
+// ================= MAPPING =================
+const tester = {
+  label: "ESSTester_01",
   url: "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0"
 };
 
-const HANDLERS = [
-  ["CHROMA", "https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e"],
-  ["NS-3",   "https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46"],
-  ["NS-4",   "https://connect.raspberrypi.com/devices/66fa4727-e6b5-4a1a-855d-1f266270b950"],
-  ["NS-5",   "https://connect.raspberrypi.com/devices/468fc957-7879-440e-b1ea-b7e7dfef37f6"],
-  ["NS-6",   "https://connect.raspberrypi.com/devices/759713e5-9e7e-408a-9686-85fb7ed7b1d2"]
-];
+const handlers = {
+  "CHROMA": "ESSHandler_04",
+  "NS-3": "ESSHandler_03",
+  "NS-4": "ESSHandler_02",
+  "NS-5": "ESSHandler_01",
+  "NS-6": "ESSHandler_05"
+};
 
-const AP = [
-  ["AP-1", "172.18.148.141"],
-  ["AP-2", "172.18.97.10"]
-];
+const ap = {
+  "AP-1": "172.18.148.141",
+  "AP-2": "172.18.97.10"
+};
 
-const S100 = [
-  ["S100_1", "172.18.50.107"],
-  ["S100_2", "172.18.87.18"],
-  ["S100_4", "172.18.50.83"]
-];
+const s100 = {
+  "S100_1": "172.18.50.107",
+  "S100_2": "172.18.87.18",
+  "S100_4": "172.18.50.83"
+};
+
+// ================= HELPERS =================
+function link(url, text) {
+  return `<a href="${url}" target="_blank">${text}</a>`;
+}
+
+// VNC only in PI mode
+function vnc(ip, text) {
+  return `<a href="#" onclick="window.open('http://localhost:9000/vnc?ip=${ip}','_blank')">${text}</a>`;
+}
 
 // ================= TABLE =================
 const tbl = document.getElementById("tbl");
 
-function row(a,b,c, cls="") {
+function row(type, name) {
   const tr = document.createElement("tr");
-  if (cls) tr.className = cls;
 
-  tr.innerHTML = `<td>${a}</td><td>${b}</td><td>${c}</td>`;
+  let value = "";
+
+  // ---- TESTER ----
+  if (type === "TESTER") {
+    value = (isPI || isPC)
+      ? link(tester.url, tester.label)
+      : tester.label;
+  }
+
+  // ---- HANDLERS ----
+  else if (handlers[type]) {
+    const label = handlers[type];
+    value = (isPI || isPC)
+      ? link("https://connect.raspberrypi.com/devices", label)
+      : label;
+  }
+
+  // ---- AP ----
+  else if (ap[type]) {
+    const ip = ap[type];
+    value = isPI ? vnc(ip, ip)
+          : isPC ? `<span class="muted">${ip}</span>`
+          : ip;
+  }
+
+  // ---- S100 ----
+  else if (s100[type]) {
+    const ip = s100[type];
+    value = isPI ? vnc(ip, ip)
+          : isPC ? `<span class="muted">${ip}</span>`
+          : ip;
+  }
+
+  tr.innerHTML = `<td>${type}</td><td>${value}</td>`;
   tbl.appendChild(tr);
 }
 
-// HEADER
-row("<b>TYPE</b>", "<b>NAME</b>", "<b>LINK</b>");
+// ================= BUILD =================
+row("TESTER", "");
 
-// ================= TESTER =================
-row(
-  "TESTER",
-  TESTER.name,
-  (isPC || isPI)
-    ? `<a href="${TESTER.url}" target="_blank">${TESTER.name}</a>`
-    : "<span class='muted'>hidden</span>"
-);
+for (const k in handlers) row(k, "");
 
-// ================= HANDLERS =================
-row("", "", "", "section");
+row("", "");
+row("AP-1", "");
+row("AP-2", "");
 
-for (const [name, url] of HANDLERS) {
-  row(
-    "HANDLER",
-    name,
-    (isPC || isPI)
-      ? `<a href="${url}" target="_blank">${name}</a>`
-      : "<span class='muted'>hidden</span>"
-  );
-}
-
-// ================= AP (PI ONLY) =================
-row("", "", "", "section");
-
-for (const [name, ip] of AP) {
-
-  if (!isPI) {
-    row("AP", name, "<span class='muted'>hidden</span>");
-    continue;
-  }
-
-  row(
-    "AP",
-    name,
-    `<a href="#" onclick="window.open('http://localhost:9000/vnc?ip=${ip}','_blank')">
-      ${TESTER.name}
-    </a>`
-  );
-}
-
-// ================= S100 (PI ONLY) =================
-row("", "", "", "section");
-
-for (const [name, ip] of S100) {
-
-  if (!isPI) {
-    row("S100", name, "<span class='muted'>hidden</span>");
-    continue;
-  }
-
-  row(
-    "S100",
-    name,
-    `<a href="#" onclick="window.open('http://localhost:9000/vnc?ip=${ip}','_blank')">
-      ${TESTER.name}
-    </a>`
-  );
-}
+row("", "");
+row("S100_1", "");
+row("S100_2", "");
+row("S100_4", "");
 
 </script>
 
