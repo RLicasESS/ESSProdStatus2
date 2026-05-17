@@ -13,14 +13,14 @@
 
     h2 {
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
 
-    .note {
+    #mode {
       text-align: center;
       font-size: 13px;
-      color: #666;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      color: #444;
     }
 
     table {
@@ -56,9 +56,9 @@
       text-decoration: underline;
     }
 
-    .small {
+    .muted {
+      color: #777;
       font-size: 12px;
-      color: #444;
     }
   </style>
 </head>
@@ -66,48 +66,26 @@
 <body>
 
 <h2>ESS LINK DASHBOARD</h2>
-<div class="note">
-  Static reference page (no live CSV dependency)
-</div>
+<div id="mode"></div>
 
 <table id="tbl"></table>
 
 <script>
-const tbl = document.getElementById("tbl");
 
-function row(type, name, link, cls="") {
-  const tr = document.createElement("tr");
-  if (cls) tr.className = cls;
+const params = new URLSearchParams(window.location.search);
 
-  const td1 = document.createElement("td");
-  td1.innerHTML = type;
+// ================= LINK MODE =================
+const linkMode = (params.get("links") || "0").toString();
+const showLinks = linkMode === "1" || linkMode === "2";
+const usePiLinks = linkMode === "2";
 
-  const td2 = document.createElement("td");
-  td2.innerHTML = name;
+// ================= DATA =================
+const TESTER = {
+  name: "MAIN TESTER",
+  url: "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0"
+};
 
-  const td3 = document.createElement("td");
-  td3.innerHTML = link;
-
-  tr.appendChild(td1);
-  tr.appendChild(td2);
-  tr.appendChild(td3);
-
-  tbl.appendChild(tr);
-}
-
-// ================= TESTER =================
-row("<b>TYPE</b>", "<b>NAME</b>", "<b>LINK</b>");
-
-row("TESTER", "MAIN TESTER",
-  `<a href="https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0" target="_blank">
-    Raspberry Pi Connect
-  </a>`
-);
-
-// ================= HANDLERS =================
-row("", "", "", "section");
-
-const handlers = [
+const HANDLERS = [
   ["CHROMA", "https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e"],
   ["NS-3",   "https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46"],
   ["NS-4",   "https://connect.raspberrypi.com/devices/66fa4727-e6b5-4a1a-855d-1f266270b950"],
@@ -115,49 +93,107 @@ const handlers = [
   ["NS-6",   "https://connect.raspberrypi.com/devices/759713e5-9e7e-408a-9686-85fb7ed7b1d2"]
 ];
 
-for (const [name, url] of handlers) {
-  row("HANDLER", name,
-    `<a href="${url}" target="_blank">${name}</a>`
-  );
-}
-
-// ================= AP MACHINES =================
-row("", "", "", "section");
-
-const ap = [
+const AP = [
   ["AP-1", "172.18.148.141"],
   ["AP-2", "172.18.97.10"]
 ];
 
-for (const [name, ip] of ap) {
-  row(
-    "AP",
-    name,
-    `
-      <a href="http://${ip}:8080/latest.png" target="_blank">latest.png</a>
-      <div class="small">VNC: ${ip}</div>
-    `
-  );
-}
-
-// ================= S100 =================
-row("", "", "", "section");
-
-const s100 = [
+const S100 = [
   ["S100_1", "172.18.50.107"],
   ["S100_2", "172.18.87.18"],
   ["S100_4", "172.18.50.83"]
 ];
 
-for (const [name, ip] of s100) {
+// ================= UI MODE LABEL =================
+const modeText =
+  linkMode === "0" ? "MODE: VIEW ONLY (no links)"
+  : linkMode === "1" ? "MODE: PI CONNECT LINKS"
+  : linkMode === "2" ? "MODE: FULL FACTORY (VNC enabled)"
+  : "MODE: VIEW ONLY";
+
+document.getElementById("mode").innerText = modeText;
+
+// ================= TABLE =================
+const tbl = document.getElementById("tbl");
+
+function row(a,b,c, cls="") {
+  const tr = document.createElement("tr");
+  if (cls) tr.className = cls;
+
+  const td1 = document.createElement("td");
+  td1.innerHTML = a;
+
+  const td2 = document.createElement("td");
+  td2.innerHTML = b;
+
+  const td3 = document.createElement("td");
+  td3.innerHTML = c;
+
+  tr.appendChild(td1);
+  tr.appendChild(td2);
+  tr.appendChild(td3);
+  tbl.appendChild(tr);
+}
+
+// ================= HEADER =================
+row("<b>TYPE</b>", "<b>NAME</b>", "<b>LINK</b>");
+
+// ================= TESTER =================
+row(
+  "TESTER",
+  TESTER.name,
+  showLinks
+    ? `<a href="${TESTER.url}" target="_blank">Pi Connect</a>`
+    : "<span class='muted'>hidden</span>"
+);
+
+// ================= HANDLERS =================
+row("", "", "", "section");
+
+for (const [name, url] of HANDLERS) {
   row(
-    "S100",
+    "HANDLER",
     name,
-    `
-      <a href="http://${ip}:8080/latest.png" target="_blank">latest.png</a>
-      <div class="small">VNC: ${ip}</div>
-    `
+    showLinks
+      ? `<a href="${url}" target="_blank">${name}</a>`
+      : "<span class='muted'>hidden</span>"
   );
+}
+
+// ================= AP =================
+row("", "", "", "section");
+
+for (const [name, ip] of AP) {
+
+  let linkText = `<span class='muted'>${ip}</span>`;
+
+  if (showLinks) {
+    if (usePiLinks) {
+      linkText = `<a href="#" onclick="window.open('http://localhost:9000/vnc?ip=${ip}','_blank')">VNC</a>`;
+    } else {
+      linkText = `<span class='muted'>${ip} (web only mode)</span>`;
+    }
+  }
+
+  row("AP", name, linkText);
+}
+
+// ================= S100 =================
+row("", "", "", "section");
+
+for (const [name, ip] of S100) {
+
+  let linkText = `<span class='muted'>${ip}</span>`;
+
+  if (showLinks) {
+    if (usePiLinks) {
+      linkText = `<a href="#" onclick="window.open('http://localhost:9000/vnc?ip=${ip}','_blank')">VNC</a>`;
+    } else {
+      linkText = `<span class='muted'>${ip} (web only mode)</span>`;
+    }
+  }
+
+  row("S100", name, linkText);
 }
 
 </script>
