@@ -10,17 +10,17 @@
 
     #mode {
       text-align: center;
-      margin-bottom: 10px;
       font-weight: bold;
+      margin-bottom: 10px;
     }
 
     table {
       border-collapse: collapse;
-      width: 85%;
+      width: 88%;
       margin: auto;
     }
 
-    th, td {
+    td {
       border: 1px solid #aaa;
       padding: 10px;
     }
@@ -36,15 +36,17 @@
       text-decoration: none;
     }
 
-    .muted {
-      color: #888;
-    }
+    .muted { color: #888; }
   </style>
 </head>
 
 <body>
 
-<h2>ESS DASHBOARD</h2>
+<h2>
+  <a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a>
+  DASHBOARD
+</h2>
+
 <div id="mode"></div>
 
 <table id="tbl"></table>
@@ -53,20 +55,22 @@
 
 // ================= MODE =================
 const mode = (new URLSearchParams(location.search).get("links") || "").toLowerCase();
-
 const isPI = mode === "pi";
 const isPC = mode === "pc";
 
 document.getElementById("mode").innerText =
   mode ? `MODE: ${mode.toUpperCase()}` : "MODE: VIEW ONLY";
 
-// ================= MAPPING =================
-const tester = {
-  label: "ESSTester_01",
+// ================= DEVICE LINKS (FIXED) =================
+
+// IMPORTANT: tester is the ONLY correct known Pi link you confirmed
+const TESTER = {
+  name: "ESSTester_01",
   url: "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0"
 };
 
-const handlers = {
+// handlers still go to main page ONLY (unless you later provide device IDs)
+const HANDLERS = {
   "CHROMA": "ESSHandler_04",
   "NS-3": "ESSHandler_03",
   "NS-4": "ESSHandler_02",
@@ -74,23 +78,23 @@ const handlers = {
   "NS-6": "ESSHandler_05"
 };
 
-const ap = {
+// AP + S100 IPs
+const AP = {
   "AP-1": "172.18.148.141",
   "AP-2": "172.18.97.10"
 };
 
-const s100 = {
+const S100 = {
   "S100_1": "172.18.50.107",
   "S100_2": "172.18.87.18",
   "S100_4": "172.18.50.83"
 };
 
 // ================= HELPERS =================
-function link(url, text) {
+function a(url, text) {
   return `<a href="${url}" target="_blank">${text}</a>`;
 }
 
-// VNC only in PI mode
 function vnc(ip, text) {
   return `<a href="#" onclick="window.open('http://localhost:9000/vnc?ip=${ip}','_blank')">${text}</a>`;
 }
@@ -98,56 +102,66 @@ function vnc(ip, text) {
 // ================= TABLE =================
 const tbl = document.getElementById("tbl");
 
-function row(type, name) {
+function row(type, value) {
   const tr = document.createElement("tr");
 
-  let value = "";
+  let out = "";
 
-  // ---- TESTER ----
-  if (type === "TESTER") {
-    value = (isPI || isPC)
-      ? link(tester.url, tester.label)
-      : tester.label;
+  // ================= ESS (HEADER CASE) =================
+  if (type === "ESS") {
+    out = a("https://connect.raspberrypi.com/devices", "ESS");
   }
 
-  // ---- HANDLERS ----
-  else if (handlers[type]) {
-    const label = handlers[type];
-    value = (isPI || isPC)
-      ? link("https://connect.raspberrypi.com/devices", label)
-      : label;
+  // ================= TESTER =================
+  else if (type === "TESTER") {
+    out = (isPI || isPC)
+      ? a(TESTER.url, TESTER.name)
+      : TESTER.name;
   }
 
-  // ---- AP ----
-  else if (ap[type]) {
-    const ip = ap[type];
-    value = isPI ? vnc(ip, ip)
-          : isPC ? `<span class="muted">${ip}</span>`
-          : ip;
+  // ================= HANDLERS =================
+  else if (HANDLERS[type]) {
+    const name = HANDLERS[type];
+
+    // IMPORTANT FIX:
+    // ONLY tester has real link
+    // handlers fallback to main page ONLY if clicked
+    out = (isPI || isPC)
+      ? a("https://connect.raspberrypi.com/devices", name)
+      : name;
   }
 
-  // ---- S100 ----
-  else if (s100[type]) {
-    const ip = s100[type];
-    value = isPI ? vnc(ip, ip)
-          : isPC ? `<span class="muted">${ip}</span>`
-          : ip;
+  // ================= AP =================
+  else if (AP[type]) {
+    const ip = AP[type];
+
+    out = isPI
+      ? vnc(ip, ip)
+      : a(`http://${ip}`, ip);   // FIX: now ALWAYS clickable
   }
 
-  tr.innerHTML = `<td>${type}</td><td>${value}</td>`;
+  // ================= S100 =================
+  else if (S100[type]) {
+    const ip = S100[type];
+
+    out = isPI
+      ? vnc(ip, ip)
+      : a(`http://${ip}`, ip);   // FIX: now ALWAYS clickable
+  }
+
+  tr.innerHTML = `<td>${type}</td><td>${out}</td>`;
   tbl.appendChild(tr);
 }
 
 // ================= BUILD =================
+row("ESS", "");
 row("TESTER", "");
 
-for (const k in handlers) row(k, "");
+for (const k in HANDLERS) row(k, "");
 
-row("", "");
 row("AP-1", "");
 row("AP-2", "");
 
-row("", "");
 row("S100_1", "");
 row("S100_2", "");
 row("S100_4", "");
