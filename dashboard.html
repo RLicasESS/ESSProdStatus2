@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ESS DASHBOARD</title>
 
   <style>
@@ -13,19 +13,17 @@
 
     h2 {
       text-align: center;
-      margin-bottom: 8px;
     }
 
     #mode {
       text-align: center;
-      font-weight: bold;
       margin-bottom: 14px;
-      color: #333;
+      font-weight: bold;
     }
 
     table {
       border-collapse: collapse;
-      width: 88%;
+      width: 90%;
       margin: auto;
     }
 
@@ -75,94 +73,44 @@
 // =====================================================
 // MODE
 // =====================================================
-const params = new URLSearchParams(window.location.search);
+var params = new URLSearchParams(window.location.search);
 
-const mode = params.get("links");
+var mode = params.get("links");
 
-const isPI = mode === "pi";
-const isPC = mode === "pc";
+var isPI = (mode === "pi");
+var isPC = (mode === "pc");
 
-document.getElementById("mode").innerText =
+document.getElementById("mode").innerHTML =
   "MODE = " + (mode || "view");
 
 // =====================================================
 // HELPERS
 // =====================================================
-function link(url, text) {
+function mkLink(url, text) {
   return '<a href="' + url + '" target="_blank">' + text + '</a>';
 }
 
-function vnc(ip, text) {
-  return '<a href="#" onclick="window.open(\'http://localhost:9000/vnc?ip=' + ip + '\',\'_blank\')">' + text + '</a>';
+function mkVNC(ip, text) {
+  return '<a href="#" onclick="window.open(\'http://localhost:9000/vnc?ip=' + ip + '\', \'_blank\'); return false;">' + text + '</a>';
 }
-
-function latest(ip, text) {
-  return '<a href="http://' + ip + ':8080/latest.png" target="_blank">' + text + '</a>';
-}
-
-// =====================================================
-// DATA
-// =====================================================
-
-// TESTER
-const TESTER = {
-  label: "ESSTester_01",
-  url: "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0"
-};
-
-// HANDLERS
-const HANDLERS = {
-  "CHROMA": {
-    label: "ESSHandler_04",
-    url: "https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e"
-  },
-
-  "NS-3": {
-    label: "ESSHandler_03",
-    url: "https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46"
-  },
-
-  "NS-4": {
-    label: "ESSHandler_02",
-    url: "https://connect.raspberrypi.com/devices/66fa4727-e6b5-4a1a-855d-1f266270b950"
-  },
-
-  "NS-5": {
-    label: "ESSHandler_01",
-    url: "https://connect.raspberrypi.com/devices/468fc957-7879-440e-b1ea-b7e7dfef37f6"
-  },
-
-  "NS-6": {
-    label: "ESSHandler_05",
-    url: "https://connect.raspberrypi.com/devices/759713e5-9e7e-408a-9686-85fb7ed7b1d2"
-  }
-};
-
-// AP
-const AP = {
-  "AP-1": "172.18.148.141",
-  "AP-2": "172.18.97.10"
-};
-
-// S100
-const S100 = {
-  "S100_1": "172.18.50.107",
-  "S100_2": "172.18.87.18",
-  "S100_4": "172.18.50.83"
-};
 
 // =====================================================
 // TABLE
 // =====================================================
-const tbl = document.getElementById("tbl");
+var tbl = document.getElementById("tbl");
 
 function addRow(type, html) {
 
-  const tr = document.createElement("tr");
+  var tr = document.createElement("tr");
 
-  tr.innerHTML =
-    '<td>' + type + '</td>' +
-    '<td>' + html + '</td>';
+  var td1 = document.createElement("td");
+  td1.innerHTML = type;
+
+  var td2 = document.createElement("td");
+  td2.innerHTML = html;
+
+  tr.appendChild(td1);
+  tr.appendChild(td2);
 
   tbl.appendChild(tr);
 }
@@ -170,60 +118,135 @@ function addRow(type, html) {
 // =====================================================
 // TESTER
 // =====================================================
-addRow(
-  "TESTER",
-  (isPI || isPC)
-    ? link(TESTER.url, TESTER.label)
-    : TESTER.label
-);
+if (isPI || isPC) {
+
+  addRow(
+    "TESTER",
+    mkLink(
+      "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0",
+      "ESSTester_01"
+    )
+  );
+
+} else {
+
+  addRow("TESTER", "ESSTester_01");
+
+}
 
 // =====================================================
 // HANDLERS
 // =====================================================
-for (const k in HANDLERS) {
+var handlers = [
 
-  const h = HANDLERS[k];
+  ["CHROMA", "ESSHandler_04",
+   "https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e"],
 
-  addRow(
-    k,
-    (isPI || isPC)
-      ? link(h.url, h.label)
-      : h.label
-  );
+  ["NS-3", "ESSHandler_02",
+   "https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46"],
+
+  ["NS-4", "ESSHandler_03",
+   "https://connect.raspberrypi.com/devices/66fa4727-e6b5-4a1a-855d-1f266270b950"],
+
+  ["NS-5", "ESSHandler_01",
+   "https://connect.raspberrypi.com/devices/468fc957-7879-440e-b1ea-b7e7dfef37f6"],
+
+  ["NS-6", "ESSHandler_05",
+   "https://connect.raspberrypi.com/devices/759713e5-9e7e-408a-9686-85fb7ed7b1d2"]
+
+];
+
+for (var i = 0; i < handlers.length; i++) {
+
+  var h = handlers[i];
+
+  if (isPI || isPC) {
+
+    addRow(
+      h[0],
+      mkLink(h[2], h[1])
+    );
+
+  } else {
+
+    addRow(h[0], h[1]);
+
+  }
 }
 
 // =====================================================
 // AP
 // =====================================================
-for (const k in AP) {
+var ap = [
 
-  const ip = AP[k];
+  ["AP-1", "172.18.148.141", "vnc://AP-1"],
+  ["AP-2", "172.18.97.10",  "vnc://AP-2"]
 
-  addRow(
-    k,
-    isPI
-      ? vnc(ip, ip)
-      : isPC
-          ? latest(ip, ip)
-          : ip
-  );
+];
+
+for (var i = 0; i < ap.length; i++) {
+
+  var a = ap[i];
+
+  if (isPI) {
+
+    addRow(
+      a[0],
+      mkVNC(a[1], a[0])
+    );
+
+  }
+  else if (isPC) {
+
+    addRow(
+      a[0],
+      '<a href="' + a[2] + '">' + a[0] + '</a>'
+    );
+
+  }
+  else {
+
+    addRow(a[0], a[1]);
+
+  }
 }
 
 // =====================================================
 // S100
 // =====================================================
-for (const k in S100) {
+var s100 = [
 
-  const ip = S100[k];
+  ["S100_1", "172.18.50.107", "vnc://S100-1"],
+  ["S100_2", "172.18.87.18",  "vnc://S100-2"],
+  ["S100_4", "172.18.50.83",  "vnc://S100-4"]
 
-  addRow(
-    k,
-    isPI
-      ? vnc(ip, ip)
-      : isPC
-          ? latest(ip, ip)
-          : ip
-  );
+];
+
+for (var i = 0; i < s100.length; i++) {
+
+  var s = s100[i];
+
+  if (isPI) {
+
+    addRow(
+      s[0],
+      mkVNC(s[1], s[0])
+    );
+
+  }
+  else if (isPC) {
+
+    addRow(
+      s[0],
+      '<a href="' + s[2] + '">' + s[0] + '</a>'
+    );
+
+  }
+  else {
+
+    addRow(s[0], s[1]);
+
+  }
 }
 
 </script>
