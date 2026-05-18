@@ -1,3 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ESS DASHBOARD</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 16px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    #mode {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 14px;
+      color: #333;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 88%;
+      margin: auto;
+    }
+
+    th, td {
+      border: 1px solid #aaa;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #2c3e50;
+      color: white;
+    }
+
+    a {
+      color: #007bff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>
+  <a href="https://connect.raspberrypi.com/devices" target="_blank">
+    ESS
+  </a>
+  DASHBOARD
+</h2>
+
+<div id="mode"></div>
+
+<table id="tbl">
+  <tr>
+    <th>TYPE</th>
+    <th>NAME</th>
+  </tr>
+</table>
+
 <script>
 
 // =====================================================
@@ -11,7 +83,7 @@ const isPI = mode === "pi";
 const isPC = mode === "pc";
 
 document.getElementById("mode").innerText =
-  "MODE = " + mode;
+  "MODE = " + (mode || "view");
 
 // =====================================================
 // HELPERS
@@ -27,3 +99,134 @@ function vnc(ip, text) {
 function latest(ip, text) {
   return '<a href="http://' + ip + ':8080/latest.png" target="_blank">' + text + '</a>';
 }
+
+// =====================================================
+// DATA
+// =====================================================
+
+// TESTER
+const TESTER = {
+  label: "ESSTester_01",
+  url: "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0"
+};
+
+// HANDLERS
+const HANDLERS = {
+  "CHROMA": {
+    label: "ESSHandler_04",
+    url: "https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e"
+  },
+
+  "NS-3": {
+    label: "ESSHandler_03",
+    url: "https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46"
+  },
+
+  "NS-4": {
+    label: "ESSHandler_02",
+    url: "https://connect.raspberrypi.com/devices/66fa4727-e6b5-4a1a-855d-1f266270b950"
+  },
+
+  "NS-5": {
+    label: "ESSHandler_01",
+    url: "https://connect.raspberrypi.com/devices/468fc957-7879-440e-b1ea-b7e7dfef37f6"
+  },
+
+  "NS-6": {
+    label: "ESSHandler_05",
+    url: "https://connect.raspberrypi.com/devices/759713e5-9e7e-408a-9686-85fb7ed7b1d2"
+  }
+};
+
+// AP
+const AP = {
+  "AP-1": "172.18.148.141",
+  "AP-2": "172.18.97.10"
+};
+
+// S100
+const S100 = {
+  "S100_1": "172.18.50.107",
+  "S100_2": "172.18.87.18",
+  "S100_4": "172.18.50.83"
+};
+
+// =====================================================
+// TABLE
+// =====================================================
+const tbl = document.getElementById("tbl");
+
+function addRow(type, html) {
+
+  const tr = document.createElement("tr");
+
+  tr.innerHTML =
+    '<td>' + type + '</td>' +
+    '<td>' + html + '</td>';
+
+  tbl.appendChild(tr);
+}
+
+// =====================================================
+// TESTER
+// =====================================================
+addRow(
+  "TESTER",
+  (isPI || isPC)
+    ? link(TESTER.url, TESTER.label)
+    : TESTER.label
+);
+
+// =====================================================
+// HANDLERS
+// =====================================================
+for (const k in HANDLERS) {
+
+  const h = HANDLERS[k];
+
+  addRow(
+    k,
+    (isPI || isPC)
+      ? link(h.url, h.label)
+      : h.label
+  );
+}
+
+// =====================================================
+// AP
+// =====================================================
+for (const k in AP) {
+
+  const ip = AP[k];
+
+  addRow(
+    k,
+    isPI
+      ? vnc(ip, ip)
+      : isPC
+          ? latest(ip, ip)
+          : ip
+  );
+}
+
+// =====================================================
+// S100
+// =====================================================
+for (const k in S100) {
+
+  const ip = S100[k];
+
+  addRow(
+    k,
+    isPI
+      ? vnc(ip, ip)
+      : isPC
+          ? latest(ip, ip)
+          : ip
+  );
+}
+
+</script>
+
+</body>
+</html>
