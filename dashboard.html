@@ -1,153 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>ESS DASHBOARD</title>
-
-  <style>
-    body { font-family: Arial; margin: 16px; }
-    h2 { text-align: center; }
-
-    #mode {
-      text-align: center;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 88%;
-      margin: auto;
-    }
-
-    td {
-      border: 1px solid #aaa;
-      padding: 10px;
-    }
-
-    a {
-      color: #007bff;
-      font-weight: bold;
-      text-decoration: none;
-    }
-
-    .muted { color: #888; }
-  </style>
-</head>
-
-<body>
-
-<h2>
-  <a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a>
-  DASHBOARD
-</h2>
-
-<div id="mode"></div>
-
-<table id="tbl"></table>
-
 <script>
 
-// ================= MODE =================
-const mode = (new URLSearchParams(location.search).get("links") || "").toLowerCase();
+// =====================================================
+// MODE
+// =====================================================
+const params = new URLSearchParams(window.location.search);
+
+const mode = params.get("links");
+
 const isPI = mode === "pi";
 const isPC = mode === "pc";
 
 document.getElementById("mode").innerText =
-  mode ? `MODE: ${mode.toUpperCase()}` : "MODE: VIEW ONLY";
+  "MODE = " + mode;
 
-// ================= DATA =================
-const TESTER = {
-  name: "ESSTester_01",
-  url: "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0"
-};
-
-const HANDLERS = {
-  "CHROMA": "ESSHandler_04",
-  "NS-3": "ESSHandler_03",
-  "NS-4": "ESSHandler_02",
-  "NS-5": "ESSHandler_01",
-  "NS-6": "ESSHandler_05"
-};
-
-const AP = {
-  "AP-1": "172.18.148.141",
-  "AP-2": "172.18.97.10"
-};
-
-const S100 = {
-  "S100_1": "172.18.50.107",
-  "S100_2": "172.18.87.18",
-  "S100_4": "172.18.50.83"
-};
-
-// ================= HELPERS =================
-function a(url, text) {
-  return `<a href="${url}" target="_blank">${text}</a>`;
+// =====================================================
+// HELPERS
+// =====================================================
+function link(url, text) {
+  return '<a href="' + url + '" target="_blank">' + text + '</a>';
 }
 
-function vnc(ip, label) {
-  return `<a href="#" onclick="window.open('http://localhost:9000/vnc?ip=${ip}','_blank')">${label}</a>`;
+function vnc(ip, text) {
+  return '<a href="#" onclick="window.open(\'http://localhost:9000/vnc?ip=' + ip + '\',\'_blank\')">' + text + '</a>';
 }
 
-function latest(ip) {
-  return `http://${ip}:8080/latest.png`;
+function latest(ip, text) {
+  return '<a href="http://' + ip + ':8080/latest.png" target="_blank">' + text + '</a>';
 }
-
-// ================= TABLE =================
-const tbl = document.getElementById("tbl");
-
-function row(type, name) {
-  const tr = document.createElement("tr");
-
-  let out = "";
-
-  // ================= TESTER =================
-  if (type === "TESTER") {
-    out = (isPI || isPC) ? a(TESTER.url, TESTER.name) : TESTER.name;
-  }
-
-  // ================= HANDLERS (NO BROKEN LINKS NOW) =================
-  else if (HANDLERS[type]) {
-    // FIX: no fake Pi Connect links anymore
-    out = HANDLERS[type];
-  }
-
-  // ================= AP =================
-  else if (AP[type]) {
-    const ip = AP[type];
-
-    out = isPI
-      ? vnc(ip, ip)
-      : a(latest(ip), ip);   // FIXED: PC = latest.png
-  }
-
-  // ================= S100 =================
-  else if (S100[type]) {
-    const ip = S100[type];
-
-    out = isPI
-      ? vnc(ip, ip)
-      : a(latest(ip), ip);   // FIXED: PC = latest.png
-  }
-
-  tr.innerHTML = `<td>${type}</td><td>${out}</td>`;
-  tbl.appendChild(tr);
-}
-
-// ================= BUILD =================
-row("TESTER", "");
-
-for (const k in HANDLERS) row(k, "");
-
-row("AP-1", "");
-row("AP-2", "");
-
-row("S100_1", "");
-row("S100_2", "");
-row("S100_4", "");
-
-</script>
-
-</body>
-</html>
