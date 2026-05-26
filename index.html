@@ -146,8 +146,24 @@
         `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION STATUS`;
     }
 
-    const CSV_URL   = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
-    const YIELD_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
+    const CSV_URL     = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
+    const YIELD_URL   = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
+    const BIN_MAP_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/bin_mapping.json";
+
+    let BIN_MAPPING = {};
+    async function loadBinMapping() {
+      try {
+        const res = await fetch(BIN_MAP_URL + "?v=" + Date.now(), { cache: "no-store" });
+        if (res.ok) BIN_MAPPING = await res.json();
+      } catch (e) {
+        console.warn("bin_mapping.json not found, bin display disabled.");
+      }
+    }
+    function getBins(handlerName, which) {
+      const map = BIN_MAPPING[handlerName.toUpperCase()] || BIN_MAPPING[handlerName] || null;
+      if (!map) return "";
+      return which === "AUTO1" ? map.AUTO1 : which === "AUTO2" ? map.AUTO2 : map.AUTO3;
+    }
 
     const HANDLER_IP = {
       "CHROMA": "172.18.179.225",
@@ -632,6 +648,7 @@
     
     async function loadCSV() {
       try {
+        await loadBinMapping();
         dbg(
           `Loading CSV…\nYield mode: ${yieldMode}\nYield URL: ${YIELD_URL}\nuseYieldForBars: ${useYieldForBars}\n` +
           `smooth: ${smoothWin}\nyScale: ${yScale}\nyZoom: ${yZoom}\nTESTER_URL: ${TESTER_URL}`
@@ -893,11 +910,12 @@
               if (pct !== null) {
                 pct = Math.max(0, Math.min(100, pct));
                 const label = (goodToShow !== null) ? goodToShow.toLocaleString() : (cell ?? "").toString();
+                const bins1 = getBins(handlerAtCol(colIndex), "AUTO1");
                 cellContent = `
                   <div class="lc-wrap">
                     <div class="lc-num">${yieldHoverHtml(label, lot, step, "AUTO1")}</div>
                     <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
-                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                    <div class="lc-pct" style="display:flex;justify-content:space-between;"><span>${pct.toFixed(1)}%</span>${bins1 ? `<span style="color:#555;">BIN ${escHtml(bins1)}</span>` : ''}</div>
                   </div>
                 `;
               }
@@ -929,11 +947,12 @@
               if (pct !== null) {
                 pct = Math.max(0, Math.min(100, pct));
                 const label = (goodToShow !== null) ? goodToShow.toLocaleString() : (cell ?? "").toString();
+                const bins2 = getBins(handlerAtCol(colIndex), "AUTO2");
                 cellContent = `
                   <div class="lc-wrap">
                     <div class="lc-num">${yieldHoverHtml(label, lot, step, "AUTO2")}</div>
                     <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
-                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                    <div class="lc-pct" style="display:flex;justify-content:space-between;"><span>${pct.toFixed(1)}%</span>${bins2 ? `<span style="color:#555;">BIN ${escHtml(bins2)}</span>` : ''}</div>
                   </div>
                 `;
               }
@@ -945,11 +964,12 @@
               if (auto3 !== null && total !== null && total > 0) {
                 let pct = (auto3 / total) * 100;
                 pct = Math.max(0, Math.min(100, pct));
+                const bins3 = getBins(handlerAtCol(colIndex), "AUTO3");
                 cellContent = `
                   <div class="lc-wrap">
                     <div class="lc-num">${auto3.toLocaleString()}</div>
                     <div class="prog"><div class="bar" style="width:${pct.toFixed(1)}%"></div></div>
-                    <div class="lc-pct">${pct.toFixed(1)}%</div>
+                    <div class="lc-pct" style="display:flex;justify-content:space-between;"><span>${pct.toFixed(1)}%</span>${bins3 ? `<span style="color:#555;">BIN ${escHtml(bins3)}</span>` : ''}</div>
                   </div>
                 `;
               }
@@ -957,9 +977,8 @@
 
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const hname = handlerAtCol(colIndex);
-              const ip = HANDLER_IP[hname];
-              if (ip) {
-                const url = `http://${ip}:8080/latest.png?ts=${Date.now()}`;
+              if (hname && HANDLER_IP[hname]) {
+                const url = `/snapshot?handler=${hname}&ts=${Date.now()}`;
                 cellContent = `<a class="statusLink" href="${url}" target="_blank" rel="noopener">${cellContent}</a>`;
               }
             }
