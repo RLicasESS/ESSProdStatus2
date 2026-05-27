@@ -977,8 +977,9 @@
 
             if (!isHeader && rowLabel === "STATUS" && colIndex > 0) {
               const hname = handlerAtCol(colIndex);
-              if (hname && HANDLER_IP[hname]) {
-                const url = `/snapshot?handler=${hname}&ts=${Date.now()}`;
+              const ip = HANDLER_IP[hname];
+              if (ip) {
+                const url = `http://${ip}:8080/latest.png?ts=${Date.now()}`;
                 cellContent = `<a class="statusLink" href="${url}" target="_blank" rel="noopener">${cellContent}</a>`;
               }
             }
