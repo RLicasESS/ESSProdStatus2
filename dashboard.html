@@ -47,6 +47,84 @@
     a:hover {
       text-decoration: underline;
     }
+
+    #health-section {
+      width: 90%;
+      margin: 30px auto 0;
+    }
+
+    #health-section hr {
+      margin-bottom: 20px;
+    }
+
+    #health-section h2 {
+      margin-bottom: 4px;
+    }
+
+    #health-timestamp {
+      text-align: center;
+      color: #555;
+      margin-bottom: 18px;
+      font-size: 0.9em;
+    }
+
+    #health-section h3 {
+      text-align: center;
+      font-size: 1em;
+      color: #2c3e50;
+      margin: 18px 0 8px;
+    }
+
+    .ok    { color: #27ae60; font-weight: bold; }
+    .notok { color: #e74c3c; font-weight: bold; }
+
+    #btn-health {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 28px;
+      font-size: 1em;
+      font-weight: bold;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #btn-health:hover {
+      background: #1a252f;
+    }
+
+    #btn-health:disabled {
+      background: #888;
+      cursor: default;
+    }
+
+    .svc-name {
+      border-bottom: 1px dashed #888;
+      cursor: help;
+      position: relative;
+    }
+
+    .svc-name .tooltip {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      z-index: 10;
+      background: #1a252f;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.82em;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      pointer-events: none;
+    }
+
+    .svc-name:hover .tooltip {
+      display: block;
+    }
   </style>
 </head>
 
@@ -247,6 +325,113 @@ for (var i = 0; i < s100.length; i++) {
     addRow(s[0], s[1]);
 
   }
+}
+
+</script>
+
+<!-- =====================================================
+     HEALTH SECTION
+     ===================================================== -->
+
+<div id="health-section">
+  <hr>
+  <h2>HEALTH CHECK</h2>
+  <p id="health-timestamp">Press button to load</p>
+
+  <button id="btn-health" onclick="loadHealth()">GET HEALTH</button>
+
+  <div id="health-content"></div>
+</div>
+
+<script>
+
+var SERVICE_DESC = {
+  "testerstatus.service":      "Polls AP, S100, and HP testers via SSH (GetTesterStatus); fetches handler status and temperatures; writes ESSTesters.csv and ESSProd.csv each cycle",
+  "ESSLotLogger.service":      "Logs lot-level events (start, end, step changes) to the local lot history database",
+  "handler_proxy.service":     "Proxies handler status, snapshots, and OCR requests from outside to handler Pis — listens on port 8001, exposed via Cloudflare tunnel",
+  "nextstep.service":          "Syncs ESSProd.csv to the Google Apps Script web app (NextStep/CurrentLots)",
+  "endlot_snapshotter.service":"Watches for END LOT events on AP and S100 testers and saves a snapshot of the completed lot",
+  "cloudflared.service":       "Cloudflare tunnel — exposes the local Pi web server to prodstatus.esstech.com",
+  "essprodstatus.service":     "Local HTTP server (port 8080) serving the dashboard and supporting JSON/CSV files — internal only, not exposed via Cloudflare tunnel",
+  "handlerstatus.service":     "Runs on each handler Pi — collects handler state and exposes it to the main Pi",
+  "requestserver.service":     "Runs on each handler Pi — handles on-demand requests (e.g. screenshots, status)",
+  "ssh.service":               "SSH daemon on the handler Pi — required for remote commands from the main Pi"
+};
+
+function svcCell(name) {
+  var desc = SERVICE_DESC[name] || "";
+  var short = name.replace(".service", "");
+  if (desc) {
+    return '<td><span class="svc-name">' + short + '<span class="tooltip">' + desc + '</span></span></td>';
+  }
+  return '<td>' + short + '</td>';
+}
+
+function statusCell(status) {
+  if (status === "OK") {
+    return '<td class="ok">&#10003; OK</td>';
+  } else {
+    return '<td class="notok">&#10007; ' + status + '</td>';
+  }
+}
+
+function loadHealth() {
+  var btn = document.getElementById("btn-health");
+  btn.disabled = true;
+  btn.textContent = "Loading...";
+
+  fetch("https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/health.json?nocache=" + Date.now())
+    .then(function(r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      document.getElementById("health-timestamp").textContent = "Last updated: " + data.timestamp;
+
+      var html = "";
+
+      // --- Local services ---
+      html += "<h3>LOCAL SERVICES (Pi)</h3>";
+      html += "<table><tr><th>SERVICE</th><th>STATUS</th></tr>";
+      for (var i = 0; i < data.local.length; i++) {
+        var row = data.local[i];
+        html += "<tr>" + svcCell(row.service) + statusCell(row.status) + "</tr>";
+      }
+      html += "</table><br>";
+
+      // --- Handler services ---
+      html += "<h3>HANDLER Pi SERVICES</h3>";
+      html += "<table><tr><th>HANDLER</th><th>IP</th>";
+      for (var j = 0; j < data.handler_service_names.length; j++) {
+        var sname = data.handler_service_names[j];
+        var desc = SERVICE_DESC[sname] || "";
+        var short = sname.replace(".service", "");
+        if (desc) {
+          html += '<th><span class="svc-name" style="color:white;border-bottom-color:#aaa;">' + short + '<span class="tooltip">' + desc + '</span></span></th>';
+        } else {
+          html += "<th>" + short + "</th>";
+        }
+      }
+      html += "</tr>";
+      for (var i = 0; i < data.handlers.length; i++) {
+        var h = data.handlers[i];
+        html += "<tr><td>" + h.name + "</td><td>" + h.ip + "</td>";
+        for (var j = 0; j < data.handler_service_names.length; j++) {
+          html += statusCell(h.services[data.handler_service_names[j]]);
+        }
+        html += "</tr>";
+      }
+      html += "</table>";
+
+      document.getElementById("health-content").innerHTML = html;
+      btn.textContent = "REFRESH HEALTH";
+      btn.disabled = false;
+    })
+    .catch(function(err) {
+      document.getElementById("health-timestamp").textContent = "Error loading health.json: " + err.message;
+      btn.textContent = "GET HEALTH";
+      btn.disabled = false;
+    });
 }
 
 </script>
