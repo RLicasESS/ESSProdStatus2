@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-18 14:53:07",
+  "timestamp": "2026-06-18 19:53:07",
   "local": [
     {
       "service": "testerstatus.service",
@@ -20,14 +20,6 @@
     {
       "service": "endlot_snapshotter.service",
       "status": "OK"
-    },
-    {
-      "service": "cloudflared.service",
-      "status": "DOWN"
-    },
-    {
-      "service": "essprodstatus.service",
-      "status": "DOWN"
     }
   ],
   "handlers": [
