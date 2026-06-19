@@ -146,9 +146,9 @@
         `<a href="https://connect.raspberrypi.com/devices" target="_blank">ESS</a> PRODUCTION STATUS`;
     }
 
-    const CSV_URL     = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/ESSProd.csv";
-    const YIELD_URL   = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/yield_live.json";
-    const BIN_MAP_URL = "https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/bin_mapping.json";
+    const CSV_URL     = "ESSProd.csv";
+    const YIELD_URL   = "yield_live.json";
+    const BIN_MAP_URL = "bin_mapping.json";
 
     let BIN_MAPPING = {};
     async function loadBinMapping() {
@@ -964,7 +964,7 @@
               const hname = handlerAtCol(colIndex);
               const ip = HANDLER_IP[hname];
               if (ip) {
-                const url = `/snapshot?handler=${hname}&ts=${Date.now()}`;
+                const url = `http://172.18.172.253:8001/snapshot?handler=${hname}&ts=${Date.now()}`;
                 cellContent = `<a class="statusLink" href="${url}" target="_blank" rel="noopener">${cellContent}</a>`;
               }
             }
