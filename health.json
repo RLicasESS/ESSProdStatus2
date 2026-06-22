@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-22 13:46:57",
+  "timestamp": "2026-06-22 13:51:31",
   "local": [
     {
       "service": "testerstatus.service",
@@ -119,8 +119,8 @@
         "pid": 674272
       },
       "lotsetting": {
-        "status": "unreachable",
-        "detail": "SSH failed",
+        "status": "ok",
+        "detail": "no overflow errors detected",
         "overflow_count": 0,
         "correction_count": 0
       }
