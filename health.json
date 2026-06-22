@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-22 12:57:25",
+  "timestamp": "2026-06-22 13:01:27",
   "local": [
     {
       "service": "testerstatus.service",
@@ -92,7 +92,8 @@
       "splashtop": {
         "status": "ok",
         "pid": 28584
-      }
+      },
+      "lotsetting": {}
     },
     {
       "name": "AP-2",
@@ -111,7 +112,8 @@
       "splashtop": {
         "status": "ok",
         "pid": 674272
-      }
+      },
+      "lotsetting": {}
     },
     {
       "name": "S100_1",
@@ -130,7 +132,8 @@
       "splashtop": {
         "status": "ok",
         "pid": 13824
-      }
+      },
+      "lotsetting": {}
     },
     {
       "name": "S100_2",
@@ -149,7 +152,8 @@
       "splashtop": {
         "status": "ok",
         "pid": 15764
-      }
+      },
+      "lotsetting": {}
     },
     {
       "name": "S100_4",
@@ -168,7 +172,8 @@
       "splashtop": {
         "status": "ok",
         "pid": 14712
-      }
+      },
+      "lotsetting": {}
     },
     {
       "name": "HP-1",
