@@ -128,6 +128,35 @@
       display: block;
     }
 
+    /* col-header hover (th context) */
+    .col-hint {
+      border-bottom: 1px dashed #aaa;
+      cursor: help;
+      position: relative;
+      display: inline-block;
+    }
+
+    .col-hint .tooltip {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      z-index: 10;
+      background: #1a252f;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.82em;
+      white-space: normal;
+      width: 260px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      pointer-events: none;
+    }
+
+    .col-hint:hover .tooltip {
+      display: block;
+    }
+
     .warn-list {
       margin: 2px 0 0 0;
       padding: 0;
@@ -307,6 +336,22 @@ var SERVICE_DESC = {
   "ssh.service":                "SSH daemon on the handler Pi — required for remote commands from the main Pi"
 };
 
+// Column header hints for the TESTERS table
+var COL_HINTS = {
+  "READ LOT":        "Checks that the tester's TesterInfo file is readable via SSH. Confirms the Pi can reach the tester and retrieve the current lot name and status.",
+  "ESS LOT SETTINGS":"ESS Lot Settings automation is running (main process, worker, or both). This script monitors the Stop button state and triggers lot-close actions automatically.",
+  "DRIVE":           "Verifies the network drive (Y:) is mapped and accessible on the tester PC. Required for reading/writing lot data files to the shared ESS network share.",
+  "SPLASHTOP":       "Splashtop remote-access service status on the tester PC. Used for remote desktop access by engineers and management."
+};
+
+function colHeader(label) {
+  var hint = COL_HINTS[label];
+  if (hint) {
+    return '<th><span class="col-hint">' + label + '<span class="tooltip">' + hint + '</span></span></th>';
+  }
+  return '<th>' + label + '</th>';
+}
+
 function svcCell(name) {
   var desc = SERVICE_DESC[name] || "";
   var short = name.replace(".service", "");
@@ -393,42 +438,47 @@ function loadHealth() {
       if (data.testers && data.testers.length > 0) {
         html += "<h3>TESTERS</h3>";
         html += "<table>";
-        html += "<tr><th>TESTER</th><th>READ LOT</th><th>ESS MAIN</th><th>ESS WORKER</th><th>DRIVE</th><th>SPLASHTOP</th></tr>";
+        html += "<tr>" +
+          "<th>TESTER</th>" +
+          colHeader("READ LOT") +
+          colHeader("ESS LOT SETTINGS") +
+          colHeader("DRIVE") +
+          colHeader("SPLASHTOP") +
+          "</tr>";
 
         for (var i = 0; i < data.testers.length; i++) {
           var t = data.testers[i];
 
           if (t.status === "skipped") {
-            html += "<tr><td>" + t.name + "</td><td colspan='5' class='skip'>not SSH-managed</td></tr>";
+            html += "<tr><td>" + t.name + "</td><td colspan='4' class='skip'>not SSH-managed</td></tr>";
             continue;
           }
 
           if (t.status === "unreachable") {
-            html += "<tr><td>" + t.name + "</td><td colspan='5' class='notok'>&#10007; UNREACHABLE</td></tr>";
+            html += "<tr><td>" + t.name + "</td><td colspan='4' class='notok'>&#10007; UNREACHABLE</td></tr>";
             continue;
           }
 
           var driveStatus = (t.drive && t.drive.status) || "unknown";
           var splshStatus = (t.splashtop && t.splashtop.status) || "unknown";
 
-          var readLotOk = t.read_lot > 0;
-          var essMainOk = t.ess_lot_main > 0;
-          var essWorkOk = t.ess_lot_worker > 0;
-          var driveOk   = driveStatus === "ok" || driveStatus === "already_ok";
-          var splshOk   = splshStatus === "ok" || splshStatus === "started";
+          var readLotOk   = t.read_lot > 0;
+          // Combined: OK if either main or worker is running
+          var essLotOk    = (t.ess_lot_main > 0) || (t.ess_lot_worker > 0);
+          var driveOk     = driveStatus === "ok" || driveStatus === "already_ok";
+          var splshOk     = splshStatus === "ok" || splshStatus === "started";
 
           html += "<tr>";
           html += "<td>" + t.name + "</td>";
           html += boolCell(readLotOk);
-          html += boolCell(essMainOk);
-          html += boolCell(essWorkOk);
+          html += boolCell(essLotOk);
           html += boolCell(driveOk, "OK", driveStatus.toUpperCase());
           html += boolCell(splshOk, splshStatus === "started" ? "STARTED" : "OK", splshStatus.toUpperCase());
           html += "</tr>";
 
           // Warnings row
           if (t.warnings && t.warnings.length > 0) {
-            html += '<tr><td></td><td colspan="5">';
+            html += '<tr><td></td><td colspan="4">';
             html += '<ul class="warn-list">';
             for (var w = 0; w < t.warnings.length; w++) {
               html += "<li>&#9888; " + t.warnings[w] + "</li>";
@@ -438,7 +488,7 @@ function loadHealth() {
 
           // Notices row
           if (t.notices && t.notices.length > 0) {
-            html += '<tr><td></td><td colspan="5">';
+            html += '<tr><td></td><td colspan="4">';
             html += '<ul class="notice-list">';
             for (var n = 0; n < t.notices.length; n++) {
               html += "<li>&#8505; " + t.notices[n] + "</li>";
