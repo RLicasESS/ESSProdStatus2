@@ -341,7 +341,8 @@ var COL_HINTS = {
   "READ LOT":        "Checks that the tester's TesterInfo file is readable via SSH. Confirms the Pi can reach the tester and retrieve the current lot name and status.",
   "ESS LOT SETTINGS":"ESS Lot Settings automation is running (main process, worker, or both). This script monitors the Stop button state and triggers lot-close actions automatically.",
   "DRIVE":           "Verifies the network drive (Y:) is mapped and accessible on the tester PC. Required for reading/writing lot data files to the shared ESS network share.",
-  "SPLASHTOP":       "Splashtop remote-access service status on the tester PC. Used for remote desktop access by engineers and management."
+  "SPLASHTOP":       "Splashtop remote-access service status on the tester PC. Used for remote desktop access by engineers and management.",
+  "LOT SETTING LOG": "Monitors the ESS Lot Setting log file for a stuck correction loop — repeated OverflowError failures trying to set Tester# or Handler# fields. Triggers if 5+ errors appear in the last 60 log lines."
 };
 
 function colHeader(label) {
@@ -377,6 +378,26 @@ function boolCell(ok, labelOk, labelFail) {
     return '<td class="ok">&#10003; ' + labelOk + '</td>';
   } else {
     return '<td class="notok">&#10007; ' + labelFail + '</td>';
+  }
+}
+
+function lotSettingCell(ls) {
+  if (!ls || !ls.status) {
+    return '<td class="skip">—</td>';
+  }
+  var st = ls.status;
+  if (st === "ok") {
+    return '<td class="ok">&#10003; OK</td>';
+  } else if (st === "stuck_loop") {
+    return '<td class="notok">&#10007; STUCK</td>';
+  } else if (st === "no_log") {
+    return '<td class="skip">no log</td>';
+  } else if (st === "skipped") {
+    return '<td class="skip">—</td>';
+  } else if (st === "unreachable") {
+    return '<td class="notok">&#10007; UNREACH</td>';
+  } else {
+    return '<td class="warn">' + st + '</td>';
   }
 }
 
@@ -444,29 +465,29 @@ function loadHealth() {
           colHeader("ESS LOT SETTINGS") +
           colHeader("DRIVE") +
           colHeader("SPLASHTOP") +
+          colHeader("LOT SETTING LOG") +
           "</tr>";
 
         for (var i = 0; i < data.testers.length; i++) {
           var t = data.testers[i];
 
           if (t.status === "skipped") {
-            html += "<tr><td>" + t.name + "</td><td colspan='4' class='skip'>not SSH-managed</td></tr>";
+            html += "<tr><td>" + t.name + "</td><td colspan='5' class='skip'>not SSH-managed</td></tr>";
             continue;
           }
 
           if (t.status === "unreachable") {
-            html += "<tr><td>" + t.name + "</td><td colspan='4' class='notok'>&#10007; UNREACHABLE</td></tr>";
+            html += "<tr><td>" + t.name + "</td><td colspan='5' class='notok'>&#10007; UNREACHABLE</td></tr>";
             continue;
           }
 
           var driveStatus = (t.drive && t.drive.status) || "unknown";
           var splshStatus = (t.splashtop && t.splashtop.status) || "unknown";
 
-          var readLotOk   = t.read_lot > 0;
-          // Combined: OK if either main or worker is running
-          var essLotOk    = (t.ess_lot_main > 0) || (t.ess_lot_worker > 0);
-          var driveOk     = driveStatus === "ok" || driveStatus === "already_ok";
-          var splshOk     = splshStatus === "ok" || splshStatus === "started";
+          var readLotOk = t.read_lot > 0;
+          var essLotOk  = (t.ess_lot_main > 0) || (t.ess_lot_worker > 0);
+          var driveOk   = driveStatus === "ok" || driveStatus === "already_ok";
+          var splshOk   = splshStatus === "ok" || splshStatus === "started";
 
           html += "<tr>";
           html += "<td>" + t.name + "</td>";
@@ -474,11 +495,12 @@ function loadHealth() {
           html += boolCell(essLotOk);
           html += boolCell(driveOk, "OK", driveStatus.toUpperCase());
           html += boolCell(splshOk, splshStatus === "started" ? "STARTED" : "OK", splshStatus.toUpperCase());
+          html += lotSettingCell(t.lotsetting);
           html += "</tr>";
 
           // Warnings row
           if (t.warnings && t.warnings.length > 0) {
-            html += '<tr><td></td><td colspan="4">';
+            html += '<tr><td></td><td colspan="5">';
             html += '<ul class="warn-list">';
             for (var w = 0; w < t.warnings.length; w++) {
               html += "<li>&#9888; " + t.warnings[w] + "</li>";
@@ -488,7 +510,7 @@ function loadHealth() {
 
           // Notices row
           if (t.notices && t.notices.length > 0) {
-            html += '<tr><td></td><td colspan="4">';
+            html += '<tr><td></td><td colspan="5">';
             html += '<ul class="notice-list">';
             for (var n = 0; n < t.notices.length; n++) {
               html += "<li>&#8505; " + t.notices[n] + "</li>";
