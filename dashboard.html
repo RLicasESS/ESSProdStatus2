@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESS DASHBOARD</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 16px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    #mode {
+      text-align: center;
+      margin-bottom: 14px;
+      font-weight: bold;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 90%;
+      margin: auto;
+    }
+
+    th, td {
+      border: 1px solid #aaa;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #2c3e50;
+      color: white;
+    }
+
+    a {
+      color: #007bff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #health-section {
+      width: 90%;
+      margin: 30px auto 0;
+    }
+
+    #health-section hr {
+      margin-bottom: 20px;
+    }
+
+    #health-section h2 {
+      margin-bottom: 4px;
+    }
+
+    #health-timestamp {
+      text-align: center;
+      color: #555;
+      margin-bottom: 18px;
+      font-size: 0.9em;
+    }
+
+    #health-section h3 {
+      text-align: center;
+      font-size: 1em;
+      color: #2c3e50;
+      margin: 18px 0 8px;
+    }
+
+    .ok    { color: #27ae60; font-weight: bold; }
+    .notok { color: #e74c3c; font-weight: bold; }
+    .warn  { color: #e67e22; font-weight: bold; }
+    .skip  { color: #888;    font-style: italic; }
+
+    #btn-health {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 28px;
+      font-size: 1em;
+      font-weight: bold;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #btn-health:hover {
+      background: #1a252f;
+    }
+
+    #btn-health:disabled {
+      background: #888;
+      cursor: default;
+    }
+
+    .svc-name {
+      border-bottom: 1px dashed #888;
+      cursor: help;
+      position: relative;
+    }
+
+    .svc-name .tooltip {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      z-index: 10;
+      background: #1a252f;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.82em;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      pointer-events: none;
+    }
+
+    .svc-name:hover .tooltip {
+      display: block;
+    }
+
+    .warn-list {
+      margin: 2px 0 0 0;
+      padding: 0;
+      list-style: none;
+      font-size: 0.82em;
+      color: #e67e22;
+    }
+
+    .notice-list {
+      margin: 2px 0 0 0;
+      padding: 0;
+      list-style: none;
+      font-size: 0.82em;
+      color: #2980b9;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>
+  <a href="https://connect.raspberrypi.com/devices" target="_blank">
+    ESS
+  </a>
+  DASHBOARD
+</h2>
+
+<div id="mode"></div>
+
+<table id="tbl">
+  <tr>
+    <th>TYPE</th>
+    <th>NAME</th>
+  </tr>
+</table>
+
+<script>
+
+// =====================================================
+// MODE
+// =====================================================
+var params = new URLSearchParams(window.location.search);
+var mode = params.get("links");
+var isPI = (mode === "pi");
+var isPC = (mode === "pc");
+
+document.getElementById("mode").innerHTML =
+  "MODE = " + (mode || "view");
+
+// =====================================================
+// HELPERS
+// =====================================================
+function mkLink(url, text) {
+  return '<a href="' + url + '" target="_blank">' + text + '</a>';
+}
+
+function mkVNC(ip, text) {
+  return '<a href="#" onclick="window.open(\'http://localhost:9000/vnc?ip=' + ip + '\', \'_blank\'); return false;">' + text + '</a>';
+}
+
+// =====================================================
+// TABLE
+// =====================================================
+var tbl = document.getElementById("tbl");
+
+function addRow(type, html) {
+  var tr = document.createElement("tr");
+  var td1 = document.createElement("td");
+  td1.innerHTML = type;
+  var td2 = document.createElement("td");
+  td2.innerHTML = html;
+  tr.appendChild(td1);
+  tr.appendChild(td2);
+  tbl.appendChild(tr);
+}
+
+// =====================================================
+// TESTER
+// =====================================================
+if (isPI || isPC) {
+  addRow(
+    "TESTER",
+    mkLink(
+      "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0",
+      "ESSTester_01"
+    )
+  );
+} else {
+  addRow("TESTER", "ESSTester_01");
+}
+
+// =====================================================
+// HANDLERS
+// =====================================================
+var handlers = [
+  ["CHROMA", "ESSHandler_04", "https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e"],
+  ["NS-3",   "ESSHandler_02", "https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46"],
+  ["NS-4",   "ESSHandler_03", "https://connect.raspberrypi.com/devices/66fa4727-e6b5-4a1a-855d-1f266270b950"],
+  ["NS-5",   "ESSHandler_01", "https://connect.raspberrypi.com/devices/468fc957-7879-440e-b1ea-b7e7dfef37f6"],
+  ["NS-6",   "ESSHandler_05", "https://connect.raspberrypi.com/devices/759713e5-9e7e-408a-9686-85fb7ed7b1d2"]
+];
+
+for (var i = 0; i < handlers.length; i++) {
+  var h = handlers[i];
+  if (isPI || isPC) {
+    addRow(h[0], mkLink(h[2], h[1]));
+  } else {
+    addRow(h[0], h[1]);
+  }
+}
+
+// =====================================================
+// AP
+// =====================================================
+var ap = [
+  ["AP-1", "172.18.148.141", "vnc://AP-1"],
+  ["AP-2", "172.18.97.10",   "vnc://AP-2"]
+];
+
+for (var i = 0; i < ap.length; i++) {
+  var a = ap[i];
+  if (isPI) {
+    addRow(a[0], mkVNC(a[1], a[0]));
+  } else if (isPC) {
+    addRow(a[0], '<a href="' + a[2] + '">' + a[0] + '</a>');
+  } else {
+    addRow(a[0], a[1]);
+  }
+}
+
+// =====================================================
+// S100
+// =====================================================
+var s100 = [
+  ["S100_1", "172.18.50.107", "vnc://S100-1"],
+  ["S100_2", "172.18.87.18",  "vnc://S100-2"],
+  ["S100_4", "172.18.50.83",  "vnc://S100-4"]
+];
+
+for (var i = 0; i < s100.length; i++) {
+  var s = s100[i];
+  if (isPI) {
+    addRow(s[0], mkVNC(s[1], s[0]));
+  } else if (isPC) {
+    addRow(s[0], '<a href="' + s[2] + '">' + s[0] + '</a>');
+  } else {
+    addRow(s[0], s[1]);
+  }
+}
+
+</script>
+
+<!-- =====================================================
+     HEALTH SECTION
+     ===================================================== -->
+
+<div id="health-section">
+  <hr>
+  <h2>HEALTH CHECK</h2>
+  <p id="health-timestamp">Press button to load</p>
+
+  <button id="btn-health" onclick="loadHealth()">GET HEALTH</button>
+
+  <div id="health-content"></div>
+</div>
+
+<script>
+
+var SERVICE_DESC = {
+  "testerstatus.service":       "Polls AP, S100, and HP testers via SSH (GetTesterStatus); fetches handler status and temperatures; writes ESSTesters.csv and ESSProd.csv each cycle",
+  "ESSLotLogger.service":       "Logs lot-level events (start, end, step changes) to the local lot history database",
+  "handler_proxy.service":      "Proxies handler status, snapshots, and OCR requests from outside to handler Pis — listens on port 8001, exposed via Cloudflare tunnel",
+  "nextstep.service":           "Syncs ESSProd.csv to the Google Apps Script web app (NextStep/CurrentLots)",
+  "endlot_snapshotter.service": "Watches for END LOT events on AP and S100 testers and saves a snapshot of the completed lot",
+  "handlerstatus.service":      "Runs on each handler Pi — collects handler state and exposes it to the main Pi",
+  "requestserver.service":      "Runs on each handler Pi — handles on-demand requests (e.g. screenshots, status)",
+  "ssh.service":                "SSH daemon on the handler Pi — required for remote commands from the main Pi"
+};
+
+function svcCell(name) {
+  var desc = SERVICE_DESC[name] || "";
+  var short = name.replace(".service", "");
+  if (desc) {
+    return '<td><span class="svc-name">' + short + '<span class="tooltip">' + desc + '</span></span></td>';
+  }
+  return '<td>' + short + '</td>';
+}
+
+function statusCell(status) {
+  if (status === "OK") {
+    return '<td class="ok">&#10003; OK</td>';
+  } else {
+    return '<td class="notok">&#10007; ' + status + '</td>';
+  }
+}
+
+// Returns a ✓/✗ cell based on a boolean
+function boolCell(ok, labelOk, labelFail) {
+  labelOk   = labelOk   || "OK";
+  labelFail = labelFail || "—";
+  if (ok) {
+    return '<td class="ok">&#10003; ' + labelOk + '</td>';
+  } else {
+    return '<td class="notok">&#10007; ' + labelFail + '</td>';
+  }
+}
+
+function loadHealth() {
+  var btn = document.getElementById("btn-health");
+  btn.disabled = true;
+  btn.textContent = "Loading...";
+
+  fetch("https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/health.json?nocache=" + Date.now())
+    .then(function(r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      document.getElementById("health-timestamp").textContent = "Last updated: " + data.timestamp;
+
+      var html = "";
+
+      // -----------------------------------------------
+      // LOCAL SERVICES
+      // -----------------------------------------------
+      html += "<h3>LOCAL SERVICES (Pi)</h3>";
+      html += "<table><tr><th>SERVICE</th><th>STATUS</th></tr>";
+      for (var i = 0; i < data.local.length; i++) {
+        var row = data.local[i];
+        html += "<tr>" + svcCell(row.service) + statusCell(row.status) + "</tr>";
+      }
+      html += "</table><br>";
+
+      // -----------------------------------------------
+      // HANDLER Pi SERVICES
+      // -----------------------------------------------
+      html += "<h3>HANDLER Pi SERVICES</h3>";
+      html += "<table><tr><th>HANDLER</th><th>IP</th>";
+      for (var j = 0; j < data.handler_service_names.length; j++) {
+        var sname = data.handler_service_names[j];
+        var desc  = SERVICE_DESC[sname] || "";
+        var short = sname.replace(".service", "");
+        if (desc) {
+          html += '<th><span class="svc-name" style="color:white;border-bottom-color:#aaa;">' + short + '<span class="tooltip">' + desc + '</span></span></th>';
+        } else {
+          html += "<th>" + short + "</th>";
+        }
+      }
+      html += "</tr>";
+      for (var i = 0; i < data.handlers.length; i++) {
+        var h = data.handlers[i];
+        html += "<tr><td>" + h.name + "</td><td>" + h.ip + "</td>";
+        for (var j = 0; j < data.handler_service_names.length; j++) {
+          html += statusCell(h.services[data.handler_service_names[j]]);
+        }
+        html += "</tr>";
+      }
+      html += "</table>";
+
+      // -----------------------------------------------
+      // TESTERS
+      // -----------------------------------------------
+      if (data.testers && data.testers.length > 0) {
+        html += "<h3>TESTERS</h3>";
+        html += "<table>";
+        html += "<tr><th>TESTER</th><th>READ LOT</th><th>ESS MAIN</th><th>ESS WORKER</th><th>DRIVE</th><th>SPLASHTOP</th></tr>";
+
+        for (var i = 0; i < data.testers.length; i++) {
+          var t = data.testers[i];
+
+          if (t.status === "skipped") {
+            html += "<tr><td>" + t.name + "</td><td colspan='5' class='skip'>not SSH-managed</td></tr>";
+            continue;
+          }
+
+          if (t.status === "unreachable") {
+            html += "<tr><td>" + t.name + "</td><td colspan='5' class='notok'>&#10007; UNREACHABLE</td></tr>";
+            continue;
+          }
+
+          var driveStatus = (t.drive && t.drive.status) || "unknown";
+          var splshStatus = (t.splashtop && t.splashtop.status) || "unknown";
+
+          var readLotOk = t.read_lot > 0;
+          var essMainOk = t.ess_lot_main > 0;
+          var essWorkOk = t.ess_lot_worker > 0;
+          var driveOk   = driveStatus === "ok" || driveStatus === "already_ok";
+          var splshOk   = splshStatus === "ok" || splshStatus === "started";
+
+          html += "<tr>";
+          html += "<td>" + t.name + "</td>";
+          html += boolCell(readLotOk);
+          html += boolCell(essMainOk);
+          html += boolCell(essWorkOk);
+          html += boolCell(driveOk, "OK", driveStatus.toUpperCase());
+          html += boolCell(splshOk, splshStatus === "started" ? "STARTED" : "OK", splshStatus.toUpperCase());
+          html += "</tr>";
+
+          // Warnings row
+          if (t.warnings && t.warnings.length > 0) {
+            html += '<tr><td></td><td colspan="5">';
+            html += '<ul class="warn-list">';
+            for (var w = 0; w < t.warnings.length; w++) {
+              html += "<li>&#9888; " + t.warnings[w] + "</li>";
+            }
+            html += "</ul></td></tr>";
+          }
+
+          // Notices row
+          if (t.notices && t.notices.length > 0) {
+            html += '<tr><td></td><td colspan="5">';
+            html += '<ul class="notice-list">';
+            for (var n = 0; n < t.notices.length; n++) {
+              html += "<li>&#8505; " + t.notices[n] + "</li>";
+            }
+            html += "</ul></td></tr>";
+          }
+        }
+
+        html += "</table>";
+      }
+
+      document.getElementById("health-content").innerHTML = html;
+      btn.textContent = "REFRESH HEALTH";
+      btn.disabled = false;
+    })
+    .catch(function(err) {
+      document.getElementById("health-timestamp").textContent = "Error loading health.json: " + err.message;
+      btn.textContent = "GET HEALTH";
+      btn.disabled = false;
+    });
+}
+
+</script>
+
+</body>
+</html>
