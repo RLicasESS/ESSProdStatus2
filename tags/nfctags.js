@@ -1,29 +1,26 @@
-/* nfctags.js — Generate GoToTags operation + log to ESS Current Lots (per‑lot tabs)
- * - Sends sheet=<LOT_ID> so each lot logs to its own tab
- * - Shows "🆕 Created tab <LOT_ID>" if server returns created_tab:true (optional)
- * - Strict logging: aborts download if logging fails (toggle STRICT_LOGGING to false for best‑effort)
+/* nfctags_dev.js — DEV version of nfctags.js
+ * Same file generation logic as nfctags.js
+ * SHEET_URL_BASE points to the dev/same Apps Script endpoint
  */
 
 //////////////////////
 // Configuration
 //////////////////////
-const TEMPLATE_URL       = 'encode_lot_template.gototags'; // alongside index.html
-const SHEET_URL_BASE     = 'https://script.google.com/macros/s/AKfycbx-xOKyk83MF-wnpOdNiNiw7ltbFG9Atdjv5Hy4yp0bqTXKUzLlY15TgaOFX-CeJPa-3A/exec';
-const STRICT_LOGGING     = true;      // true: abort download if Sheets logging fails; false: warn but continue
-const REQUEST_TIMEOUT_MS = 10000;     // 10s timeout for web requests
+const TEMPLATE_URL       = 'encode_lot_template.gototags';
+const SHEET_URL_BASE     = 'https://script.google.com/macros/s/AKfycbyK0g8lpoicoNxZcwWEVHbGsKrb5MYpo2u6-IH2qoKuD5SMIbeGb4lqoIVSHSYEz7Zjvg/exec';
+const STRICT_LOGGING     = true;
+const REQUEST_TIMEOUT_MS = 10000;
 
 //////////////////////
 // DOM helpers
 //////////////////////
 const $ = (s) => document.querySelector(s);
-const statusEl = () => $('#status');
-const logEl    = () => $('#log');
 function setStatus(html, cls='') {
-  const el = statusEl(); if (!el) return;
+  const el = $('#status'); if (!el) return;
   el.className = cls; el.innerHTML = html;
 }
 function appendLog(line='') {
-  const el = logEl(); if (!el) return;
+  const el = $('#log'); if (!el) return;
   el.hidden = false; el.textContent += line + '\n';
 }
 
@@ -44,7 +41,7 @@ function nowStamp() {
 async function isZipBlob(blob) {
   const head = await blob.slice(0,2).arrayBuffer();
   const b = new Uint8Array(head);
-  return b[0] === 0x50 && b[1] === 0x4B; // 'PK'
+  return b[0] === 0x50 && b[1] === 0x4B;
 }
 async function fetchWithTimeout(resource, options={}) {
   const { timeout = REQUEST_TIMEOUT_MS, ...rest } = options;
@@ -67,37 +64,43 @@ async function fetchTemplateBlob() {
 async function makeGototagsFromTemplate({ lot, qty, product }) {
   const tpl = await fetchTemplateBlob();
 
-  // A) Template is a plain text operation file (not a zip)
   if (!(await isZipBlob(tpl))) {
     setStatus('Template is a text operation file. Repacking…','');
     const text = await tpl.text();
+    const mpc      = $('#mpc')?.value.trim()         || '';
+    const pkgType  = $('#packagetype')?.value.trim() || '';
+    const dateCode = $('#datecode')?.value.trim()    || '';
+
     const replaced = text
-      .replaceAll('LOT_PLACEHOLDER', esc(lot))
-      .replaceAll('QTY_PLACEHOLDER', esc(qty))
-      .replaceAll('PRODUCT_PLACEHOLDER', esc(product));
+      .replaceAll('LOT_PLACEHOLDER',      esc(lot))
+      .replaceAll('QTY_PLACEHOLDER',      esc(qty))
+      .replaceAll('PRODUCT_PLACEHOLDER',  esc(product))
+      .replaceAll('MPC_PLACEHOLDER',      esc(mpc))
+      .replaceAll('PKG_PLACEHOLDER',      esc(pkgType))
+      .replaceAll('DATECODE_PLACEHOLDER', esc(dateCode));
     const zip = new JSZip();
-    zip.file('file.gototags', replaced); // inner op file common name
+    zip.file('file.gototags', replaced);
     setStatus('Creating .gototags (zip)…','');
     return await zip.generateAsync({ type:'blob' });
   }
 
-  // B) Template is a zipped .gototags
   setStatus('Unzipping template…','');
   const zip = await JSZip.loadAsync(tpl);
   let replacedCount = 0;
 
-  // Replace placeholders in *.json
   for (const f of Object.values(zip.files)) {
     if (f.dir || !f.name.toLowerCase().endsWith('.json')) continue;
     const txt = await f.async('string');
     const rep = txt
       .replaceAll('LOT_PLACEHOLDER', esc(lot))
       .replaceAll('QTY_PLACEHOLDER', esc(qty))
-      .replaceAll('PRODUCT_PLACEHOLDER', esc(product));
+      .replaceAll('PRODUCT_PLACEHOLDER',  esc(product))
+      .replaceAll('MPC_PLACEHOLDER',      esc($('#mpc')?.value.trim() || ''))
+      .replaceAll('PKG_PLACEHOLDER',      esc($('#packagetype')?.value.trim() || ''))
+      .replaceAll('DATECODE_PLACEHOLDER', esc($('#datecode')?.value.trim() || ''));
     if (rep !== txt) { zip.file(f.name, rep); replacedCount++; }
   }
 
-  // Replace in any inner *text* .gototags (not a zip)
   for (const f of Object.values(zip.files)) {
     if (f.dir || !f.name.toLowerCase().endsWith('.gototags')) continue;
     const raw = await zip.file(f.name).async('uint8array');
@@ -107,77 +110,16 @@ async function makeGototagsFromTemplate({ lot, qty, product }) {
       const rep = txt
         .replaceAll('LOT_PLACEHOLDER', esc(lot))
         .replaceAll('QTY_PLACEHOLDER', esc(qty))
-        .replaceAll('PRODUCT_PLACEHOLDER', esc(product));
+        .replaceAll('PRODUCT_PLACEHOLDER',  esc(product))
+        .replaceAll('MPC_PLACEHOLDER',      esc($('#mpc')?.value.trim() || ''))
+        .replaceAll('PKG_PLACEHOLDER',      esc($('#packagetype')?.value.trim() || ''))
+        .replaceAll('DATECODE_PLACEHOLDER', esc($('#datecode')?.value.trim() || ''));
       if (rep !== txt) { zip.file(f.name, rep); replacedCount++; }
     }
   }
 
   setStatus(`Creating .gototags (zip)… <small>${replacedCount} file(s) updated</small>`,'');
   return await zip.generateAsync({ type:'blob' });
-}
-
-//////////////////////
-// Sheets logging (per‑lot tab)
-//////////////////////
-// --- Sheets logging (PER‑LOT TAB) ---
-async function logToEssSheet({ lot, product, qty }) {
-  const u = new URL(SHEET_URL_BASE);
-  u.searchParams.set('action',  'lot_seed');
-  u.searchParams.set('lot_id',  lot);
-  u.searchParams.set('product', product);
-  u.searchParams.set('qty',     qty);
-  u.searchParams.set('sheet',   lot);  // per-lot tab (LOT_ID)
-
-  setStatus(`Logging to <b>ESS Current Lots</b> (tab: <b>${lot}</b>)…`, '');
-  console.info('[Sheets] GET', u.toString());
-
-  const res = await fetchWithTimeout(u.toString(), { method: 'GET', timeout: REQUEST_TIMEOUT_MS });
-  const ct  = (res.headers.get('content-type') || '').toLowerCase();
-  const body = ct.includes('application/json') ? await res.json() : await res.text();
-
-  if (!res.ok) {
-    const msg = typeof body === 'string' ? body.slice(0, 200) : JSON.stringify(body).slice(0, 200);
-    throw new Error(`Sheets logging failed (${res.status}): ${msg}`);
-  }
-
-  if (typeof body === 'object' && body !== null) {
-    if (body.ok === false) throw new Error(body.error || 'Sheets logging error');
-
-    const tab  = body.tab || lot;
-    const row  = body.identity_row ?? body.row ?? 2;
-    const tsL  = body.ts_local || '';
-    const tsZ  = body.ts_iso   || '';
-    const tz   = body.timezone || '';
-
-    const tsStr = tsL
-      ? `${tsL}${tz ? ' (' + tz + ')' : ''}`
-      : (tsZ ? `${tsZ} (UTC)` : '');
-
-    // Created vs. updated message, now with timestamp
-    if (body.created_tab === true) {
-      setStatus(
-        `🆕 Created tab <b>${tab}</b> and wrote identity row (row <b>${row}</b>)<br>` +
-        (tsStr ? `🕒 <b>Server timestamp:</b> ${tsStr}<br>` : '') +
-        `Creating .gototags…`,
-        'ok'
-      );
-    } else {
-      setStatus(
-        `✅ Logged to <b>${tab}</b> (row <b>${row}</b>)<br>` +
-        (tsStr ? `🕒 <b>Server timestamp:</b> ${tsStr}<br>` : '') +
-        `Creating .gototags…`,
-        'ok'
-      );
-    }
-
-    console.debug('[Sheets] JSON:', body);
-  } else {
-    // Non-JSON; keep generic success
-    setStatus(`✅ Logged to <b>${lot}</b>. Creating .gototags…`, 'ok');
-    console.debug('[Sheets] Text:', body);
-  }
-
-  return body;
 }
 
 //////////////////////
@@ -207,32 +149,16 @@ async function onGenerate() {
       return;
     }
 
-    // 1) Log to per‑lot tab
-    try {
-      await logToEssSheet({ lot, product, qty });
-    } catch (e) {
-      appendLog('Sheets logging error: ' + e.message);
-      console.warn(e);
-      if (STRICT_LOGGING) {
-        setStatus('❌ Could not log to <b>ESS Current Lots</b>. Download aborted.','err');
-        return;
-      } else {
-        setStatus('⚠️ Could not log to ESS (continuing). Creating .gototags…','warn');
-      }
-    }
-
-    // 2) Build + download operation file
+    // Build + download — sheet writes already handled by blur events
     const blob = await makeGototagsFromTemplate({ lot, qty, product });
     const safeLot = lot.replace(/[^A-Za-z0-9_\-]/g,'_');
-    //const safeLot = lot.replace(/[^A-Za-z0-9_\-]/g,'_');
-    //const safeLot = lot.replace(/[^A-Za-z0-9_-]/g,'_');
     const name = `encode_run_${nowStamp()}_${safeLot}.gototags`;
 
     setStatus('Downloading file…','');
     saveAs(blob, name);
 
     setStatus(
-      `✅ Downloaded <b>${name}</b>${STRICT_LOGGING ? ' and logged to ESS.' : '.'} ` +
+      `✅ Downloaded <b>${name}</b>. ` +
       `Double‑click to open GoToTags → press <b>Start ▶</b> → write the tag.`,
       'ok'
     );
@@ -254,13 +180,13 @@ if (!window.__NFCTAGS_BOUND__) {
   window.addEventListener('DOMContentLoaded', () => {
     const btn = $('#btnGen');
     if (btn) {
-      btn.addEventListener('click', onGenerate, { once:false });
+      btn.addEventListener('click', onGenerate, { once: false });
       setStatus('Page ready. Enter LOT / QTY / PRODUCT, then click <b>Generate Write File</b>.','');
-      console.debug('[nfctags] bound click handler once');
+      console.debug('[nfctags_dev] bound click handler');
     } else {
-      console.warn('[nfctags] #btnGen not found');
+      console.warn('[nfctags_dev] #btnGen not found');
     }
   });
 } else {
-  console.debug('[nfctags] skipped binding (already bound)');
+  console.debug('[nfctags_dev] skipped binding (already bound)');
 }

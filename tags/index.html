@@ -5,41 +5,121 @@
   <title>NFC Encode (LOT / QTY / PRODUCT)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root { --fg:#0f172a; --bg:#f8fafc; --accent:#2563eb; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--fg); background:var(--bg); margin:0; }
-    header { padding:1rem 1.25rem; border-bottom:1px solid #e2e8f0; }
-    main { max-width:800px; margin:0 auto; padding:1.25rem; }
-    h1 { margin:.25rem 0 .5rem; font-weight:600; }
-    p.note { color:#475569; margin:.25rem 0 1rem; }
-    .grid { display:grid; gap:.75rem; grid-template-columns:1fr; }
-    label { font-size:.9rem; color:#334155; }
-    input { width:100%; padding:.65rem .75rem; border:1px solid #cbd5e1; border-radius:.5rem; font-size:1rem; }
-    .row { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:.75rem; }
-    button { cursor:pointer; border:0; padding:.7rem 1rem; border-radius:.5rem; font-weight:600; }
-    .primary { background:var(--accent); color:white; }
-    .ok { color:#15803d; font-weight:600; }
-    .warn { color:#b45309; font-weight:600; }
-    .err { color:#b91c1c; font-weight:600; }
-    #log { white-space:pre-wrap; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:.5rem; padding:.75rem; margin-top:1rem; }
+    :root {
+      --fg: #0f172a;
+      --bg: #f8fafc;
+      --accent: #2563eb;
+    }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--fg);
+      background: var(--bg);
+      margin: 0;
+    }
+    header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1.25rem;
+    }
+    h1 {
+      margin: .25rem 0 .5rem;
+      font-weight: 600;
+    }
+    p.note {
+      color: #475569;
+      margin: .25rem 0 1rem;
+    }
+    .grid {
+      display: grid;
+      gap: .75rem;
+      grid-template-columns: 1fr;
+    }
+    label {
+      font-size: .9rem;
+      color: #334155;
+    }
+    input {
+      width: 100%;
+      padding: .65rem .75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: .5rem;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: border-color .15s;
+    }
+    input.autofilled {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+    .row {
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+      margin-top: .75rem;
+    }
+    button {
+      cursor: pointer;
+      border: 0;
+      padding: .7rem 1rem;
+      border-radius: .5rem;
+      font-weight: 600;
+    }
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+    .ok   { color: #15803d; font-weight: 600; }
+    .warn { color: #b45309; font-weight: 600; }
+    .err  { color: #b91c1c; font-weight: 600; }
+    #log {
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: .5rem;
+      padding: .75rem;
+      margin-top: 1rem;
+    }
+    #lookup-status {
+      font-size: .85rem;
+      margin-top: .35rem;
+      min-height: 1.2em;
+    }
   </style>
-
-  <!-- Correct CDN script tags (only once each) -->
+  <!-- CDN libraries -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-  <!-- Your app code (only once) -->
-  <script defer src="nfctags.js"></script>
+  <!-- App code -->
+  <script defer src="nfctags_dev.js"></script>
 </head>
 <body>
   <header>
     <h1>NFC Encode – LOT / QTY / PRODUCT</h1>
     <p class="note">
-      Generate the <code>.gototags</code> file, then double‑click it to open GoToTags, press <b>Start ▶</b>, and write a tag.
+      Generate the <code>.gototags</code> file, then double-click it to open GoToTags,
+      press <b>Start ▶</b>, and write a tag.
     </p>
   </header>
-
   <main>
     <section>
       <div class="grid">
+        <div>
+          <label for="product">Product</label>
+          <input id="product" placeholder="e.g., ESxxxx" autocomplete="off" />
+          <div id="lookup-status"></div>
+        </div>
+        <div>
+          <label for="mpc">MPC</label>
+          <input id="mpc" placeholder="e.g., ESxxxxQ-AMT-EWA" />
+        </div>
+        <div>
+          <label for="packagetype">Package Type</label>
+          <input id="packagetype" placeholder="e.g., 5x5 QFN 40L" />
+        </div>
         <div>
           <label for="lot">Lot</label>
           <input id="lot" placeholder="e.g., TGWXxxxxxxx" />
@@ -49,19 +129,234 @@
           <input id="qty" placeholder="e.g., 54321" />
         </div>
         <div>
-          <label for="product">Product</label>
-          <input id="product" placeholder="e.g., ESxxxx" />
+          <label for="datecode">Date Code</label>
+          <input id="datecode" placeholder="e.g., A123" />
         </div>
       </div>
-
       <div class="row">
-        <!-- type="button" prevents any implicit form submit -->
         <button type="button" class="primary" id="btnGen">Generate Write File</button>
       </div>
-
       <div id="status" class="note" style="margin-top:.75rem;"></div>
       <div id="log" hidden></div>
     </section>
   </main>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyK0g8lpoicoNxZcwWEVHbGsKrb5MYpo2u6-IH2qoKuD5SMIbeGb4lqoIVSHSYEz7Zjvg/exec";
+
+    const elProduct      = document.getElementById("product");
+    const elMpc          = document.getElementById("mpc");
+    const elPackagetype  = document.getElementById("packagetype");
+    const elLookupStatus = document.getElementById("lookup-status");
+
+    let lastLookedUp = "";   // avoid re-fetching same value on repeated blur
+
+    function setLookupStatus(msg, cls) {
+      elLookupStatus.textContent = msg;
+      elLookupStatus.className   = cls || "";
+    }
+
+    function markAutofilled(el, filled) {
+      if (filled) el.classList.add("autofilled");
+      else        el.classList.remove("autofilled");
+    }
+
+    async function lookupProduct(product) {
+      product = product.trim().toUpperCase();
+      if (!product || product === lastLookedUp) return;
+      lastLookedUp = product;
+
+      setLookupStatus("Looking up product…", "warn");
+
+      const url = `${SCRIPT_URL}?action=product_lookup&product=${encodeURIComponent(product)}`;
+
+      let data;
+      try {
+        const res = await fetch(url);
+        data = await res.json();
+      } catch (err) {
+        setLookupStatus("Lookup failed (network error)", "err");
+        return;
+      }
+
+      if (!data.ok) {
+        setLookupStatus(`Product not found in ESS Test Flows`, "err");
+        return;
+      }
+
+      const filled = [];
+
+      if (data.mpc && !elMpc.value.trim()) {
+        elMpc.value = data.mpc;
+        markAutofilled(elMpc, true);
+        filled.push("MPC");
+      }
+
+      if (data.pkg_type && !elPackagetype.value.trim()) {
+        elPackagetype.value = data.pkg_type;
+        markAutofilled(elPackagetype, true);
+        filled.push("Package Type");
+      }
+
+      if (filled.length) {
+        setLookupStatus(`✓ Auto-filled: ${filled.join(", ")}`, "ok");
+      } else if (data.mpc || data.pkg_type) {
+        setLookupStatus("✓ Product found (fields already filled)", "ok");
+      } else {
+        setLookupStatus("✓ Product found but no MPC and Package Type in ESS Test Flows", "warn");
+      }
+    }
+
+    // Trigger on blur (leaving the field) or Enter key
+    elProduct.addEventListener("blur", () => lookupProduct(elProduct.value));
+    elProduct.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        lookupProduct(elProduct.value);
+      }
+    });
+
+    // Clear autofill highlight when user manually edits MPC or Package Type
+    elMpc.addEventListener("input",         () => markAutofilled(elMpc, false));
+    elPackagetype.addEventListener("input",  () => markAutofilled(elPackagetype, false));
+
+    // When Product is edited: clear MPC, Package Type, and reset lookup state
+    elProduct.addEventListener("input", () => {
+      lastLookedUp = "";
+      setLookupStatus("");
+      elMpc.value = "";
+      elPackagetype.value = "";
+      markAutofilled(elMpc, false);
+      markAutofilled(elPackagetype, false);
+    });
+
+    // ── updateProductMeta: fires on MPC or Package Type blur ────────────────
+    async function updateProductMeta(changedField) {
+      const product = elProduct.value.trim().toUpperCase();
+      const mpc     = elMpc.value.trim();
+      const pkgType = elPackagetype.value.trim();
+
+      if (!product || (!mpc && !pkgType)) return { skipped: "nothing to write back" };
+
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set("action",  "update_product_meta");
+      url.searchParams.set("product", product);
+      if (mpc)     url.searchParams.set("mpc",      mpc);
+      if (pkgType) url.searchParams.set("pkg_type", pkgType);
+
+      const elStatus = document.getElementById("status");
+      elStatus.textContent = "Saving to ESS Test Flows…";
+      elStatus.className   = "note warn";
+
+      try {
+        const res  = await fetch(url.toString());
+        const data = await res.json();
+        if (data.ok && data.written && data.written.length) {
+          elStatus.textContent = `✓ ESS Test Flows updated — ${data.written.join(", ")}`;
+          elStatus.className   = "note ok";
+        } else if (data.ok === false) {
+          elStatus.textContent = `⚠️ ESS Test Flows update failed: ${data.error}`;
+          elStatus.className   = "note warn";
+        } else {
+          elStatus.textContent = "";
+        }
+        return data;
+      } catch (e) {
+        elStatus.textContent = `⚠️ ESS Test Flows update failed: ${String(e)}`;
+        elStatus.className   = "note warn";
+        return { ok: false, error: String(e) };
+      }
+    }
+
+    // ── writeLotMeta: fires on Lot blur ──────────────────────────────────────
+    async function writeLotMeta() {
+      const lot      = document.getElementById("lot").value.trim();
+      const dateCode = document.getElementById("datecode").value.trim();
+      const mpc      = elMpc.value.trim();
+      const pkgType  = elPackagetype.value.trim();
+
+      if (!lot)                          return { skipped: "no lot" };
+      if (!dateCode && !mpc && !pkgType) return { skipped: "no meta values" };
+
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set("action",  "lot_meta_write");
+      url.searchParams.set("lot_id",  lot);
+      url.searchParams.set("sheet",   lot);
+      if (dateCode) url.searchParams.set("date_code", dateCode);
+      if (mpc)      url.searchParams.set("mpc",       mpc);
+      if (pkgType)  url.searchParams.set("pkg_type",  pkgType);
+
+      const elStatus = document.getElementById("status");
+      elStatus.textContent = "Saving lot meta…";
+      elStatus.className   = "note warn";
+
+      try {
+        const res  = await fetch(url.toString());
+        const data = await res.json();
+        if (data.ok) {
+          const parts = [];
+          if (data.date_code) parts.push(`Date Code: ${data.date_code}`);
+          if (data.mpc)       parts.push(`MPC: ${data.mpc}`);
+          if (data.pkg_type)  parts.push(`Pkg: ${data.pkg_type}`);
+          elStatus.textContent = `✓ Lot meta saved — ${parts.join(" · ")}`;
+          elStatus.className   = "note ok";
+        } else {
+          elStatus.textContent = `⚠️ Lot meta write failed: ${data.error || JSON.stringify(data)}`;
+          elStatus.className   = "note warn";
+        }
+        return data;
+      } catch (e) {
+        elStatus.textContent = `⚠️ Lot meta write failed: ${String(e)}`;
+        elStatus.className   = "note warn";
+        return { ok: false, error: String(e) };
+      }
+    }
+
+    // ── lotSeed: fires on Quantity blur ──────────────────────────────────────
+    async function lotSeed() {
+      const lot     = document.getElementById("lot").value.trim();
+      const qty     = document.getElementById("qty").value.trim();
+      const product = elProduct.value.trim().toUpperCase();
+
+      if (!lot || !qty || !product) return { skipped: "missing lot, qty, or product" };
+
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set("action",  "lot_seed");
+      url.searchParams.set("lot_id",  lot);
+      url.searchParams.set("sheet",   lot);
+      url.searchParams.set("product", product);
+      url.searchParams.set("qty",     qty);
+
+      const elStatus = document.getElementById("status");
+      elStatus.textContent = "Saving quantity…";
+      elStatus.className   = "note warn";
+
+      try {
+        const res  = await fetch(url.toString());
+        const data = await res.json();
+        if (data.ok) {
+          elStatus.textContent = `✓ Lot seeded — ${lot} · ${product} · QTY: ${qty}`;
+          elStatus.className   = "note ok";
+        } else {
+          elStatus.textContent = `⚠️ Lot seed failed: ${data.error || JSON.stringify(data)}`;
+          elStatus.className   = "note warn";
+        }
+        return data;
+      } catch (e) {
+        elStatus.textContent = `⚠️ Lot seed failed: ${String(e)}`;
+        elStatus.className   = "note warn";
+        return { ok: false, error: String(e) };
+      }
+    }
+
+    // ── Blur triggers ─────────────────────────────────────────────────────────
+    elMpc.addEventListener("blur",         () => updateProductMeta("mpc"));
+    elPackagetype.addEventListener("blur", () => updateProductMeta("pkg_type"));
+    document.getElementById("lot").addEventListener("blur",      () => writeLotMeta());
+    document.getElementById("qty").addEventListener("blur",      () => lotSeed());
+    document.getElementById("datecode").addEventListener("blur", () => writeLotMeta());
+
+    // Generate button is handled by nfctags.js (onGenerate)
+  </script>
 </body>
 </html>
