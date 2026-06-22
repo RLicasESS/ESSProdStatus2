@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-22 13:28:32",
+  "timestamp": "2026-06-22 13:32:31",
   "local": [
     {
       "service": "testerstatus.service",
@@ -94,8 +94,8 @@
         "pid": 28584
       },
       "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
+        "status": "no_log",
+        "detail": "no valid log output (script may not be deployed)",
         "overflow_count": 0,
         "correction_count": 0
       }
@@ -144,8 +144,8 @@
         "pid": 13824
       },
       "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
+        "status": "no_log",
+        "detail": "no valid log output (script may not be deployed)",
         "overflow_count": 0,
         "correction_count": 0
       }
@@ -169,8 +169,8 @@
         "pid": 15764
       },
       "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
+        "status": "no_log",
+        "detail": "no valid log output (script may not be deployed)",
         "overflow_count": 0,
         "correction_count": 0
       }
@@ -194,8 +194,8 @@
         "pid": 14712
       },
       "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
+        "status": "no_log",
+        "detail": "no valid log output (script may not be deployed)",
         "overflow_count": 0,
         "correction_count": 0
       }
