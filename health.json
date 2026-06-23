@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-22 18:03:34",
+  "timestamp": "2026-06-22 18:08:28",
   "local": [
     {
       "service": "testerstatus.service",
@@ -77,28 +77,7 @@
   "testers": [
     {
       "name": "AP-1",
-      "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "ok",
-        "pid": 28584
-      },
-      "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "AP-2",
