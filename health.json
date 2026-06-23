@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-23 11:11:41",
+  "timestamp": "2026-06-23 11:16:42",
   "local": [
     {
       "service": "testerstatus.service",
@@ -177,28 +177,7 @@
     },
     {
       "name": "S100_4",
-      "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "ok",
-        "pid": 14712
-      },
-      "lotsetting": {
-        "status": "unreachable",
-        "detail": "SSH failed",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "HP-1",
