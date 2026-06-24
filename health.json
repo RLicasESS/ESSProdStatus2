@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-24 16:43:38",
+  "timestamp": "2026-06-24 16:48:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -33,15 +33,23 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 194,
-        "ocr_last_time": "2026-06-24 16:39:39",
+        "ocr_count": 195,
+        "ocr_last_time": "2026-06-24 16:44:50",
         "status": "OCR"
       },
       "handler_eth": {
         "ip": null,
         "status": "N/A"
       },
-      "png_connected": "OK"
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "unknown",
+        "png": [
+          1,
+          2
+        ],
+        "result": "UNKNOWN"
+      }
     },
     {
       "name": "NS-3",
@@ -52,7 +60,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 51,
+        "web_count": 52,
         "ocr_count": 144,
         "ocr_last_time": "2026-06-24 12:19:56",
         "status": "WARN"
@@ -61,7 +69,14 @@
         "ip": "192.168.1.35",
         "status": "OK"
       },
-      "png_connected": "OK"
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "unknown",
+        "png": [
+          1
+        ],
+        "result": "UNKNOWN"
+      }
     },
     {
       "name": "NS-4",
@@ -72,7 +87,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 59,
+        "web_count": 60,
         "ocr_count": 136,
         "ocr_last_time": "2026-06-24 11:40:03",
         "status": "WARN"
@@ -81,31 +96,18 @@
         "ip": "192.168.1.35",
         "status": "OK"
       },
-      "png_connected": "OK"
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "unknown",
+        "png": [
+          2
+        ],
+        "result": "UNKNOWN"
+      }
     },
     {
       "name": "NS-5",
       "ip": "172.18.139.227",
-      "services": {
-        "handlerstatus.service": "OK",
-        "requestserver.service": "OK",
-        "ssh.service": "OK"
-      },
-      "web_ocr": {
-        "web_count": 195,
-        "ocr_count": 0,
-        "ocr_last_time": null,
-        "status": "OK"
-      },
-      "handler_eth": {
-        "ip": "192.168.1.35",
-        "status": "OK"
-      },
-      "png_connected": "OK"
-    },
-    {
-      "name": "NS-6",
-      "ip": "172.18.164.42",
       "services": {
         "handlerstatus.service": "OK",
         "requestserver.service": "OK",
@@ -118,10 +120,45 @@
         "status": "OK"
       },
       "handler_eth": {
+        "ip": "192.168.1.35",
+        "status": "OK"
+      },
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "unknown",
+        "png": [
+          1,
+          2
+        ],
+        "result": "UNKNOWN"
+      }
+    },
+    {
+      "name": "NS-6",
+      "ip": "172.18.164.42",
+      "services": {
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
+      },
+      "web_ocr": {
+        "web_count": 197,
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "OK"
+      },
+      "handler_eth": {
         "ip": "192.168.0.5",
         "status": "OK"
       },
-      "png_connected": "OK"
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "unknown",
+        "png": [
+          1
+        ],
+        "result": "UNKNOWN"
+      }
     }
   ],
   "handler_service_names": [
