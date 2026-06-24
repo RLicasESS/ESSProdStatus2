@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-24 12:41:36",
+  "timestamp": "2026-06-24 12:45:48",
   "local": [
     {
       "service": "testerstatus.service",
@@ -51,7 +51,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 4,
+        "web_count": 5,
         "ocr_count": 144,
         "ocr_last_time": "2026-06-24 12:19:56",
         "status": "WARN"
@@ -89,7 +89,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 148,
+        "web_count": 149,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -108,7 +108,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 149,
+        "web_count": 150,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
