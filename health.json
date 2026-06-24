@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-24 11:40:35",
+  "timestamp": "2026-06-24 11:44:35",
   "local": [
     {
       "service": "testerstatus.service",
@@ -32,8 +32,8 @@
         "ssh.service": "OK"
       },
       "ocr_fallback": {
-        "count": 136,
-        "last_time": "2026-06-24 11:39:05",
+        "count": 137,
+        "last_time": "2026-06-24 11:44:16",
         "status": "WARN"
       }
     },
@@ -46,8 +46,8 @@
         "ssh.service": "OK"
       },
       "ocr_fallback": {
-        "count": 136,
-        "last_time": "2026-06-24 11:38:36",
+        "count": 137,
+        "last_time": "2026-06-24 11:43:45",
         "status": "WARN"
       }
     },
