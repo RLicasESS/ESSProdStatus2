@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-24 16:10:37",
+  "timestamp": "2026-06-24 16:15:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -33,14 +33,15 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 188,
-        "ocr_last_time": "2026-06-24 16:08:30",
+        "ocr_count": 189,
+        "ocr_last_time": "2026-06-24 16:13:41",
         "status": "OCR"
       },
       "handler_eth": {
         "ip": null,
         "status": "N/A"
-      }
+      },
+      "png_connected": "OK"
     },
     {
       "name": "NS-3",
@@ -51,7 +52,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 44,
+        "web_count": 45,
         "ocr_count": 144,
         "ocr_last_time": "2026-06-24 12:19:56",
         "status": "WARN"
@@ -59,7 +60,8 @@
       "handler_eth": {
         "ip": "192.168.1.35",
         "status": "OK"
-      }
+      },
+      "png_connected": "OK"
     },
     {
       "name": "NS-4",
@@ -70,7 +72,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 52,
+        "web_count": 53,
         "ocr_count": 136,
         "ocr_last_time": "2026-06-24 11:40:03",
         "status": "WARN"
@@ -78,30 +80,12 @@
       "handler_eth": {
         "ip": "192.168.1.35",
         "status": "OK"
-      }
+      },
+      "png_connected": "OK"
     },
     {
       "name": "NS-5",
       "ip": "172.18.139.227",
-      "services": {
-        "handlerstatus.service": "OK",
-        "requestserver.service": "OK",
-        "ssh.service": "OK"
-      },
-      "web_ocr": {
-        "web_count": 189,
-        "ocr_count": 0,
-        "ocr_last_time": null,
-        "status": "OK"
-      },
-      "handler_eth": {
-        "ip": "192.168.1.35",
-        "status": "OK"
-      }
-    },
-    {
-      "name": "NS-6",
-      "ip": "172.18.164.42",
       "services": {
         "handlerstatus.service": "OK",
         "requestserver.service": "OK",
@@ -114,9 +98,30 @@
         "status": "OK"
       },
       "handler_eth": {
+        "ip": "192.168.1.35",
+        "status": "OK"
+      },
+      "png_connected": "OK"
+    },
+    {
+      "name": "NS-6",
+      "ip": "172.18.164.42",
+      "services": {
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
+      },
+      "web_ocr": {
+        "web_count": 191,
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "OK"
+      },
+      "handler_eth": {
         "ip": "192.168.0.5",
         "status": "OK"
-      }
+      },
+      "png_connected": "OK"
     }
   ],
   "handler_service_names": [
