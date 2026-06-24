@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-24 12:31:35",
+  "timestamp": "2026-06-24 12:37:00",
   "local": [
     {
       "service": "testerstatus.service",
@@ -33,9 +33,13 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 146,
-        "ocr_last_time": "2026-06-24 12:30:59",
+        "ocr_count": 147,
+        "ocr_last_time": "2026-06-24 12:36:10",
         "status": "OCR"
+      },
+      "handler_eth": {
+        "ip": null,
+        "status": "N/A"
       }
     },
     {
@@ -47,10 +51,14 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 2,
+        "web_count": 3,
         "ocr_count": 144,
         "ocr_last_time": "2026-06-24 12:19:56",
         "status": "WARN"
+      },
+      "handler_eth": {
+        "ip": "192.168.1.35",
+        "status": "OK"
       }
     },
     {
@@ -62,10 +70,14 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 10,
+        "web_count": 11,
         "ocr_count": 136,
         "ocr_last_time": "2026-06-24 11:40:03",
         "status": "WARN"
+      },
+      "handler_eth": {
+        "ip": "192.168.1.35",
+        "status": "OK"
       }
     },
     {
@@ -77,9 +89,13 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 146,
+        "web_count": 147,
         "ocr_count": 0,
         "ocr_last_time": null,
+        "status": "OK"
+      },
+      "handler_eth": {
+        "ip": "192.168.1.35",
         "status": "OK"
       }
     },
@@ -92,9 +108,13 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 147,
+        "web_count": 148,
         "ocr_count": 0,
         "ocr_last_time": null,
+        "status": "OK"
+      },
+      "handler_eth": {
+        "ip": "192.168.0.5",
         "status": "OK"
       }
     }
