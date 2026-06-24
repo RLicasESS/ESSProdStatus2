@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-24 12:08:37",
+  "timestamp": "2026-06-24 12:13:37",
   "local": [
     {
       "service": "testerstatus.service",
@@ -31,10 +31,11 @@
         "requestserver.service": "OK",
         "ssh.service": "OK"
       },
-      "ocr_fallback": {
-        "count": 141,
-        "last_time": "2026-06-24 12:05:02",
-        "status": "WARN"
+      "web_ocr": {
+        "web_count": 0,
+        "ocr_count": 142,
+        "ocr_last_time": "2026-06-24 12:10:13",
+        "status": "OCR"
       }
     },
     {
@@ -45,10 +46,11 @@
         "requestserver.service": "OK",
         "ssh.service": "OK"
       },
-      "ocr_fallback": {
-        "count": 141,
-        "last_time": "2026-06-24 12:04:25",
-        "status": "WARN"
+      "web_ocr": {
+        "web_count": 0,
+        "ocr_count": 142,
+        "ocr_last_time": "2026-06-24 12:09:35",
+        "status": "OCR"
       }
     },
     {
@@ -59,9 +61,10 @@
         "requestserver.service": "OK",
         "ssh.service": "OK"
       },
-      "ocr_fallback": {
-        "count": 136,
-        "last_time": "2026-06-24 11:40:03",
+      "web_ocr": {
+        "web_count": 6,
+        "ocr_count": 136,
+        "ocr_last_time": "2026-06-24 11:40:03",
         "status": "WARN"
       }
     },
@@ -73,9 +76,10 @@
         "requestserver.service": "OK",
         "ssh.service": "OK"
       },
-      "ocr_fallback": {
-        "count": 0,
-        "last_time": null,
+      "web_ocr": {
+        "web_count": 143,
+        "ocr_count": 0,
+        "ocr_last_time": null,
         "status": "OK"
       }
     },
@@ -87,9 +91,10 @@
         "requestserver.service": "OK",
         "ssh.service": "OK"
       },
-      "ocr_fallback": {
-        "count": 0,
-        "last_time": null,
+      "web_ocr": {
+        "web_count": 143,
+        "ocr_count": 0,
+        "ocr_last_time": null,
         "status": "OK"
       }
     }
