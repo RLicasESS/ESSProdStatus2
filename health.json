@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-25 16:17:35",
+  "timestamp": "2026-06-25 16:21:36",
   "local": [
     {
       "service": "testerstatus.service",
@@ -45,7 +45,7 @@
       "png_sites": {
         "csv": "dual",
         "png": [],
-        "result": "MISMATCH"
+        "result": "ERROR"
       }
     },
     {
@@ -57,7 +57,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 190,
+        "web_count": 191,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -84,7 +84,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 190,
+        "web_count": 191,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -111,7 +111,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 191,
+        "web_count": 192,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -139,7 +139,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 191,
+        "web_count": 192,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
