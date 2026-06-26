@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-26 07:48:35",
+  "timestamp": "2026-06-26 07:54:00",
   "local": [
     {
       "service": "testerstatus.service",
@@ -33,8 +33,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 91,
-        "ocr_last_time": "2026-06-26 07:47:22",
+        "ocr_count": 92,
+        "ocr_last_time": "2026-06-26 07:52:33",
         "status": "OCR"
       },
       "handler_eth": {
@@ -44,8 +44,11 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
       }
     },
     {
@@ -57,7 +60,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 91,
+        "web_count": 92,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -84,7 +87,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 92,
+        "web_count": 93,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -111,7 +114,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 92,
+        "web_count": 93,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -139,7 +142,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 92,
+        "web_count": 93,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -243,28 +246,7 @@
     },
     {
       "name": "S100_4",
-      "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "ok",
-        "pid": 14712
-      },
-      "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "HP-1",
