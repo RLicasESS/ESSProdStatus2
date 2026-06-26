@@ -345,7 +345,8 @@ var COL_HINTS = {
   "WEB/OCR":         "Counts today's handler web reads ([WEB] counts used) vs OCR fallbacks ([WEB FAIL]) from png2csv.log. ✓ = web only; ⚠ = mixed; – = OCR only (web not enabled or down).",
   "ETH":             "Pings the handler's direct ethernet IP from the Pi (192.168.1.35 for NS-3/4/5, 192.168.0.5 for NS-6). ✓ = reachable; ✗ = no link; – = not applicable (CHROMA).",
   "PNG":             "Checks that the handler's site-count screenshot (PNG) is reachable and was captured successfully.",
-  "SITES":           "Compares the site count detected from the screenshot (PNG) against the site count reported in the CSV (handler config). ✓ MATCH = they agree; ✗ MISMATCH = the handler's reported sites don't match what the screenshot shows — may indicate a stale config or a handler running a different site setup than expected."
+  "SITES":           "Compares the site count detected from the screenshot (PNG) against the site count reported in the CSV (handler config). ✓ MATCH = they agree; ✗ MISMATCH = the handler's reported sites don't match what the screenshot shows — may indicate a stale config or a handler running a different site setup than expected.",
+  "BIN_MAP":         "Checks bin_mapping.json for this handler: present, fresh (not flagged or timed-out stale), and — for NS-3/4/5/6 — in agreement with its sibling NS handlers' AUTO1/AUTO2/AUTO3 bin lists. ⚠ STALE = mapping hasn't refreshed recently; ✗ MISSING = no entry for this handler; ✗ DRIFT = this handler's bin routing differs from another NS handler's, which may mean it's been reconfigured unintentionally."
 };
 
 function colHeader(label) {
@@ -434,6 +435,24 @@ function sitesCell(sites) {
   }
 }
 
+function binMapCell(bm) {
+  if (!bm || !bm.status) return '<td class="skip">—</td>';
+  if (bm.status === "OK") {
+    return '<td class="ok">&#10003; OK</td>';
+  } else if (bm.status === "STALE") {
+    return '<td class="warn">&#9888; STALE (' + (bm.ts || "?") + ')</td>';
+  } else if (bm.status === "MISSING") {
+    return '<td class="notok">&#10007; MISSING</td>';
+  } else if (bm.status === "DRIFT") {
+    var against = (bm.drift_against || []).join(", ");
+    return '<td class="notok">&#10007; DRIFT vs ' + against + '</td>';
+  } else if (bm.status === "FILE_ERROR") {
+    return '<td class="notok">&#10007; FILE_ERROR</td>';
+  } else {
+    return '<td class="warn">? ' + bm.status + '</td>';
+  }
+}
+
 function lotSettingCell(ls) {
   if (!ls || !ls.status) {
     return '<td class="skip">—</td>';
@@ -500,6 +519,7 @@ function loadHealth() {
       html += '<th><span class="col-hint" style="color:white;border-bottom-color:#aaa;">ETH<span class="tooltip">' + COL_HINTS["ETH"] + '</span></span></th>';
       html += '<th><span class="col-hint" style="color:white;border-bottom-color:#aaa;">PNG<span class="tooltip">' + COL_HINTS["PNG"] + '</span></span></th>';
       html += '<th><span class="col-hint" style="color:white;border-bottom-color:#aaa;">SITES<span class="tooltip">' + COL_HINTS["SITES"] + '</span></span></th>';
+      html += '<th><span class="col-hint" style="color:white;border-bottom-color:#aaa;">BIN_MAP<span class="tooltip">' + COL_HINTS["BIN_MAP"] + '</span></span></th>';
       html += "</tr>";
 
       for (var i = 0; i < data.handlers.length; i++) {
@@ -512,6 +532,7 @@ function loadHealth() {
         html += ethCell(h.handler_eth);
         html += pngConnectedCell(h.png_connected);
         html += sitesCell(h.png_sites);
+        html += binMapCell(h.bin_mapping);
         html += "</tr>";
       }
       html += "</table>";
