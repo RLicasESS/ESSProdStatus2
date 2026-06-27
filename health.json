@@ -1,25 +1,35 @@
 {
-  "timestamp": "2026-06-26 17:59:37",
+  "timestamp": "2026-06-26 18:04:35",
   "local": [
     {
       "service": "testerstatus.service",
-      "status": "OK"
+      "status": "OK",
+      "port": null
     },
     {
       "service": "ESSLotLogger.service",
-      "status": "OK"
+      "status": "OK",
+      "port": null
     },
     {
       "service": "handler_proxy.service",
-      "status": "OK"
+      "status": "OK",
+      "port": 8001
     },
     {
       "service": "nextstep.service",
-      "status": "OK"
+      "status": "OK",
+      "port": null
     },
     {
       "service": "endlot_snapshotter.service",
-      "status": "OK"
+      "status": "OK",
+      "port": null
+    },
+    {
+      "service": "systemhealth.service",
+      "status": "DOWN",
+      "port": 8003
     }
   ],
   "handlers": [
@@ -33,8 +43,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 209,
-        "ocr_last_time": "2026-06-26 17:58:11",
+        "ocr_count": 210,
+        "ocr_last_time": "2026-06-26 18:03:19",
         "status": "OCR"
       },
       "handler_eth": {
@@ -62,7 +72,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 210,
+        "web_count": 211,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -94,7 +104,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 211,
+        "web_count": 212,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -126,7 +136,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 211,
+        "web_count": 212,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -156,7 +166,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 211,
+        "web_count": 212,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
