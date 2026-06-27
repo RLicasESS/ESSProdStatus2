@@ -341,6 +341,7 @@ var SERVICE_DESC = {
   "nextstep.service":           "Syncs ESSProd.csv to the Google Apps Script web app (NextStep/CurrentLots)",
   "endlot_snapshotter.service": "Watches for END LOT events on AP and S100 testers and saves a snapshot of the completed lot",
   "systemhealth.service":       "Listens on port 8003 — triggers the health check script on demand from the dashboard button",
+  "PIGithub.service":           "Listens on port 9000 — serves the /vnc endpoint called by the dashboard to open vncviewer on the Pi for AP and S100 machines",
   "handlerstatus.service":      "Runs on each handler Pi — collects handler state and exposes it to the main Pi",
   "requestserver.service":      "Runs on each handler Pi — handles on-demand requests (e.g. screenshots, status)",
   "ssh.service":                "SSH daemon on the handler Pi — required for remote commands from the main Pi"
