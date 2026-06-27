@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-26 18:48:35",
+  "timestamp": "2026-06-26 18:52:34",
   "local": [
     {
       "service": "testerstatus.service",
@@ -30,6 +30,11 @@
       "service": "systemhealth.service",
       "status": "OK",
       "port": 8003
+    },
+    {
+      "service": "PIGithub.service",
+      "status": "DOWN",
+      "port": 9000
     }
   ],
   "handlers": [
@@ -43,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 218,
-        "ocr_last_time": "2026-06-26 18:44:25",
+        "ocr_count": 219,
+        "ocr_last_time": "2026-06-26 18:49:34",
         "status": "OCR"
       },
       "handler_eth": {
@@ -136,7 +141,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 220,
+        "web_count": 221,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -166,7 +171,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 220,
+        "web_count": 221,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
