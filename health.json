@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-26 17:16:34",
+  "timestamp": "2026-06-26 17:20:36",
   "local": [
     {
       "service": "testerstatus.service",
@@ -33,8 +33,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 200,
-        "ocr_last_time": "2026-06-26 17:11:56",
+        "ocr_count": 201,
+        "ocr_last_time": "2026-06-26 17:17:04",
         "status": "OCR"
       },
       "handler_eth": {
