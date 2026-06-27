@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESS DASHBOARD</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 16px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    #mode {
+      text-align: center;
+      margin-bottom: 14px;
+      font-weight: bold;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 90%;
+      margin: auto;
+    }
+
+    th, td {
+      border: 1px solid #aaa;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #2c3e50;
+      color: white;
+    }
+
+    a {
+      color: #007bff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #health-section {
+      width: 90%;
+      margin: 30px auto 0;
+    }
+
+    #health-section hr {
+      margin-bottom: 20px;
+    }
+
+    #health-section h2 {
+      margin-bottom: 4px;
+    }
+
+    #health-timestamp {
+      text-align: center;
+      color: #555;
+      margin-bottom: 18px;
+      font-size: 0.9em;
+    }
+
+    #health-status-msg {
+      text-align: center;
+      font-size: 0.88em;
+      min-height: 1.2em;
+      margin-bottom: 6px;
+      color: #555;
+    }
+
+    #health-section h3 {
+      text-align: center;
+      font-size: 1em;
+      color: #2c3e50;
+      margin: 18px 0 8px;
+    }
+
+    .ok    { color: #27ae60; font-weight: bold; }
+    .notok { color: #e74c3c; font-weight: bold; }
+    .warn  { color: #e67e22; font-weight: bold; }
+    .skip  { color: #888;    font-style: italic; }
+
+    #btn-health {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 28px;
+      font-size: 1em;
+      font-weight: bold;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #btn-health:hover {
+      background: #1a252f;
+    }
+
+    #btn-health:disabled {
+      background: #888;
+      cursor: default;
+    }
+
+    .svc-name {
+      border-bottom: 1px dashed #888;
+      cursor: help;
+      position: relative;
+    }
+
+    .svc-name .tooltip {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      z-index: 10;
+      background: #1a252f;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.82em;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      pointer-events: none;
+    }
+
+    .svc-name:hover .tooltip {
+      display: block;
+    }
+
+    /* col-header hover (th context) */
+    .col-hint {
+      border-bottom: 1px dashed #aaa;
+      cursor: help;
+      position: relative;
+      display: inline-block;
+    }
+
+    .col-hint .tooltip {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      z-index: 10;
+      background: #1a252f;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.82em;
+      white-space: normal;
+      width: 260px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      pointer-events: none;
+    }
+
+    .col-hint:hover .tooltip {
+      display: block;
+    }
+
+    .warn-list {
+      margin: 2px 0 0 0;
+      padding: 0;
+      list-style: none;
+      font-size: 0.82em;
+      color: #e67e22;
+    }
+
+    .notice-list {
+      margin: 2px 0 0 0;
+      padding: 0;
+      list-style: none;
+      font-size: 0.82em;
+      color: #2980b9;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>
+  <a href="https://connect.raspberrypi.com/devices" target="_blank">
+    ESS
+  </a>
+  DASHBOARD
+</h2>
+
+<div id="mode"></div>
+
+<table id="tbl">
+  <tr>
+    <th>TYPE</th>
+    <th>NAME</th>
+  </tr>
+</table>
+
+<script>
+
+// =====================================================
+// MODE
+// =====================================================
+var params = new URLSearchParams(window.location.search);
+var mode = params.get("links");
+var isPI = (mode === "pi");
+var isPC = (mode === "pc");
+
+document.getElementById("mode").innerHTML =
+  "MODE = " + (mode || "view");
+
+// =====================================================
+// HELPERS
+// =====================================================
+function mkLink(url, text) {
+  return '<a href="' + url + '" target="_blank">' + text + '</a>';
+}
+
+function mkVNC(ip, text) {
+  return '<a href="#" onclick="window.open(\'http://localhost:9000/vnc?ip=' + ip + '\', \'_blank\'); return false;">' + text + '</a>';
+}
+
+// =====================================================
+// TABLE
+// =====================================================
+var tbl = document.getElementById("tbl");
+
+function addRow(type, html) {
+  var tr = document.createElement("tr");
+  var td1 = document.createElement("td");
+  td1.innerHTML = type;
+  var td2 = document.createElement("td");
+  td2.innerHTML = html;
+  tr.appendChild(td1);
+  tr.appendChild(td2);
+  tbl.appendChild(tr);
+}
+
+// =====================================================
+// TESTER
+// =====================================================
+if (isPI || isPC) {
+  addRow(
+    "TESTER",
+    mkLink(
+      "https://connect.raspberrypi.com/devices/60a5a481-6e1a-43b3-8fd6-95b26e95aca0",
+      "ESSTester_01"
+    )
+  );
+} else {
+  addRow("TESTER", "ESSTester_01");
+}
+
+// =====================================================
+// HANDLERS
+// =====================================================
+var handlers = [
+  ["CHROMA", "ESSHandler_04", "https://connect.raspberrypi.com/devices/5fabcfc7-1bf1-445b-bf3d-b3e285895c7e"],
+  ["NS-3",   "ESSHandler_02", "https://connect.raspberrypi.com/devices/462b197a-acdb-4c97-bc15-70ab73addc46"],
+  ["NS-4",   "ESSHandler_03", "https://connect.raspberrypi.com/devices/66fa4727-e6b5-4a1a-855d-1f266270b950"],
+  ["NS-5",   "ESSHandler_01", "https://connect.raspberrypi.com/devices/468fc957-7879-440e-b1ea-b7e7dfef37f6"],
+  ["NS-6",   "ESSHandler_05", "https://connect.raspberrypi.com/devices/759713e5-9e7e-408a-9686-85fb7ed7b1d2"]
+];
+
+for (var i = 0; i < handlers.length; i++) {
+  var h = handlers[i];
+  if (isPI || isPC) {
+    addRow(h[0], mkLink(h[2], h[1]));
+  } else {
+    addRow(h[0], h[1]);
+  }
+}
+
+// =====================================================
+// AP
+// =====================================================
+var ap = [
+  ["AP-1", "172.18.148.141", "vnc://AP-1"],
+  ["AP-2", "172.18.97.10",   "vnc://AP-2"]
+];
+
+for (var i = 0; i < ap.length; i++) {
+  var a = ap[i];
+  if (isPI) {
+    addRow(a[0], mkVNC(a[1], a[0]));
+  } else if (isPC) {
+    addRow(a[0], '<a href="' + a[2] + '">' + a[0] + '</a>');
+  } else {
+    addRow(a[0], a[1]);
+  }
+}
+
+// =====================================================
+// S100
+// =====================================================
+var s100 = [
+  ["S100_1", "172.18.50.107", "vnc://S100-1"],
+  ["S100_2", "172.18.87.18",  "vnc://S100-2"],
+  ["S100_4", "172.18.50.83",  "vnc://S100-4"]
+];
+
+for (var i = 0; i < s100.length; i++) {
+  var s = s100[i];
+  if (isPI) {
+    addRow(s[0], mkVNC(s[1], s[0]));
+  } else if (isPC) {
+    addRow(s[0], '<a href="' + s[2] + '">' + s[0] + '</a>');
+  } else {
+    addRow(s[0], s[1]);
+  }
+}
+
+</script>
+
+<!-- =====================================================
+     HEALTH SECTION
+     ===================================================== -->
+
+<div id="health-section">
+  <hr>
+  <h2>HEALTH CHECK</h2>
+  <p id="health-timestamp">Press button to run a health check</p>
+  <p id="health-status-msg"></p>
+
+  <button id="btn-health" onclick="runAndLoadHealth()">GET HEALTH</button>
+
+  <div id="health-content"></div>
+</div>
+
+<script>
+
+var SERVICE_DESC = {
+  "testerstatus.service":       "Polls AP, S100, and HP testers via SSH (GetTesterStatus); fetches handler status and temperatures; writes ESSTesters.csv and ESSProd.csv each cycle",
+  "ESSLotLogger.service":       "Logs lot-level events (start, end, step changes) to the local lot history database",
+  "handler_proxy.service":      "Proxies handler status, snapshots, and OCR requests from outside to handler Pis — listens on port 8001, exposed via Cloudflare tunnel",
+  "nextstep.service":           "Syncs ESSProd.csv to the Google Apps Script web app (NextStep/CurrentLots)",
+  "endlot_snapshotter.service": "Watches for END LOT events on AP and S100 testers and saves a snapshot of the completed lot",
+  "systemhealth.service":       "Listens on port 8003 — triggers the health check script on demand from the dashboard button",
+  "handlerstatus.service":      "Runs on each handler Pi — collects handler state and exposes it to the main Pi",
+  "requestserver.service":      "Runs on each handler Pi — handles on-demand requests (e.g. screenshots, status)",
+  "ssh.service":                "SSH daemon on the handler Pi — required for remote commands from the main Pi"
+};
+
+var COL_HINTS = {
+  "READ LOT":        "Checks that the tester's TesterInfo file is readable via SSH. Confirms the Pi can reach the tester and retrieve the current lot name and status.",
+  "ESS LOT SETTINGS":"ESS Lot Settings automation is running (main process, worker, or both). This script monitors the Stop button state and triggers lot-close actions automatically.",
+  "DRIVE":           "Verifies the network drive (Y:) is mapped and accessible on the tester PC. Required for reading/writing lot data files to the shared ESS network share.",
+  "SPLASHTOP":       "Splashtop remote-access service status on the tester PC. Used for remote desktop access by engineers and management.",
+  "LOT SETTING LOG": "Monitors the ESS Lot Setting log file for a stuck correction loop — repeated OverflowError failures trying to set Tester# or Handler# fields. Triggers if 5+ errors appear in the last 60 log lines.",
+  "WEB/OCR":         "Counts today's handler web reads ([WEB] counts used) vs OCR fallbacks ([WEB FAIL]) from png2csv.log. ✓ = web only; ⚠ = mixed; – = OCR only (web not enabled or down).",
+  "ETH":             "Pings the handler's direct ethernet IP from the Pi (192.168.1.35 for NS-3/4/5, 192.168.0.5 for NS-6). ✓ = reachable; ✗ = no link; – = not applicable (CHROMA).",
+  "PNG":             "Checks that the handler's site-count screenshot (PNG) is reachable and was captured successfully.",
+  "SITES":           "Compares the site count detected from the screenshot (PNG) against the site count reported in the CSV (handler config). ✓ MATCH = they agree; ✗ MISMATCH = the handler's reported sites don't match what the screenshot shows — may indicate a stale config or a handler running a different site setup than expected.",
+  "BIN_MAP":         "Checks bin_mapping.json for this handler: present, fresh (not flagged or timed-out stale), and — for NS-3/4/5/6 — in agreement with its sibling NS handlers' AUTO1/AUTO2/AUTO3 bin lists. ⚠ STALE = mapping hasn't refreshed recently; ✗ MISSING = no entry for this handler; ✗ DRIFT = this handler's bin routing differs from another NS handler's, which may mean it's been reconfigured unintentionally; ✗ ERROR = handler is in an ESSProd error state, so its bin mapping can't be trusted as current (same reason SITES skips its check during an error)."
+};
+
+// How long to wait after triggering the check before fetching health.json.
+// The check typically takes ~15-25s depending on SSH timeouts.
+var HEALTH_CHECK_WAIT_MS = 20000;
+
+// How many times to retry fetching health.json if the timestamp hasn't advanced.
+var FETCH_RETRIES = 3;
+var FETCH_RETRY_DELAY_MS = 5000;
+
+function setStatus(msg) {
+  document.getElementById("health-status-msg").textContent = msg;
+}
+
+function colHeader(label) {
+  var hint = COL_HINTS[label];
+  if (hint) {
+    return '<th><span class="col-hint">' + label + '<span class="tooltip">' + hint + '</span></span></th>';
+  }
+  return '<th>' + label + '</th>';
+}
+
+function svcCell(name) {
+  var desc = SERVICE_DESC[name] || "";
+  var short = name.replace(".service", "");
+  if (desc) {
+    return '<td><span class="svc-name">' + short + '<span class="tooltip">' + desc + '</span></span></td>';
+  }
+  return '<td>' + short + '</td>';
+}
+
+function statusCell(status) {
+  if (status === "OK") {
+    return '<td class="ok">&#10003; OK</td>';
+  } else {
+    return '<td class="notok">&#10007; ' + status + '</td>';
+  }
+}
+
+function boolCell(ok, labelOk, labelFail) {
+  labelOk   = labelOk   || "OK";
+  labelFail = labelFail || "—";
+  if (ok) {
+    return '<td class="ok">&#10003; ' + labelOk + '</td>';
+  } else {
+    return '<td class="notok">&#10007; ' + labelFail + '</td>';
+  }
+}
+
+function webOcrCell(wo) {
+  if (!wo) return '<td class="skip">—</td>';
+  var st = wo.status;
+  var w  = wo.web_count;
+  var o  = wo.ocr_count;
+  if (st === "OK") {
+    return '<td class="ok">&#10003; WEB:' + w + ' OCR:' + o + '</td>';
+  } else if (st === "WARN") {
+    return '<td class="warn">&#9888; WEB:' + w + ' OCR:' + o + '</td>';
+  } else if (st === "OCR") {
+    return '<td class="skip">&#8211; WEB:' + w + ' OCR:' + o + '</td>';
+  } else {
+    return '<td class="skip">? ' + st + '</td>';
+  }
+}
+
+function ethCell(eth) {
+  if (!eth) return '<td class="skip">—</td>';
+  var st = eth.status;
+  if (st === "N/A") {
+    return '<td class="skip">&#8211;</td>';
+  } else if (st === "OK") {
+    return '<td class="ok">&#10003;</td>';
+  } else if (st === "DOWN") {
+    return '<td class="notok">&#10007; DOWN</td>';
+  } else {
+    return '<td class="warn">? ' + st + '</td>';
+  }
+}
+
+function pngConnectedCell(status) {
+  if (!status) return '<td class="skip">—</td>';
+  if (status === "OK") {
+    return '<td class="ok">&#10003; OK</td>';
+  } else {
+    return '<td class="notok">&#10007; ' + status + '</td>';
+  }
+}
+
+function sitesCell(sites) {
+  if (!sites || !sites.result) return '<td class="skip">—</td>';
+  if (sites.result === "MATCH") {
+    return '<td class="ok">&#10003; MATCH</td>';
+  } else if (sites.result === "MISMATCH") {
+    var pngList = (sites.png || []).join(",");
+    return '<td class="notok">&#10007; MISMATCH (csv: ' + sites.csv + ' / png: ' + pngList + ')</td>';
+  } else {
+    return '<td class="warn">? ' + sites.result + '</td>';
+  }
+}
+
+function binMapCell(bm) {
+  if (!bm || !bm.status) return '<td class="skip">—</td>';
+  if (bm.status === "OK") {
+    return '<td class="ok">&#10003; OK</td>';
+  } else if (bm.status === "STALE") {
+    return '<td class="warn">&#9888; STALE (' + (bm.ts || "?") + ')</td>';
+  } else if (bm.status === "MISSING") {
+    return '<td class="notok">&#10007; MISSING</td>';
+  } else if (bm.status === "DRIFT") {
+    var against = (bm.drift_against || []).join(", ");
+    return '<td class="notok">&#10007; DRIFT vs ' + against + '</td>';
+  } else if (bm.status === "FILE_ERROR") {
+    return '<td class="notok">&#10007; FILE_ERROR</td>';
+  } else if (bm.status === "ERROR") {
+    return '<td class="notok">&#10007; ERROR (handler in error)</td>';
+  } else {
+    return '<td class="warn">? ' + bm.status + '</td>';
+  }
+}
+
+function lotSettingCell(ls) {
+  if (!ls || !ls.status) {
+    return '<td class="skip">—</td>';
+  }
+  var st = ls.status;
+  if (st === "ok") {
+    return '<td class="ok">&#10003; OK</td>';
+  } else if (st === "stuck_loop") {
+    return '<td class="notok">&#10007; STUCK</td>';
+  } else if (st === "no_log") {
+    return '<td class="skip">no log</td>';
+  } else if (st === "skipped") {
+    return '<td class="skip">—</td>';
+  } else if (st === "unreachable") {
+    return '<td class="notok">&#10007; UNREACH</td>';
+  } else {
+    return '<td class="warn">' + st + '</td>';
+  }
+}
+
+// =====================================================
+// RENDER health.json DATA INTO THE PAGE
+// =====================================================
+function renderHealth(data) {
+  document.getElementById("health-timestamp").textContent = "Last updated: " + data.timestamp;
+
+  var html = "";
+
+  // LOCAL SERVICES
+  html += "<h3>LOCAL SERVICES (Pi)</h3>";
+  html += "<table><tr><th>SERVICE</th><th>STATUS</th><th>PORT</th></tr>";
+  for (var i = 0; i < data.local.length; i++) {
+    var row = data.local[i];
+    var portCell = "<td>" + (row.port ? (":" + row.port) : "&#8211;") + "</td>";
+    html += "<tr>" + svcCell(row.service) + statusCell(row.status) + portCell + "</tr>";
+  }
+  html += "</table><br>";
+
+  // HANDLER Pi SERVICES
+  html += "<h3>HANDLER Pi SERVICES</h3>";
+  html += "<table><tr><th>HANDLER</th><th>IP</th>";
+  for (var j = 0; j < data.handler_service_names.length; j++) {
+    var sname = data.handler_service_names[j];
+    var desc  = SERVICE_DESC[sname] || "";
+    var short = sname.replace(".service", "");
+    if (desc) {
+      html += '<th><span class="svc-name" style="color:white;border-bottom-color:#aaa;">' + short + '<span class="tooltip">' + desc + '</span></span></th>';
+    } else {
+      html += "<th>" + short + "</th>";
+    }
+  }
+  html += '<th><span class="col-hint" style="color:white;border-bottom-color:#aaa;">WEB/OCR<span class="tooltip">' + COL_HINTS["WEB/OCR"] + '</span></span></th>';
+  html += '<th><span class="col-hint" style="color:white;border-bottom-color:#aaa;">ETH<span class="tooltip">'     + COL_HINTS["ETH"]     + '</span></span></th>';
+  html += '<th><span class="col-hint" style="color:white;border-bottom-color:#aaa;">PNG<span class="tooltip">'     + COL_HINTS["PNG"]     + '</span></span></th>';
+  html += '<th><span class="col-hint" style="color:white;border-bottom-color:#aaa;">SITES<span class="tooltip">'   + COL_HINTS["SITES"]   + '</span></span></th>';
+  html += '<th><span class="col-hint" style="color:white;border-bottom-color:#aaa;">BIN_MAP<span class="tooltip">' + COL_HINTS["BIN_MAP"] + '</span></span></th>';
+  html += "</tr>";
+
+  for (var i = 0; i < data.handlers.length; i++) {
+    var h = data.handlers[i];
+    html += "<tr><td>" + h.name + "</td><td>" + h.ip + "</td>";
+    for (var j = 0; j < data.handler_service_names.length; j++) {
+      html += statusCell(h.services[data.handler_service_names[j]]);
+    }
+    html += webOcrCell(h.web_ocr);
+    html += ethCell(h.handler_eth);
+    html += pngConnectedCell(h.png_connected);
+    html += sitesCell(h.png_sites);
+    html += binMapCell(h.bin_mapping);
+    html += "</tr>";
+  }
+  html += "</table>";
+
+  // TESTERS
+  if (data.testers && data.testers.length > 0) {
+    html += "<h3>TESTERS</h3>";
+    html += "<table>";
+    html += "<tr>" +
+      "<th>TESTER</th>" +
+      colHeader("READ LOT") +
+      colHeader("ESS LOT SETTINGS") +
+      colHeader("DRIVE") +
+      colHeader("SPLASHTOP") +
+      colHeader("LOT SETTING LOG") +
+      "</tr>";
+
+    for (var i = 0; i < data.testers.length; i++) {
+      var t = data.testers[i];
+
+      if (t.status === "skipped") {
+        html += "<tr><td>" + t.name + "</td><td colspan='5' class='skip'>not SSH-managed</td></tr>";
+        continue;
+      }
+
+      if (t.status === "unreachable") {
+        html += "<tr><td>" + t.name + "</td><td colspan='5' class='notok'>&#10007; UNREACHABLE</td></tr>";
+        continue;
+      }
+
+      var driveStatus = (t.drive && t.drive.status) || "unknown";
+      var splshStatus = (t.splashtop && t.splashtop.status) || "unknown";
+
+      var readLotOk = t.read_lot > 0;
+      var essLotOk  = (t.ess_lot_main > 0) || (t.ess_lot_worker > 0);
+      var driveOk   = driveStatus === "ok" || driveStatus === "already_ok";
+      var splshOk   = splshStatus === "ok" || splshStatus === "started";
+
+      html += "<tr>";
+      html += "<td>" + t.name + "</td>";
+      html += boolCell(readLotOk);
+      html += boolCell(essLotOk);
+      html += boolCell(driveOk, "OK", driveStatus.toUpperCase());
+      html += boolCell(splshOk, splshStatus === "started" ? "STARTED" : "OK", splshStatus.toUpperCase());
+      html += lotSettingCell(t.lotsetting);
+      html += "</tr>";
+
+      if (t.warnings && t.warnings.length > 0) {
+        html += '<tr><td></td><td colspan="5">';
+        html += '<ul class="warn-list">';
+        for (var w = 0; w < t.warnings.length; w++) {
+          html += "<li>&#9888; " + t.warnings[w] + "</li>";
+        }
+        html += "</ul></td></tr>";
+      }
+
+      if (t.notices && t.notices.length > 0) {
+        html += '<tr><td></td><td colspan="5">';
+        html += '<ul class="notice-list">';
+        for (var n = 0; n < t.notices.length; n++) {
+          html += "<li>&#8505; " + t.notices[n] + "</li>";
+        }
+        html += "</ul></td></tr>";
+      }
+    }
+
+    html += "</table>";
+  }
+
+  document.getElementById("health-content").innerHTML = html;
+}
+
+// =====================================================
+// FETCH health.json (with retry if timestamp unchanged)
+// =====================================================
+function fetchHealthJson(previousTimestamp, retriesLeft, onDone, onError) {
+  fetch("https://raw.githubusercontent.com/RLicasESS/ESSProdStatus2/main/health.json?nocache=" + Date.now())
+    .then(function(r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      // If we triggered a fresh run, wait for a newer timestamp
+      if (previousTimestamp && data.timestamp === previousTimestamp && retriesLeft > 0) {
+        setStatus("Waiting for updated results... (" + retriesLeft + " retries left)");
+        setTimeout(function() {
+          fetchHealthJson(previousTimestamp, retriesLeft - 1, onDone, onError);
+        }, FETCH_RETRY_DELAY_MS);
+        return;
+      }
+      onDone(data);
+    })
+    .catch(function(err) {
+      onError(err);
+    });
+}
+
+// =====================================================
+// MAIN BUTTON HANDLER
+// Triggers the health check on localhost:8003, waits,
+// then fetches the updated health.json from GitHub.
+// =====================================================
+function runAndLoadHealth() {
+  var btn = document.getElementById("btn-health");
+  btn.disabled = true;
+  btn.textContent = "Running...";
+  setStatus("Triggering health check on Pi...");
+
+  // Grab the current timestamp so we can detect when a fresh run has landed
+  var previousTimestamp = null;
+  var tsEl = document.getElementById("health-timestamp");
+  var tsText = tsEl.textContent;
+  if (tsText.indexOf("Last updated:") === 0) {
+    previousTimestamp = tsText.replace("Last updated:", "").trim();
+  }
+
+  // Step 1: Hit systemhealth.service to kick off the script
+  fetch("http://localhost:8003/run")
+    .then(function(r) {
+      if (!r.ok) throw new Error("systemhealth returned HTTP " + r.status);
+      setStatus("Health check running on Pi — waiting ~" + (HEALTH_CHECK_WAIT_MS / 1000) + "s for results...");
+    })
+    .catch(function(err) {
+      // Service not reachable — warn but still try to fetch the last known JSON
+      setStatus("⚠ Could not reach systemhealth.service (" + err.message + ") — loading last known results.");
+    })
+    .finally(function() {
+      // Step 2: Wait for the script to finish, then fetch
+      setTimeout(function() {
+        setStatus("Fetching results from GitHub...");
+        fetchHealthJson(
+          previousTimestamp,
+          FETCH_RETRIES,
+          function(data) {
+            renderHealth(data);
+            setStatus("");
+            btn.textContent = "REFRESH HEALTH";
+            btn.disabled = false;
+          },
+          function(err) {
+            setStatus("Error loading health.json: " + err.message);
+            btn.textContent = "GET HEALTH";
+            btn.disabled = false;
+          }
+        );
+      }, HEALTH_CHECK_WAIT_MS);
+    });
+}
+
+</script>
+
+</body>
+</html>
