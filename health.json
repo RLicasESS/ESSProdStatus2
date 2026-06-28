@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-28 09:40:56",
+  "timestamp": "2026-06-28 09:43:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -80,7 +80,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 113,
+        "web_count": 114,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -110,7 +110,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 113,
+        "web_count": 114,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -144,7 +144,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 113,
+        "web_count": 114,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -288,7 +288,28 @@
     },
     {
       "name": "S100_4",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 14712
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "HP-1",
