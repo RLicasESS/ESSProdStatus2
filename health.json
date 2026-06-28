@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-28 05:36:41",
+  "timestamp": "2026-06-28 05:39:41",
   "local": [
     {
       "service": "testerstatus.service",
@@ -58,12 +58,12 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "single site 2",
+        "csv": "dual",
         "png": [
           1,
           2
         ],
-        "result": "MISMATCH"
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "OK",
@@ -179,7 +179,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 66,
+        "web_count": 67,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
