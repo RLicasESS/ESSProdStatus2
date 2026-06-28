@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-27 17:31:37",
+  "timestamp": "2026-06-27 17:35:35",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 204,
-        "ocr_last_time": "2026-06-27 17:28:48",
+        "ocr_count": 205,
+        "ocr_last_time": "2026-06-27 17:33:58",
         "status": "OCR"
       },
       "handler_eth": {
@@ -58,13 +58,16 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "csv": "single site 2",
+        "png": [
+          1,
+          2
+        ],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
+        "status": "OK",
+        "ts": "2026-06-27T12:20:35",
         "drift_against": []
       }
     },
@@ -77,7 +80,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 205,
+        "web_count": 206,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -89,13 +92,17 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "drift_against": []
+        "status": "DRIFT",
+        "ts": "2026-06-27T12:20:35",
+        "drift_against": [
+          "NS-6"
+        ]
       }
     },
     {
@@ -107,7 +114,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 205,
+        "web_count": 206,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -141,7 +148,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 205,
+        "web_count": 206,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,7 +178,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 205,
+        "web_count": 206,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
