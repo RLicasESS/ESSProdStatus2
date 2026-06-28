@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-27 21:52:37",
+  "timestamp": "2026-06-27 21:57:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 254,
-        "ocr_last_time": "2026-06-27 21:48:02",
+        "ocr_count": 255,
+        "ocr_last_time": "2026-06-27 21:53:13",
         "status": "OCR"
       },
       "handler_eth": {
@@ -58,12 +58,12 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "dual",
+        "csv": "single site 2",
         "png": [
           1,
           2
         ],
-        "result": "MATCH"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
         "status": "OK",
@@ -80,7 +80,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 256,
+        "web_count": 257,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -110,7 +110,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 256,
+        "web_count": 257,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -144,7 +144,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 256,
+        "web_count": 257,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -179,7 +179,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 256,
+        "web_count": 257,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -191,19 +191,13 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [
-          1
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "DRIFT",
-        "ts": "2026-06-27T12:20:35",
-        "drift_against": [
-          "NS-3",
-          "NS-4",
-          "NS-5"
-        ]
+        "status": "ERROR",
+        "ts": null,
+        "drift_against": []
       }
     }
   ],
