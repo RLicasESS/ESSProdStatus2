@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-28 12:16:34",
+  "timestamp": "2026-06-28 12:21:35",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 114,
-        "ocr_last_time": "2026-06-28 12:14:04",
+        "ocr_count": 115,
+        "ocr_last_time": "2026-06-28 12:19:15",
         "status": "OCR"
       },
       "handler_eth": {
@@ -66,7 +66,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "STALE",
         "ts": "2026-06-27T12:20:35",
         "drift_against": []
       }
@@ -80,7 +80,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 144,
+        "web_count": 145,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -98,7 +98,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "DRIFT",
+        "status": "STALE",
         "ts": "2026-06-27T12:20:35",
         "drift_against": [
           "NS-6"
@@ -114,7 +114,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 143,
+        "web_count": 144,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -132,7 +132,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "DRIFT",
+        "status": "STALE",
         "ts": "2026-06-27T12:20:35",
         "drift_against": [
           "NS-6"
@@ -148,7 +148,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 144,
+        "web_count": 145,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -159,15 +159,15 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "single site 1",
+        "csv": "dual",
         "png": [
           1,
           2
         ],
-        "result": "MISMATCH"
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "DRIFT",
+        "status": "STALE",
         "ts": "2026-06-27T12:20:35",
         "drift_against": [
           "NS-6"
@@ -183,7 +183,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 144,
+        "web_count": 145,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -201,7 +201,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "DRIFT",
+        "status": "STALE",
         "ts": "2026-06-27T12:20:35",
         "drift_against": [
           "NS-3",
