@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 15:23:53",
+  "timestamp": "2026-06-29 15:27:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 172,
-        "ocr_last_time": "2026-06-29 15:19:25",
+        "ocr_count": 173,
+        "ocr_last_time": "2026-06-29 15:24:34",
         "status": "OCR"
       },
       "handler_eth": {
@@ -77,7 +77,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 180,
+        "web_count": 181,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -145,7 +145,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 180,
+        "web_count": 181,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -180,7 +180,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 180,
+        "web_count": 181,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -193,10 +193,9 @@
       "png_sites": {
         "csv": "single site 1",
         "png": [
-          1,
-          2
+          1
         ],
-        "result": "MISMATCH"
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "DRIFT",
@@ -297,17 +296,14 @@
     {
       "name": "S100_4",
       "status": "ok",
-      "pythonw_count": 2,
-      "read_lot": 0,
-      "ess_lot_main": 0,
+      "pythonw_count": 5,
+      "read_lot": 1,
+      "ess_lot_main": 2,
       "ess_lot_worker": 2,
       "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+        "EXTRA: 2 ESS Lot mains running (expected 1)"
       ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
-      ],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
