@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 14:24:50",
+  "timestamp": "2026-06-29 14:29:46",
   "local": [
     {
       "service": "testerstatus.service",
@@ -80,7 +80,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 169,
+        "web_count": 170,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -114,7 +114,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 169,
+        "web_count": 170,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -148,7 +148,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 169,
+        "web_count": 170,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -160,17 +160,13 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [
-          1
-        ],
-        "result": "MISMATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "DRIFT",
-        "ts": "2026-06-29T13:58:16",
-        "drift_against": [
-          "NS-6"
-        ]
+        "status": "ERROR",
+        "ts": null,
+        "drift_against": []
       }
     },
     {
@@ -182,7 +178,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 169,
+        "web_count": 170,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -291,28 +287,7 @@
     },
     {
       "name": "S100_4",
-      "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "ok",
-        "pid": 14712
-      },
-      "lotsetting": {
-        "status": "unreachable",
-        "detail": "SSH failed",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "HP-1",
