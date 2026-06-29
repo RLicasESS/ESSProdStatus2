@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 09:51:34",
+  "timestamp": "2026-06-29 09:56:36",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 114,
-        "ocr_last_time": "2026-06-29 09:49:38",
+        "ocr_count": 115,
+        "ocr_last_time": "2026-06-29 09:54:47",
         "status": "OCR"
       },
       "handler_eth": {
@@ -63,7 +63,7 @@
         "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "STALE",
         "ts": "2026-06-29T08:09:02",
         "drift_against": []
       }
@@ -71,40 +71,6 @@
     {
       "name": "NS-3",
       "ip": "172.18.161.100",
-      "services": {
-        "handlerstatus.service": "OK",
-        "requestserver.service": "OK",
-        "ssh.service": "OK"
-      },
-      "web_ocr": {
-        "web_count": 115,
-        "ocr_count": 0,
-        "ocr_last_time": null,
-        "status": "OK"
-      },
-      "handler_eth": {
-        "ip": "192.168.1.35",
-        "status": "OK"
-      },
-      "png_connected": "OK",
-      "png_sites": {
-        "csv": "single site 1",
-        "png": [
-          1
-        ],
-        "result": "MATCH"
-      },
-      "bin_mapping": {
-        "status": "DRIFT",
-        "ts": "2026-06-29T08:09:02",
-        "drift_against": [
-          "NS-6"
-        ]
-      }
-    },
-    {
-      "name": "NS-4",
-      "ip": "172.18.234.51",
       "services": {
         "handlerstatus.service": "OK",
         "requestserver.service": "OK",
@@ -122,6 +88,38 @@
       },
       "png_connected": "OK",
       "png_sites": {
+        "csv": "single site 1",
+        "png": [
+          1
+        ],
+        "result": "MATCH"
+      },
+      "bin_mapping": {
+        "status": "OK",
+        "ts": "2026-06-29T09:52:25",
+        "drift_against": []
+      }
+    },
+    {
+      "name": "NS-4",
+      "ip": "172.18.234.51",
+      "services": {
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
+      },
+      "web_ocr": {
+        "web_count": 117,
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "OK"
+      },
+      "handler_eth": {
+        "ip": "192.168.1.35",
+        "status": "OK"
+      },
+      "png_connected": "OK",
+      "png_sites": {
         "csv": "single site 2",
         "png": [
           2
@@ -129,11 +127,9 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "DRIFT",
-        "ts": "2026-06-29T08:09:02",
-        "drift_against": [
-          "NS-6"
-        ]
+        "status": "OK",
+        "ts": "2026-06-29T09:52:25",
+        "drift_against": []
       }
     },
     {
@@ -145,7 +141,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 115,
+        "web_count": 116,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -164,11 +160,9 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "DRIFT",
-        "ts": "2026-06-29T08:09:02",
-        "drift_against": [
-          "NS-6"
-        ]
+        "status": "OK",
+        "ts": "2026-06-29T09:52:25",
+        "drift_against": []
       }
     },
     {
@@ -180,7 +174,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 116,
+        "web_count": 117,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -192,12 +186,14 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
+        "status": "OK",
+        "ts": "2026-06-29T09:52:25",
         "drift_against": []
       }
     }
