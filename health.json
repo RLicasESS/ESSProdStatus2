@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 13:21:43",
+  "timestamp": "2026-06-29 13:25:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -80,7 +80,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 156,
+        "web_count": 157,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -112,7 +112,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 157,
+        "web_count": 158,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -144,7 +144,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 156,
+        "web_count": 157,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -155,12 +155,12 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "dual",
+        "csv": "single site 1",
         "png": [
           1,
           2
         ],
-        "result": "MATCH"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
         "status": "OK",
@@ -289,11 +289,13 @@
     {
       "name": "S100_4",
       "status": "ok",
-      "pythonw_count": 3,
+      "pythonw_count": 5,
       "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
+      "ess_lot_main": 2,
+      "ess_lot_worker": 2,
+      "warnings": [
+        "EXTRA: 2 ESS Lot mains running (expected 1)"
+      ],
       "notices": [],
       "drive": {
         "status": "ok",
