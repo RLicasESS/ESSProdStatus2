@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 13:57:38",
+  "timestamp": "2026-06-29 14:01:41",
   "local": [
     {
       "service": "testerstatus.service",
@@ -67,45 +67,13 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-06-29T11:03:40",
+        "ts": "2026-06-29T13:58:16",
         "drift_against": []
       }
     },
     {
       "name": "NS-3",
       "ip": "172.18.161.100",
-      "services": {
-        "handlerstatus.service": "OK",
-        "requestserver.service": "OK",
-        "ssh.service": "OK"
-      },
-      "web_ocr": {
-        "web_count": 163,
-        "ocr_count": 0,
-        "ocr_last_time": null,
-        "status": "OK"
-      },
-      "handler_eth": {
-        "ip": "192.168.1.35",
-        "status": "OK"
-      },
-      "png_connected": "OK",
-      "png_sites": {
-        "csv": "single site 1",
-        "png": [
-          1
-        ],
-        "result": "MATCH"
-      },
-      "bin_mapping": {
-        "status": "OK",
-        "ts": "2026-06-29T11:03:40",
-        "drift_against": []
-      }
-    },
-    {
-      "name": "NS-4",
-      "ip": "172.18.234.51",
       "services": {
         "handlerstatus.service": "OK",
         "requestserver.service": "OK",
@@ -123,6 +91,40 @@
       },
       "png_connected": "OK",
       "png_sites": {
+        "csv": "single site 1",
+        "png": [
+          1
+        ],
+        "result": "MATCH"
+      },
+      "bin_mapping": {
+        "status": "DRIFT",
+        "ts": "2026-06-29T13:58:16",
+        "drift_against": [
+          "NS-6"
+        ]
+      }
+    },
+    {
+      "name": "NS-4",
+      "ip": "172.18.234.51",
+      "services": {
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
+      },
+      "web_ocr": {
+        "web_count": 165,
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "OK"
+      },
+      "handler_eth": {
+        "ip": "192.168.1.35",
+        "status": "OK"
+      },
+      "png_connected": "OK",
+      "png_sites": {
         "csv": "single site 2",
         "png": [
           2
@@ -130,9 +132,11 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "OK",
-        "ts": "2026-06-29T11:03:40",
-        "drift_against": []
+        "status": "DRIFT",
+        "ts": "2026-06-29T13:58:16",
+        "drift_against": [
+          "NS-6"
+        ]
       }
     },
     {
@@ -144,7 +148,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 163,
+        "web_count": 164,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -156,13 +160,18 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "drift_against": []
+        "status": "DRIFT",
+        "ts": "2026-06-29T13:58:16",
+        "drift_against": [
+          "NS-6"
+        ]
       }
     },
     {
@@ -186,13 +195,20 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1,
+          2
+        ],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "drift_against": []
+        "status": "DRIFT",
+        "ts": "2026-06-29T13:58:16",
+        "drift_against": [
+          "NS-3",
+          "NS-4",
+          "NS-5"
+        ]
       }
     }
   ],
