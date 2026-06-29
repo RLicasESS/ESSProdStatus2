@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-28 17:35:33",
+  "timestamp": "2026-06-28 17:39:35",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 175,
-        "ocr_last_time": "2026-06-28 17:30:27",
+        "ocr_count": 176,
+        "ocr_last_time": "2026-06-28 17:35:38",
         "status": "OCR"
       },
       "handler_eth": {
@@ -66,8 +66,8 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "STALE",
-        "ts": "2026-06-27T12:20:35",
+        "status": "OK",
+        "ts": "2026-06-28T17:35:44",
         "drift_against": []
       }
     },
@@ -98,11 +98,9 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "STALE",
-        "ts": "2026-06-27T12:20:35",
-        "drift_against": [
-          "NS-6"
-        ]
+        "status": "OK",
+        "ts": "2026-06-28T17:35:45",
+        "drift_against": []
       }
     },
     {
@@ -132,11 +130,9 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "STALE",
-        "ts": "2026-06-27T12:20:35",
-        "drift_against": [
-          "NS-6"
-        ]
+        "status": "OK",
+        "ts": "2026-06-28T17:35:45",
+        "drift_against": []
       }
     },
     {
@@ -148,7 +144,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 206,
+        "web_count": 207,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -167,11 +163,9 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "STALE",
-        "ts": "2026-06-27T12:20:35",
-        "drift_against": [
-          "NS-6"
-        ]
+        "status": "OK",
+        "ts": "2026-06-28T17:35:45",
+        "drift_against": []
       }
     },
     {
@@ -183,7 +177,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 206,
+        "web_count": 207,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -201,13 +195,9 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "STALE",
-        "ts": "2026-06-27T12:20:35",
-        "drift_against": [
-          "NS-3",
-          "NS-4",
-          "NS-5"
-        ]
+        "status": "OK",
+        "ts": "2026-06-28T17:35:45",
+        "drift_against": []
       }
     }
   ],
