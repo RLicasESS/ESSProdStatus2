@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 15:41:38",
+  "timestamp": "2026-06-29 15:45:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 176,
-        "ocr_last_time": "2026-06-29 15:39:59",
+        "ocr_count": 177,
+        "ocr_last_time": "2026-06-29 15:45:07",
         "status": "OCR"
       },
       "handler_eth": {
@@ -63,7 +63,7 @@
         "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "STALE",
         "ts": "2026-06-29T13:58:16",
         "drift_against": []
       }
@@ -96,7 +96,7 @@
       },
       "bin_mapping": {
         "status": "DRIFT",
-        "ts": "2026-06-29T13:58:16",
+        "ts": "2026-06-29T15:42:10",
         "drift_against": [
           "NS-6"
         ]
@@ -111,7 +111,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 184,
+        "web_count": 185,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -130,7 +130,7 @@
       },
       "bin_mapping": {
         "status": "DRIFT",
-        "ts": "2026-06-29T13:58:16",
+        "ts": "2026-06-29T15:42:10",
         "drift_against": [
           "NS-6"
         ]
@@ -157,13 +157,18 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "drift_against": []
+        "status": "DRIFT",
+        "ts": "2026-06-29T15:42:10",
+        "drift_against": [
+          "NS-6"
+        ]
       }
     },
     {
@@ -175,7 +180,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 184,
+        "web_count": 185,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -187,20 +192,13 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [
-          1,
-          2
-        ],
-        "result": "MISMATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "DRIFT",
-        "ts": "2026-06-29T13:58:16",
-        "drift_against": [
-          "NS-3",
-          "NS-4",
-          "NS-5"
-        ]
+        "status": "ERROR",
+        "ts": null,
+        "drift_against": []
       }
     }
   ],
