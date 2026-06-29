@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 01:07:35",
+  "timestamp": "2026-06-29 01:11:35",
   "local": [
     {
       "service": "testerstatus.service",
@@ -142,7 +142,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 13,
+        "web_count": 14,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -172,7 +172,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 13,
+        "web_count": 14,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -220,7 +220,7 @@
       },
       "splashtop": {
         "status": "ok",
-        "pid": 1591092
+        "pid": 1955176
       },
       "lotsetting": {
         "status": "ok",
