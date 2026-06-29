@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 16:12:38",
+  "timestamp": "2026-06-29 16:16:37",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 182,
-        "ocr_last_time": "2026-06-29 16:10:49",
+        "ocr_count": 183,
+        "ocr_last_time": "2026-06-29 16:15:57",
         "status": "OCR"
       },
       "handler_eth": {
@@ -59,7 +59,9 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
+        "png": [
+          2
+        ],
         "result": "MISMATCH"
       },
       "bin_mapping": {
@@ -111,7 +113,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 190,
+        "web_count": 191,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -180,7 +182,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 190,
+        "web_count": 191,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
