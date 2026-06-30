@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29 17:32:35",
+  "timestamp": "2026-06-29 17:37:37",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 197,
-        "ocr_last_time": "2026-06-29 17:28:00",
+        "ocr_count": 198,
+        "ocr_last_time": "2026-06-29 17:33:09",
         "status": "OCR"
       },
       "handler_eth": {
@@ -77,7 +77,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 205,
+        "web_count": 206,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -113,7 +113,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 206,
+        "web_count": 207,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -149,7 +149,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 205,
+        "web_count": 206,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -186,7 +186,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 206,
+        "web_count": 207,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -303,13 +303,11 @@
     {
       "name": "S100_4",
       "status": "ok",
-      "pythonw_count": 5,
+      "pythonw_count": 3,
       "read_lot": 1,
-      "ess_lot_main": 2,
-      "ess_lot_worker": 2,
-      "warnings": [
-        "EXTRA: 2 ESS Lot mains running (expected 1)"
-      ],
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
       "notices": [],
       "drive": {
         "status": "ok",
@@ -321,8 +319,8 @@
         "pid": 11256
       },
       "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
+        "status": "unreachable",
+        "detail": "SSH failed",
         "overflow_count": 0,
         "correction_count": 0
       }
