@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-30 11:33:33",
+  "timestamp": "2026-06-30 11:37:35",
   "local": [
     {
       "service": "testerstatus.service",
@@ -77,7 +77,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 135,
+        "web_count": 136,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -149,7 +149,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 135,
+        "web_count": 136,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -235,7 +235,7 @@
       "warnings": [],
       "notices": [],
       "drive": {
-        "status": "not_mapped",
+        "status": "ok",
         "drive": "T",
         "remote": "\\\\172.18.155.223\\tester"
       },
