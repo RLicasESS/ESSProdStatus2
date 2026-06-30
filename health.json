@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-30 16:22:36",
+  "timestamp": "2026-06-30 16:26:34",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 191,
-        "ocr_last_time": "2026-06-30 16:21:04",
+        "ocr_count": 192,
+        "ocr_last_time": "2026-06-30 16:26:14",
         "status": "OCR"
       },
       "handler_eth": {
@@ -66,7 +66,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-06-30T14:10:18",
+        "ts": "2026-06-30T16:22:54",
         "drift_against": []
       }
     },
@@ -79,7 +79,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 191,
+        "web_count": 192,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -98,7 +98,7 @@
       },
       "bin_mapping": {
         "status": "DRIFT",
-        "ts": "2026-06-30T14:10:19",
+        "ts": "2026-06-30T16:22:54",
         "drift_against": [
           "NS-4",
           "NS-5",
@@ -115,7 +115,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 192,
+        "web_count": 193,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -134,7 +134,7 @@
       },
       "bin_mapping": {
         "status": "DRIFT",
-        "ts": "2026-06-30T14:10:19",
+        "ts": "2026-06-30T16:22:54",
         "drift_against": [
           "NS-3",
           "NS-5",
@@ -171,7 +171,7 @@
       },
       "bin_mapping": {
         "status": "DRIFT",
-        "ts": "2026-06-30T14:10:19",
+        "ts": "2026-06-30T16:22:55",
         "drift_against": [
           "NS-3",
           "NS-4",
@@ -188,7 +188,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 192,
+        "web_count": 193,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -201,14 +201,13 @@
       "png_sites": {
         "csv": "single site 1",
         "png": [
-          1,
-          2
+          1
         ],
-        "result": "MISMATCH"
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "DRIFT",
-        "ts": "2026-06-30T14:10:19",
+        "ts": "2026-06-30T16:22:55",
         "drift_against": [
           "NS-3",
           "NS-4",
