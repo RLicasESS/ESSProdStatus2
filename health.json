@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-01 09:41:35",
+  "timestamp": "2026-07-01 09:45:40",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 113,
-        "ocr_last_time": "2026-07-01 09:39:40",
+        "ocr_count": 114,
+        "ocr_last_time": "2026-07-01 09:44:50",
         "status": "OCR"
       },
       "handler_eth": {
@@ -79,7 +79,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 113,
+        "web_count": 114,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -109,7 +109,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 113,
+        "web_count": 114,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -145,7 +145,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 113,
+        "web_count": 114,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -182,7 +182,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 114,
+        "web_count": 115,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -195,10 +195,9 @@
       "png_sites": {
         "csv": "single site 1",
         "png": [
-          1,
-          2
+          1
         ],
-        "result": "MISMATCH"
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "DRIFT",
@@ -315,8 +314,8 @@
         "pid": 11256
       },
       "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
+        "status": "unreachable",
+        "detail": "SSH failed",
         "overflow_count": 0,
         "correction_count": 0
       }
