@@ -357,7 +357,7 @@ var COL_HINTS = {
   "ETH":             "Pings the handler's direct ethernet IP from the Pi (192.168.1.35 for NS-3/4/5, 192.168.0.5 for NS-6). ✓ = reachable; ✗ = no link; – = not applicable (CHROMA).",
   "PNG":             "Checks that the handler's site-count screenshot (PNG) is reachable and was captured successfully.",
   "SITES":           "Compares the site count detected from the screenshot (PNG) against the site count reported in the CSV (handler config). ✓ MATCH = they agree; ✗ MISMATCH = the handler's reported sites don't match what the screenshot shows — may indicate a stale config or a handler running a different site setup than expected.",
-  "BIN_MAP":         "Checks bin_mapping.json for this handler: present, fresh (not flagged or timed-out stale), and — for NS-3/4/5/6 — in agreement with its sibling NS handlers' AUTO1/AUTO2/AUTO3 bin lists. ⚠ STALE = mapping hasn't refreshed recently; ✗ MISSING = no entry for this handler; ✗ MISMATCH = this handler's bin routing differs from another NS handler's, which may mean it's been reconfigured unintentionally; ✗ ERROR = handler is in an ESSProd error state, so its bin mapping can't be trusted as current (same reason SITES skips its check during an error)."
+  "BIN_MAP":         "Checks bin_mapping.json for this handler: present, fresh (not flagged or timed-out stale), and — by re-reading the handler's current screenshot — in agreement with what's actually on screen right now. \u26a0 STALE = mapping hasn't refreshed recently; \u2717 MISSING = no entry for this handler; \u2717 MISMATCH = the live screenshot's bin routing differs from what's stored in bin_mapping.json, which may mean the JSON is out of date or was written from a bad read; ? UNKNOWN = couldn't get a reliable live read to compare against (e.g. a dialog covering the screen); \u2717 ERROR = handler is in an ESSProd error state, so its bin mapping can't be trusted as current (same reason SITES skips its check during an error)."
 };
 
 // How long to wait after triggering the check before fetching health.json.
@@ -458,6 +458,13 @@ function sitesCell(sites) {
   }
 }
 
+function fmtBins(b) {
+  if (!b) return "?";
+  return ["AUTO1", "AUTO2", "AUTO3"].map(function(k) {
+    return k + "=" + (b[k] || "\u2013");
+  }).join(" ");
+}
+
 function binMapCell(bm) {
   if (!bm || !bm.status) return '<td class="skip">—</td>';
   if (bm.status === "OK") {
@@ -466,9 +473,11 @@ function binMapCell(bm) {
     return '<td class="warn">&#9888; STALE (' + (bm.ts || "?") + ')</td>';
   } else if (bm.status === "MISSING") {
     return '<td class="notok">&#10007; MISSING</td>';
-  } else if (bm.status === "DRIFT") {
-    var against = (bm.drift_against || []).join(", ");
-    return '<td class="notok">&#10007; MISMATCH vs ' + against + '</td>';
+  } else if (bm.status === "MISMATCH") {
+    return '<td class="notok">&#10007; MISMATCH (json: ' + fmtBins(bm.json_bins) +
+           ' / png: ' + fmtBins(bm.png_bins) + ')</td>';
+  } else if (bm.status === "UNKNOWN") {
+    return '<td class="warn">? UNKNOWN</td>';
   } else if (bm.status === "FILE_ERROR") {
     return '<td class="notok">&#10007; FILE_ERROR</td>';
   } else if (bm.status === "ERROR") {
