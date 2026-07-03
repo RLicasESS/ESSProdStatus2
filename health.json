@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-02 17:16:39",
+  "timestamp": "2026-07-02 17:20:41",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 201,
-        "ocr_last_time": "2026-07-02 17:14:58",
+        "ocr_count": 202,
+        "ocr_last_time": "2026-07-02 17:20:09",
         "status": "OCR"
       },
       "handler_eth": {
@@ -65,7 +65,7 @@
         "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "STALE",
+        "status": "OK",
         "ts": "2026-07-01T16:36:29",
         "json_bins": {
           "AUTO1": "1",
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 202,
+        "web_count": 203,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -107,7 +107,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "STALE",
+        "status": "MISMATCH",
         "ts": "2026-07-01T16:36:29",
         "json_bins": {
           "AUTO1": "1",
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 202,
+        "web_count": 203,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -148,7 +148,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "STALE",
+        "status": "OK",
         "ts": "2026-07-01T16:36:30",
         "json_bins": {
           "AUTO1": "1",
@@ -171,7 +171,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 202,
+        "web_count": 203,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -190,7 +190,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "STALE",
+        "status": "OK",
         "ts": "2026-07-01T16:36:30",
         "json_bins": {
           "AUTO1": "1",
@@ -232,7 +232,7 @@
         "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "STALE",
+        "status": "OK",
         "ts": "2026-07-01T16:36:30",
         "json_bins": {
           "AUTO1": "1, 5",
