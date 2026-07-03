@@ -465,17 +465,25 @@ function fmtBins(b) {
   }).join(" ");
 }
 
+function fmtBinsDiff(jsonB, pngB) {
+  var jb = jsonB || {};
+  var pb = pngB || {};
+  var diffs = ["AUTO1", "AUTO2", "AUTO3"].filter(function(k) {
+    return (jb[k] || "") !== (pb[k] || "");
+  }).map(function(k) {
+    return k + ": json=" + (jb[k] || "\u2013") + " / png=" + (pb[k] || "\u2013");
+  });
+  return diffs.length ? diffs.join(", ") : "no field diff";
+}
+
 function binMapCell(bm) {
   if (!bm || !bm.status) return '<td class="skip">—</td>';
-  if (bm.status === "OK") {
+  if (bm.status === "OK" || bm.status === "STALE") {
     return '<td class="ok">&#10003; OK</td>';
-  } else if (bm.status === "STALE") {
-    return '<td class="warn">&#9888; STALE (' + (bm.ts || "?") + ')</td>';
   } else if (bm.status === "MISSING") {
     return '<td class="notok">&#10007; MISSING</td>';
   } else if (bm.status === "MISMATCH") {
-    return '<td class="notok">&#10007; MISMATCH (json: ' + fmtBins(bm.json_bins) +
-           ' / png: ' + fmtBins(bm.png_bins) + ')</td>';
+    return '<td class="notok">&#10007; MISMATCH (' + fmtBinsDiff(bm.json_bins, bm.png_bins) + ')</td>';
   } else if (bm.status === "UNKNOWN") {
     return '<td class="warn">? UNKNOWN</td>';
   } else if (bm.status === "FILE_ERROR") {
