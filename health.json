@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-03 20:57:37",
+  "timestamp": "2026-07-03 21:02:35",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 244,
-        "ocr_last_time": "2026-07-03 20:56:32",
+        "ocr_count": 245,
+        "ocr_last_time": "2026-07-03 21:01:43",
         "status": "OCR"
       },
       "handler_eth": {
@@ -59,112 +59,23 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 3",
-        "png": [
-          1
-        ],
+        "png": [],
         "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "STALE",
-        "ts": "2026-07-01T16:36:29",
+        "status": "UNKNOWN",
+        "ts": "2026-07-03T20:58:41",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     },
     {
       "name": "NS-3",
       "ip": "172.18.161.100",
-      "services": {
-        "handlerstatus.service": "OK",
-        "requestserver.service": "OK",
-        "ssh.service": "OK"
-      },
-      "web_ocr": {
-        "web_count": 244,
-        "ocr_count": 0,
-        "ocr_last_time": null,
-        "status": "OK"
-      },
-      "handler_eth": {
-        "ip": "192.168.1.35",
-        "status": "OK"
-      },
-      "png_connected": "OK",
-      "png_sites": {
-        "csv": "dual",
-        "png": [
-          1,
-          2
-        ],
-        "result": "MATCH"
-      },
-      "bin_mapping": {
-        "status": "OK",
-        "ts": "2026-07-02T19:57:52",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "3, 4, 5, 6, 8, 9, E",
-          "AUTO3": ""
-        },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "3, 4, 5, 6, 8, 9, E",
-          "AUTO3": ""
-        }
-      }
-    },
-    {
-      "name": "NS-4",
-      "ip": "172.18.234.51",
-      "services": {
-        "handlerstatus.service": "OK",
-        "requestserver.service": "OK",
-        "ssh.service": "OK"
-      },
-      "web_ocr": {
-        "web_count": 246,
-        "ocr_count": 0,
-        "ocr_last_time": null,
-        "status": "OK"
-      },
-      "handler_eth": {
-        "ip": "192.168.1.35",
-        "status": "OK"
-      },
-      "png_connected": "OK",
-      "png_sites": {
-        "csv": "single site 2",
-        "png": [
-          2
-        ],
-        "result": "MATCH"
-      },
-      "bin_mapping": {
-        "status": "OK",
-        "ts": "2026-07-02T19:57:52",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        }
-      }
-    },
-    {
-      "name": "NS-5",
-      "ip": "172.18.139.227",
       "services": {
         "handlerstatus.service": "OK",
         "requestserver.service": "OK",
@@ -191,7 +102,90 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-07-02T19:57:52",
+        "ts": "2026-07-03T20:58:41",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "3, 4, 5, 6, 8, 9, E",
+          "AUTO3": ""
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "3, 4, 5, 6, 8, 9, E",
+          "AUTO3": ""
+        }
+      }
+    },
+    {
+      "name": "NS-4",
+      "ip": "172.18.234.51",
+      "services": {
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
+      },
+      "web_ocr": {
+        "web_count": 247,
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "OK"
+      },
+      "handler_eth": {
+        "ip": "192.168.1.35",
+        "status": "OK"
+      },
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "single site 2",
+        "png": [
+          2
+        ],
+        "result": "MATCH"
+      },
+      "bin_mapping": {
+        "status": "OK",
+        "ts": "2026-07-03T20:58:41",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
+      }
+    },
+    {
+      "name": "NS-5",
+      "ip": "172.18.139.227",
+      "services": {
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
+      },
+      "web_ocr": {
+        "web_count": 246,
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "OK"
+      },
+      "handler_eth": {
+        "ip": "192.168.1.35",
+        "status": "OK"
+      },
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "dual",
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
+      },
+      "bin_mapping": {
+        "status": "OK",
+        "ts": "2026-07-03T20:58:41",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 4, 5",
@@ -213,7 +207,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 246,
+        "web_count": 247,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -233,7 +227,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-07-02T19:57:52",
+        "ts": "2026-07-03T20:58:41",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
