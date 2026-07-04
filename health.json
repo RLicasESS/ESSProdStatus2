@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-03 20:26:38",
+  "timestamp": "2026-07-03 20:31:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 238,
-        "ocr_last_time": "2026-07-03 20:25:29",
+        "ocr_count": 239,
+        "ocr_last_time": "2026-07-03 20:30:38",
         "status": "OCR"
       },
       "handler_eth": {
@@ -60,16 +60,12 @@
       "png_sites": {
         "csv": "single site 3",
         "png": [],
-        "result": "UNKNOWN"
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "STALE",
-        "ts": "2026-07-01T16:36:29",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        },
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
         "png_bins": null
       }
     },
@@ -82,7 +78,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 238,
+        "web_count": 239,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -124,7 +120,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 240,
+        "web_count": 241,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -165,7 +161,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 239,
+        "web_count": 240,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -207,7 +203,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 240,
+        "web_count": 241,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -220,19 +216,24 @@
       "png_sites": {
         "csv": "single site 1",
         "png": [
-          1
+          1,
+          2
         ],
-        "result": "MATCH"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
+        "status": "OK",
         "ts": "2026-07-02T19:57:52",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
           "AUTO3": "3, 4, E"
         },
-        "png_bins": null
+        "png_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "3, 4, E"
+        }
       }
     }
   ],
