@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-07 12:29:38",
+  "timestamp": "2026-07-07 12:33:47",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 146,
-        "ocr_last_time": "2026-07-07 12:27:58",
+        "ocr_count": 147,
+        "ocr_last_time": "2026-07-07 12:33:10",
         "status": "OCR"
       },
       "handler_eth": {
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 146,
+        "web_count": 147,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,7 +171,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 146,
+        "web_count": 147,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -213,7 +213,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 146,
+        "web_count": 147,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -259,7 +259,33 @@
     },
     {
       "name": "AP-2",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 2,
+      "read_lot": 0,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [
+        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+      ],
+      "notices": [
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
+      ],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 6160
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "S100_1",
