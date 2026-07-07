@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-07 11:55:42",
+  "timestamp": "2026-07-07 11:59:35",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 139,
-        "ocr_last_time": "2026-07-07 11:51:43",
+        "ocr_count": 140,
+        "ocr_last_time": "2026-07-07 11:56:54",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 139,
+        "web_count": 140,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 139,
+        "web_count": 140,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -213,7 +213,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 139,
+        "web_count": 140,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -260,16 +260,12 @@
     {
       "name": "AP-2",
       "status": "ok",
-      "pythonw_count": 2,
-      "read_lot": 0,
+      "pythonw_count": 3,
+      "read_lot": 1,
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
-      "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
-      ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
-      ],
+      "warnings": [],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
