@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-07 18:10:38",
+  "timestamp": "2026-07-07 18:14:35",
   "local": [
     {
       "service": "testerstatus.service",
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 212,
+        "web_count": 213,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 212,
+        "web_count": 213,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -170,7 +170,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 213,
+        "web_count": 214,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -212,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 212,
+        "web_count": 213,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -350,8 +350,8 @@
         "pid": 3104
       },
       "lotsetting": {
-        "status": "unreachable",
-        "detail": "SSH failed",
+        "status": "ok",
+        "detail": "no overflow errors detected",
         "overflow_count": 0,
         "correction_count": 0
       }
