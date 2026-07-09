@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-08 19:52:37",
+  "timestamp": "2026-07-08 19:57:33",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 230,
-        "ocr_last_time": "2026-07-08 19:48:45",
+        "ocr_count": 231,
+        "ocr_last_time": "2026-07-08 19:53:54",
         "status": "OCR"
       },
       "handler_eth": {
@@ -60,16 +60,12 @@
       "png_sites": {
         "csv": "single site 1",
         "png": [],
-        "result": "MISMATCH"
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
-        "ts": "2026-07-08T10:56:37",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        },
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
         "png_bins": null
       }
     },
@@ -82,7 +78,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 232,
+        "web_count": 233,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -124,7 +120,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 233,
+        "web_count": 234,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -165,7 +161,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 233,
+        "web_count": 234,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -207,7 +203,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 232,
+        "web_count": 233,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -345,8 +341,8 @@
         "pid": 3104
       },
       "lotsetting": {
-        "status": "unreachable",
-        "detail": "SSH failed",
+        "status": "ok",
+        "detail": "no overflow errors detected",
         "overflow_count": 0,
         "correction_count": 0
       }
