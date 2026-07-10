@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-10 07:03:34",
+  "timestamp": "2026-07-10 07:07:33",
   "local": [
     {
       "service": "testerstatus.service",
@@ -78,7 +78,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 83,
+        "web_count": 84,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -109,7 +109,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 83,
+        "web_count": 84,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -150,7 +150,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 83,
+        "web_count": 84,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -162,14 +162,25 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-07-09T14:31:38",
+        "json_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "4, E"
+        }
       }
     },
     {
@@ -181,7 +192,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 83,
+        "web_count": 84,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -193,14 +204,24 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1
+        ],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-07-09T14:31:38",
+        "json_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "3, 4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "3, 4, E"
+        }
       }
     }
   ],
