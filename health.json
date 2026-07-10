@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-10 13:09:35",
+  "timestamp": "2026-07-10 13:13:36",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 153,
-        "ocr_last_time": "2026-07-10 13:05:52",
+        "ocr_count": 154,
+        "ocr_last_time": "2026-07-10 13:11:03",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 154,
+        "web_count": 155,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 154,
+        "web_count": 155,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,7 +171,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 154,
+        "web_count": 155,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -182,12 +182,12 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "single site 1",
+        "csv": "dual",
         "png": [
           1,
           2
         ],
-        "result": "MISMATCH"
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "OK",
@@ -300,8 +300,8 @@
         "pid": 13824
       },
       "lotsetting": {
-        "status": "no_log",
-        "detail": "no .log files found in logs dir",
+        "status": "ok",
+        "detail": "no overflow errors detected",
         "overflow_count": 0,
         "correction_count": 0
       }
