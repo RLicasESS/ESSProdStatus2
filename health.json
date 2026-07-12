@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-11 20:07:33",
+  "timestamp": "2026-07-11 20:09:33",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,15 +48,15 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 234,
-        "ocr_last_time": "2026-07-11 20:04:24",
+        "ocr_count": 235,
+        "ocr_last_time": "2026-07-11 20:09:33",
         "status": "OCR"
       },
       "handler_eth": {
         "ip": null,
         "status": "N/A"
       },
-      "png_connected": "OK",
+      "png_connected": "UNKNOWN",
       "png_sites": {
         "csv": "single site 1",
         "png": [],
@@ -150,7 +150,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 236,
+        "web_count": 237,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -192,7 +192,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 236,
+        "web_count": 237,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
