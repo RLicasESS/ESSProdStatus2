@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-12 16:05:34",
+  "timestamp": "2026-07-12 16:09:34",
   "local": [
     {
       "service": "testerstatus.service",
@@ -78,7 +78,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 188,
+        "web_count": 189,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -89,15 +89,15 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "error",
+        "csv": "single site 1",
         "png": [
           1
         ],
-        "result": "UNKNOWN"
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-07-12T16:01:41",
+        "ts": "2026-07-12T16:06:07",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "3, 4, 5, 6, 8, 9, E",
@@ -138,7 +138,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-07-12T16:01:41",
+        "ts": "2026-07-12T16:06:07",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -160,7 +160,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 189,
+        "web_count": 190,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,16 +171,16 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "dual",
+        "csv": "error",
         "png": [
           1,
           2
         ],
-        "result": "MATCH"
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-07-12T16:01:41",
+        "ts": "2026-07-12T16:06:07",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -202,7 +202,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 189,
+        "web_count": 190,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -221,7 +221,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-07-12T16:01:41",
+        "ts": "2026-07-12T16:06:07",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
