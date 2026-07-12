@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-11 20:09:33",
+  "timestamp": "2026-07-11 20:14:32",
   "local": [
     {
       "service": "testerstatus.service",
@@ -56,7 +56,7 @@
         "ip": null,
         "status": "N/A"
       },
-      "png_connected": "UNKNOWN",
+      "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
         "png": [],
@@ -78,7 +78,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 235,
+        "web_count": 236,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -109,7 +109,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 236,
+        "web_count": 237,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
