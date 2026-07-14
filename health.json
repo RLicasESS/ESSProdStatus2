@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-14 09:02:37",
+  "timestamp": "2026-07-14 09:12:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 105,
-        "ocr_last_time": "2026-07-14 08:58:38",
+        "ocr_count": 107,
+        "ocr_last_time": "2026-07-14 09:09:00",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 106,
+        "web_count": 108,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 106,
+        "web_count": 108,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 8,
-        "ocr_last_time": "2026-07-14 08:59:05",
+        "ocr_count": 10,
+        "ocr_last_time": "2026-07-14 09:09:20",
         "status": "OCR"
       },
       "handler_eth": {
@@ -197,9 +197,9 @@
           "AUTO3": "2, 14"
         },
         "png_bins": {
-          "AUTO1": "1, 5",
-          "AUTO2": "2",
-          "AUTO3": "4, E"
+          "AUTO1": "1",
+          "AUTO2": "",
+          "AUTO3": "11"
         }
       }
     },
@@ -212,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 106,
+        "web_count": 108,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -225,23 +225,20 @@
       "png_sites": {
         "csv": "single site 1",
         "png": [
-          1
+          1,
+          2
         ],
-        "result": "MATCH"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-07-13T17:13:45",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
           "AUTO3": "3, 4, E"
         },
-        "png_bins": {
-          "AUTO1": "1, 5",
-          "AUTO2": "2",
-          "AUTO3": "3, 4, E"
-        }
+        "png_bins": null
       }
     }
   ],
@@ -325,7 +322,7 @@
       },
       "splashtop": {
         "status": "ok",
-        "pid": 3104
+        "pid": 11584
       },
       "lotsetting": {
         "status": "ok",
