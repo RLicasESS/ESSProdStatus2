@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-15 01:20:40",
+  "timestamp": "2026-07-15 01:31:45",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 16,
-        "ocr_last_time": "2026-07-15 01:18:58",
+        "ocr_count": 18,
+        "ocr_last_time": "2026-07-15 01:29:20",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 15,
+        "web_count": 17,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 16,
+        "web_count": 18,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 16,
-        "ocr_last_time": "2026-07-15 01:19:03",
+        "ocr_count": 18,
+        "ocr_last_time": "2026-07-15 01:29:19",
         "status": "OCR"
       },
       "handler_eth": {
@@ -212,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 15,
+        "web_count": 18,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -311,28 +311,7 @@
     },
     {
       "name": "S100_4",
-      "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "ok",
-        "pid": 12076
-      },
-      "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "HP-1",
