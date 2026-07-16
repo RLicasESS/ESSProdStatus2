@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-16 15:56:43",
+  "timestamp": "2026-07-16 16:06:55",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 186,
-        "ocr_last_time": "2026-07-16 15:56:10",
+        "ocr_count": 188,
+        "ocr_last_time": "2026-07-16 16:06:33",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 186,
+        "web_count": 188,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 187,
+        "web_count": 189,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -165,28 +165,30 @@
       "name": "NS-5",
       "ip": "172.18.139.227",
       "services": {
-        "handlerstatus.service": "OK",
-        "requestserver.service": "OK",
-        "ssh.service": "OK"
+        "handlerstatus.service": "DOWN",
+        "requestserver.service": "DOWN",
+        "ssh.service": "DOWN"
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 156,
-        "ocr_last_time": "2026-07-16 15:54:22",
-        "status": "OCR"
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "UNKNOWN"
       },
       "handler_eth": {
         "ip": "192.168.1.35",
-        "status": "OK"
+        "status": "UNKNOWN"
       },
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [],
-        "result": "MISMATCH"
+        "png": [
+          1
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
+        "status": "OK",
         "ts": "2026-07-15T12:03:59",
         "json_bins": {
           "AUTO1": "1, 5",
@@ -194,9 +196,9 @@
           "AUTO3": "4, E"
         },
         "png_bins": {
-          "AUTO1": "3",
-          "AUTO2": "",
-          "AUTO3": "2, 14"
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "4, E"
         }
       }
     },
@@ -209,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 97,
+        "web_count": 99,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
