@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-15 23:48:41",
+  "timestamp": "2026-07-15 23:58:43",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 276,
-        "ocr_last_time": "2026-07-15 23:45:36",
+        "ocr_count": 278,
+        "ocr_last_time": "2026-07-15 23:55:58",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 278,
+        "web_count": 280,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -100,24 +100,14 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [
-          1
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-07-15T12:03:59",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "3, 4, 5, 6, 8, 9, E",
-          "AUTO3": "7"
-        },
-        "png_bins": {
-          "AUTO1": "",
-          "AUTO2": "2, 3, 4, 6, 7, 14",
-          "AUTO3": "5"
-        }
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
+        "png_bins": null
       }
     },
     {
@@ -129,7 +119,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 279,
+        "web_count": 281,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +161,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 279,
-        "ocr_last_time": "2026-07-15 23:48:45",
+        "ocr_count": 280,
+        "ocr_last_time": "2026-07-15 23:53:53",
         "status": "OCR"
       },
       "handler_eth": {
@@ -209,7 +199,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 278,
+        "web_count": 280,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
