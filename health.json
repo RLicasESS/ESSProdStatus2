@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-19 22:14:40",
+  "timestamp": "2026-07-19 22:24:48",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 247,
-        "ocr_last_time": "2026-07-19 22:09:37",
+        "ocr_count": 249,
+        "ocr_last_time": "2026-07-19 22:19:57",
         "status": "OCR"
       },
       "handler_eth": {
@@ -59,14 +59,24 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "STALE",
+        "ts": "2026-07-18T17:13:14",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
       }
     },
     {
@@ -78,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 260,
+        "web_count": 262,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -119,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 189,
+        "web_count": 191,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -161,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 260,
-        "ocr_last_time": "2026-07-19 22:10:35",
+        "ocr_count": 262,
+        "ocr_last_time": "2026-07-19 22:20:50",
         "status": "OCR"
       },
       "handler_eth": {
@@ -201,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 261,
+        "web_count": 263,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
