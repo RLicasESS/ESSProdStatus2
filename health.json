@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-20 15:41:47",
+  "timestamp": "2026-07-20 15:46:47",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 181,
-        "ocr_last_time": "2026-07-20 15:37:19",
+        "ocr_count": 182,
+        "ocr_last_time": "2026-07-20 15:42:32",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 183,
+        "web_count": 184,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 184,
+        "web_count": 185,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 183,
-        "ocr_last_time": "2026-07-20 15:37:33",
+        "ocr_count": 184,
+        "ocr_last_time": "2026-07-20 15:42:42",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 184,
+        "web_count": 185,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -303,13 +303,12 @@
     {
       "name": "S100_2",
       "status": "ok",
-      "pythonw_count": 4,
+      "pythonw_count": 2,
       "read_lot": 0,
-      "ess_lot_main": 2,
-      "ess_lot_worker": 2,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
       "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected",
-        "EXTRA: 2 ESS Lot mains running (expected 1)"
+        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
         "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
