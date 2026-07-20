@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-20 13:18:42",
+  "timestamp": "2026-07-20 15:34:46",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 154,
-        "ocr_last_time": "2026-07-20 13:17:14",
+        "ocr_count": 180,
+        "ocr_last_time": "2026-07-20 15:32:08",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 155,
+        "web_count": 182,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 156,
+        "web_count": 183,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 156,
-        "ocr_last_time": "2026-07-20 13:18:29",
+        "ocr_count": 182,
+        "ocr_last_time": "2026-07-20 15:32:24",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 156,
+        "web_count": 183,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -302,7 +302,32 @@
     },
     {
       "name": "S100_2",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 2,
+      "read_lot": 0,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [
+        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+      ],
+      "notices": [
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+      ],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 15200
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "S100_4",
