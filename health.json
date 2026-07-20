@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-20 10:47:53",
+  "timestamp": "2026-07-20 10:57:43",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 125,
-        "ocr_last_time": "2026-07-20 10:46:45",
+        "ocr_count": 127,
+        "ocr_last_time": "2026-07-20 10:57:07",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 126,
+        "web_count": 128,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 127,
+        "web_count": 129,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -141,24 +141,14 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 2",
-        "png": [
-          2
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-07-20T10:37:49",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        },
-        "png_bins": {
-          "AUTO1": "",
-          "AUTO2": "3",
-          "AUTO3": "2, 14"
-        }
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
+        "png_bins": null
       }
     },
     {
@@ -171,8 +161,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 126,
-        "ocr_last_time": "2026-07-20 10:43:58",
+        "ocr_count": 128,
+        "ocr_last_time": "2026-07-20 10:54:16",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +201,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 127,
+        "web_count": 129,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -285,9 +275,9 @@
       "warnings": [],
       "notices": [],
       "drive": {
-        "status": "unreachable",
+        "status": "ok",
         "drive": "T",
-        "remote": null
+        "remote": "\\\\172.18.155.223\\tester"
       },
       "splashtop": {
         "status": "ok",
