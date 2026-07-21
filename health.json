@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-21 13:08:47",
+  "timestamp": "2026-07-21 13:13:46",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 152,
-        "ocr_last_time": "2026-07-21 13:04:10",
+        "ocr_count": 153,
+        "ocr_last_time": "2026-07-21 13:09:18",
         "status": "OCR"
       },
       "handler_eth": {
@@ -59,18 +59,24 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [],
-        "result": "MISMATCH"
+        "png": [
+          1
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
+        "status": "OK",
         "ts": "2026-07-21T09:01:42",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": null
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
       }
     },
     {
@@ -82,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 153,
+        "web_count": 154,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -123,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 154,
+        "web_count": 155,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -134,12 +140,12 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "unknown",
+        "csv": "single site 2",
         "png": [
           1,
           2
         ],
-        "result": "UNKNOWN"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
         "status": "UNKNOWN",
@@ -162,8 +168,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 153,
-        "ocr_last_time": "2026-07-21 13:04:18",
+        "ocr_count": 154,
+        "ocr_last_time": "2026-07-21 13:09:27",
         "status": "OCR"
       },
       "handler_eth": {
@@ -202,7 +208,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 153,
+        "web_count": 154,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -294,13 +300,12 @@
     {
       "name": "S100_2",
       "status": "ok",
-      "pythonw_count": 4,
+      "pythonw_count": 2,
       "read_lot": 0,
-      "ess_lot_main": 2,
-      "ess_lot_worker": 2,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
       "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected",
-        "EXTRA: 2 ESS Lot mains running (expected 1)"
+        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
         "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
