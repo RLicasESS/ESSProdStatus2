@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-22 11:40:00",
+  "timestamp": "2026-07-22 11:43:57",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 136,
-        "ocr_last_time": "2026-07-22 11:37:39",
+        "ocr_count": 137,
+        "ocr_last_time": "2026-07-22 11:42:50",
         "status": "OCR"
       },
       "handler_eth": {
@@ -66,7 +66,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-07-21T19:42:27",
+        "ts": "2026-07-22T11:41:16",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -99,15 +99,15 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "unknown",
+        "csv": "single site 1",
         "png": [
           1
         ],
-        "result": "UNKNOWN"
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-07-21T19:42:27",
+        "ts": "2026-07-22T11:41:16",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "3, 4, 5, 6, 8, 9, E",
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 136,
+        "web_count": 137,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -149,7 +149,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-07-21T19:42:27",
+        "ts": "2026-07-22T11:41:17",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 136,
-        "ocr_last_time": "2026-07-22 11:37:28",
+        "ocr_count": 137,
+        "ocr_last_time": "2026-07-22 11:42:37",
         "status": "OCR"
       },
       "handler_eth": {
@@ -190,7 +190,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-07-21T19:42:27",
+        "ts": "2026-07-22T11:41:17",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
