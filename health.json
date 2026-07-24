@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-24 09:34:44",
+  "timestamp": "2026-07-24 09:39:43",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 112,
-        "ocr_last_time": "2026-07-24 09:33:11",
+        "ocr_count": 113,
+        "ocr_last_time": "2026-07-24 09:38:21",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 112,
+        "web_count": 113,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 112,
+        "web_count": 113,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 111,
-        "ocr_last_time": "2026-07-24 09:30:05",
+        "ocr_count": 112,
+        "ocr_last_time": "2026-07-24 09:35:13",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 112,
+        "web_count": 113,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -230,7 +230,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
+        "status": "OK",
         "ts": "2026-07-24T09:06:53",
         "json_bins": {
           "AUTO1": "1",
@@ -240,7 +240,7 @@
         "png_bins": {
           "AUTO1": "1",
           "AUTO2": "8, 10, 11",
-          "AUTO3": "4, 5, 6, E"
+          "AUTO3": "4, 6, E"
         }
       }
     }
