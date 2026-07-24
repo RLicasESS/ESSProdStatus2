@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-23 19:43:43",
+  "timestamp": "2026-07-23 19:47:45",
   "local": [
     {
       "service": "testerstatus.service",
@@ -78,7 +78,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 230,
+        "web_count": 231,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -90,24 +90,14 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [
-          1
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-07-23T16:37:50",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "3, 4, 5, 6, 8, 9, E",
-          "AUTO3": "7"
-        },
-        "png_bins": {
-          "AUTO1": "",
-          "AUTO2": "2, 3, 4, 6, 7, 14",
-          "AUTO3": "5"
-        }
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
+        "png_bins": null
       }
     },
     {
@@ -119,7 +109,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 231,
+        "web_count": 232,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -161,8 +151,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 230,
-        "ocr_last_time": "2026-07-23 19:41:52",
+        "ocr_count": 231,
+        "ocr_last_time": "2026-07-23 19:47:01",
         "status": "OCR"
       },
       "handler_eth": {
@@ -201,7 +191,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 53,
+        "web_count": 54,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -220,7 +210,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
+        "status": "OK",
         "ts": "2026-07-23T16:37:51",
         "json_bins": {
           "AUTO1": "1",
@@ -230,7 +220,7 @@
         "png_bins": {
           "AUTO1": "1",
           "AUTO2": "8, 10, 11",
-          "AUTO3": "2, 4, 5, 6, E"
+          "AUTO3": "2, 4, 6, E"
         }
       }
     }
