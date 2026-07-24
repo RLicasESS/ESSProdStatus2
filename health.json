@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-24 11:10:55",
+  "timestamp": "2026-07-24 11:16:13",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 130,
-        "ocr_last_time": "2026-07-24 11:06:15",
+        "ocr_count": 131,
+        "ocr_last_time": "2026-07-24 11:11:25",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 130,
+        "web_count": 132,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 131,
+        "web_count": 132,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 130,
-        "ocr_last_time": "2026-07-24 11:07:52",
+        "ocr_count": 131,
+        "ocr_last_time": "2026-07-24 11:13:01",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 131,
+        "web_count": 132,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -254,12 +254,17 @@
     {
       "name": "AP-1",
       "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
+      "pythonw_count": 0,
+      "read_lot": 0,
+      "ess_lot_main": 0,
+      "ess_lot_worker": 0,
+      "warnings": [
+        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+      ],
+      "notices": [
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
+      ],
       "drive": {
         "status": "ok",
         "drive": "T",
