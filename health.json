@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-25 14:22:03",
+  "timestamp": "2026-07-25 14:24:53",
   "local": [
     {
       "service": "testerstatus.service",
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 168,
+        "web_count": 169,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 167,
-        "ocr_last_time": "2026-07-25 14:17:32",
+        "ocr_count": 168,
+        "ocr_last_time": "2026-07-25 14:22:41",
         "status": "OCR"
       },
       "handler_eth": {
@@ -326,7 +326,32 @@
     },
     {
       "name": "S100_4",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 2,
+      "read_lot": 0,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [
+        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+      ],
+      "notices": [
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+      ],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 10556
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "HP-1",
