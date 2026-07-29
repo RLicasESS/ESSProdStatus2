@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-29 15:59:41",
+  "timestamp": "2026-07-29 16:04:40",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 185,
-        "ocr_last_time": "2026-07-29 15:54:59",
+        "ocr_count": 186,
+        "ocr_last_time": "2026-07-29 16:00:10",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 186,
+        "web_count": 187,
         "ocr_count": 1,
         "ocr_last_time": "2026-07-29 15:34:39",
         "status": "WARN"
@@ -125,7 +125,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 187,
+        "web_count": 188,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -208,7 +208,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 187,
+        "web_count": 188,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -334,12 +334,14 @@
     {
       "name": "S100_4",
       "status": "ok",
-      "pythonw_count": 3,
+      "pythonw_count": 1,
       "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
+      "ess_lot_main": 0,
+      "ess_lot_worker": 0,
       "warnings": [],
-      "notices": [],
+      "notices": [
+        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
+      ],
       "drive": {
         "status": "ok",
         "drive": "T",
