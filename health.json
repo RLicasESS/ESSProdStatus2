@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-29 16:13:41",
+  "timestamp": "2026-07-29 16:18:40",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 188,
-        "ocr_last_time": "2026-07-29 16:10:33",
+        "ocr_count": 189,
+        "ocr_last_time": "2026-07-29 16:15:44",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 189,
+        "web_count": 190,
         "ocr_count": 1,
         "ocr_last_time": "2026-07-29 15:34:39",
         "status": "WARN"
@@ -106,14 +106,18 @@
         "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
+        "status": "MISMATCH",
         "ts": "2026-07-29T11:24:12",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
           "AUTO3": "3, 4, E"
         },
-        "png_bins": null
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
       }
     },
     {
@@ -125,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 190,
+        "web_count": 191,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -136,12 +140,12 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "dual",
+        "csv": "single site 2",
         "png": [
           1,
           2
         ],
-        "result": "MATCH"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
         "status": "MISMATCH",
@@ -168,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 189,
-        "ocr_last_time": "2026-07-29 16:09:58",
+        "ocr_count": 190,
+        "ocr_last_time": "2026-07-29 16:15:07",
         "status": "OCR"
       },
       "handler_eth": {
@@ -208,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 190,
+        "web_count": 191,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
