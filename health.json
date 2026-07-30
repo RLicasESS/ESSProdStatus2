@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-30 13:44:02",
+  "timestamp": "2026-07-30 13:50:59",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 160,
-        "ocr_last_time": "2026-07-30 13:42:40",
+        "ocr_count": 161,
+        "ocr_last_time": "2026-07-30 13:47:51",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 160,
+        "web_count": 162,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 161,
+        "web_count": 162,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 160,
-        "ocr_last_time": "2026-07-30 13:39:46",
+        "ocr_count": 162,
+        "ocr_last_time": "2026-07-30 13:50:03",
         "status": "OCR"
       },
       "handler_eth": {
@@ -183,24 +183,14 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [
-          1
-        ],
-        "result": "MISMATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "OK",
-        "ts": "2026-07-30T13:36:49",
-        "json_bins": {
-          "AUTO1": "1, 5",
-          "AUTO2": "2",
-          "AUTO3": "4, E"
-        },
-        "png_bins": {
-          "AUTO1": "1, 5",
-          "AUTO2": "2",
-          "AUTO3": "4, E"
-        }
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
+        "png_bins": null
       }
     },
     {
@@ -212,7 +202,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 160,
+        "web_count": 162,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -320,17 +310,17 @@
         "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
       ],
       "drive": {
-        "status": "unreachable",
+        "status": "ok",
         "drive": "T",
-        "remote": null
+        "remote": "\\\\172.18.155.223\\tester"
       },
       "splashtop": {
         "status": "ok",
         "pid": 1932
       },
       "lotsetting": {
-        "status": "unreachable",
-        "detail": "SSH failed",
+        "status": "ok",
+        "detail": "no overflow errors detected",
         "overflow_count": 0,
         "correction_count": 0
       }
