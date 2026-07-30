@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-30 10:28:54",
+  "timestamp": "2026-07-30 10:33:08",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 122,
-        "ocr_last_time": "2026-07-30 10:25:33",
+        "ocr_count": 123,
+        "ocr_last_time": "2026-07-30 10:30:44",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 122,
+        "web_count": 123,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 123,
+        "web_count": 124,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 122,
-        "ocr_last_time": "2026-07-30 10:24:14",
+        "ocr_count": 123,
+        "ocr_last_time": "2026-07-30 10:29:23",
         "status": "OCR"
       },
       "handler_eth": {
@@ -212,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 122,
+        "web_count": 123,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -314,23 +314,21 @@
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
       "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+        "MISSING: Read Lot Number.py \u2014 restart FAILED"
       ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
-      ],
+      "notices": [],
       "drive": {
-        "status": "ok",
+        "status": "unreachable",
         "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
+        "remote": null
       },
       "splashtop": {
         "status": "ok",
         "pid": 1932
       },
       "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
+        "status": "unreachable",
+        "detail": "SSH failed",
         "overflow_count": 0,
         "correction_count": 0
       }
