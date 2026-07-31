@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-31 10:57:35",
+  "timestamp": "2026-07-31 11:00:36",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 127,
-        "ocr_last_time": "2026-07-31 10:53:22",
+        "ocr_count": 128,
+        "ocr_last_time": "2026-07-31 10:58:34",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 128,
+        "web_count": 129,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 128,
+        "web_count": 129,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -335,14 +335,14 @@
     {
       "name": "S100_4",
       "status": "ok",
-      "pythonw_count": 5,
+      "pythonw_count": 1,
       "read_lot": 1,
-      "ess_lot_main": 2,
-      "ess_lot_worker": 2,
-      "warnings": [
-        "EXTRA: 2 ESS Lot mains running (expected 1)"
+      "ess_lot_main": 0,
+      "ess_lot_worker": 0,
+      "warnings": [],
+      "notices": [
+        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
       ],
-      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
