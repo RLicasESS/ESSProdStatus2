@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-31 10:24:48",
+  "timestamp": "2026-07-31 10:29:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 121,
-        "ocr_last_time": "2026-07-31 10:22:14",
+        "ocr_count": 122,
+        "ocr_last_time": "2026-07-31 10:27:26",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 122,
+        "web_count": 123,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 122,
+        "web_count": 123,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -149,14 +149,18 @@
         "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
+        "status": "OK",
         "ts": "2026-07-30T17:00:00",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5, E",
           "AUTO3": "4"
         },
-        "png_bins": null
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5, E",
+          "AUTO3": "4"
+        }
       }
     },
     {
@@ -169,8 +173,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 121,
-        "ocr_last_time": "2026-07-31 10:21:02",
+        "ocr_count": 122,
+        "ocr_last_time": "2026-07-31 10:26:11",
         "status": "OCR"
       },
       "handler_eth": {
@@ -209,7 +213,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 122,
+        "web_count": 123,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -306,16 +310,12 @@
     {
       "name": "S100_2",
       "status": "ok",
-      "pythonw_count": 2,
-      "read_lot": 0,
+      "pythonw_count": 3,
+      "read_lot": 1,
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
-      "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
-      ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
-      ],
+      "warnings": [],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
@@ -323,7 +323,7 @@
       },
       "splashtop": {
         "status": "ok",
-        "pid": 1932
+        "pid": 14080
       },
       "lotsetting": {
         "status": "ok",
