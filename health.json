@@ -1,0 +1,369 @@
+{
+  "timestamp": "2026-08-02 19:10:33",
+  "local": [
+    {
+      "service": "testerstatus.service",
+      "status": "OK",
+      "port": null
+    },
+    {
+      "service": "ESSLotLogger.service",
+      "status": "OK",
+      "port": null
+    },
+    {
+      "service": "handler_proxy.service",
+      "status": "OK",
+      "port": 8001
+    },
+    {
+      "service": "nextstep.service",
+      "status": "OK",
+      "port": null
+    },
+    {
+      "service": "endlot_snapshotter.service",
+      "status": "OK",
+      "port": null
+    },
+    {
+      "service": "systemhealth.service",
+      "status": "OK",
+      "port": 8003
+    },
+    {
+      "service": "PIGithub.service",
+      "status": "OK",
+      "port": 9000
+    }
+  ],
+  "handlers": [
+    {
+      "name": "CHROMA",
+      "ip": "172.18.179.225",
+      "services": {
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
+      },
+      "web_ocr": {
+        "web_count": 0,
+        "ocr_count": 222,
+        "ocr_last_time": "2026-08-02 19:09:46",
+        "status": "OCR"
+      },
+      "handler_eth": {
+        "ip": null,
+        "status": "N/A"
+      },
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "single site 1",
+        "png": [
+          1
+        ],
+        "result": "MATCH"
+      },
+      "bin_mapping": {
+        "status": "OK",
+        "ts": "2026-08-02T11:32:43",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
+      }
+    },
+    {
+      "name": "NS-3",
+      "ip": "172.18.161.100",
+      "services": {
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
+      },
+      "web_ocr": {
+        "web_count": 223,
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "OK"
+      },
+      "handler_eth": {
+        "ip": "192.168.1.35",
+        "status": "OK"
+      },
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "dual",
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
+      },
+      "bin_mapping": {
+        "status": "OK",
+        "ts": "2026-08-02T11:32:43",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
+      }
+    },
+    {
+      "name": "NS-4",
+      "ip": "172.18.234.51",
+      "services": {
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
+      },
+      "web_ocr": {
+        "web_count": 224,
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "OK"
+      },
+      "handler_eth": {
+        "ip": "192.168.1.35",
+        "status": "OK"
+      },
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "dual",
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
+      },
+      "bin_mapping": {
+        "status": "OK",
+        "ts": "2026-08-02T11:32:43",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5, E",
+          "AUTO3": "4"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5, E",
+          "AUTO3": "4"
+        }
+      }
+    },
+    {
+      "name": "NS-5",
+      "ip": "172.18.139.227",
+      "services": {
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
+      },
+      "web_ocr": {
+        "web_count": 0,
+        "ocr_count": 223,
+        "ocr_last_time": "2026-08-02 19:07:53",
+        "status": "OCR"
+      },
+      "handler_eth": {
+        "ip": "192.168.1.35",
+        "status": "OK"
+      },
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "dual",
+        "png": [
+          1
+        ],
+        "result": "MISMATCH"
+      },
+      "bin_mapping": {
+        "status": "OK",
+        "ts": "2026-08-02T11:32:43",
+        "json_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "4, E"
+        }
+      }
+    },
+    {
+      "name": "NS-6",
+      "ip": "172.18.164.42",
+      "services": {
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
+      },
+      "web_ocr": {
+        "web_count": 224,
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "OK"
+      },
+      "handler_eth": {
+        "ip": "192.168.0.5",
+        "status": "OK"
+      },
+      "png_connected": "OK",
+      "png_sites": {
+        "csv": "dual",
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
+      },
+      "bin_mapping": {
+        "status": "OK",
+        "ts": "2026-08-02T11:32:43",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
+      }
+    }
+  ],
+  "handler_service_names": [
+    "handlerstatus.service",
+    "requestserver.service",
+    "ssh.service"
+  ],
+  "testers": [
+    {
+      "name": "AP-1",
+      "status": "unreachable"
+    },
+    {
+      "name": "AP-2",
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 9944
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
+    },
+    {
+      "name": "S100_1",
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 5428
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
+    },
+    {
+      "name": "S100_2",
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 14080
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
+    },
+    {
+      "name": "S100_4",
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 10524
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
+    },
+    {
+      "name": "HP-1",
+      "status": "skipped"
+    },
+    {
+      "name": "HP-2",
+      "status": "skipped"
+    }
+  ]
+}
