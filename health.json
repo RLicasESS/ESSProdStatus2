@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-04 05:29:33",
+  "timestamp": "2026-08-04 05:33:32",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 64,
-        "ocr_last_time": "2026-08-04 05:26:12",
+        "ocr_count": 65,
+        "ocr_last_time": "2026-08-04 05:31:21",
         "status": "OCR"
       },
       "handler_eth": {
@@ -78,7 +78,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 64,
+        "web_count": 65,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -109,7 +109,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 64,
+        "web_count": 65,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -121,25 +121,14 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [
-          1,
-          2
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-08-03T19:10:20",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5, E",
-          "AUTO3": "4"
-        },
-        "png_bins": {
-          "AUTO1": "",
-          "AUTO2": "3, 14",
-          "AUTO3": "2"
-        }
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
+        "png_bins": null
       }
     },
     {
@@ -152,8 +141,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 64,
-        "ocr_last_time": "2026-08-04 05:25:59",
+        "ocr_count": 65,
+        "ocr_last_time": "2026-08-04 05:31:08",
         "status": "OCR"
       },
       "handler_eth": {
@@ -192,7 +181,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 64,
+        "web_count": 65,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
