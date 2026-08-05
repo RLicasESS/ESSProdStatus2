@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-05 11:27:34",
+  "timestamp": "2026-08-05 11:36:33",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 133,
-        "ocr_last_time": "2026-08-05 11:25:06",
+        "ocr_count": 135,
+        "ocr_last_time": "2026-08-05 11:35:28",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 134,
+        "web_count": 136,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 135,
+        "web_count": 136,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -142,14 +142,24 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "unknown",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1
+        ],
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-08-05T08:38:06",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5, E",
+          "AUTO3": "4"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5, E",
+          "AUTO3": "4"
+        }
       }
     },
     {
@@ -162,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 133,
-        "ocr_last_time": "2026-08-05 11:22:34",
+        "ocr_count": 135,
+        "ocr_last_time": "2026-08-05 11:32:51",
         "status": "OCR"
       },
       "handler_eth": {
@@ -202,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 134,
+        "web_count": 135,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
