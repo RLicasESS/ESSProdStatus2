@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-05 08:37:33",
+  "timestamp": "2026-08-05 08:41:33",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 100,
-        "ocr_last_time": "2026-08-05 08:34:01",
+        "ocr_count": 101,
+        "ocr_last_time": "2026-08-05 08:39:10",
         "status": "OCR"
       },
       "handler_eth": {
@@ -78,7 +78,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 101,
+        "web_count": 102,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -98,7 +98,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-05T08:20:16",
+        "ts": "2026-08-05T08:38:06",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -120,7 +120,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 101,
+        "web_count": 102,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -131,16 +131,16 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "dual",
+        "csv": "single site 2",
         "png": [
           1,
           2
         ],
-        "result": "MATCH"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-05T08:20:16",
+        "ts": "2026-08-05T08:38:06",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5, E",
@@ -163,8 +163,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 100,
-        "ocr_last_time": "2026-08-05 08:32:55",
+        "ocr_count": 101,
+        "ocr_last_time": "2026-08-05 08:38:04",
         "status": "OCR"
       },
       "handler_eth": {
@@ -180,7 +180,7 @@
         "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "STALE",
         "ts": "2026-08-05T08:20:16",
         "json_bins": {
           "AUTO1": "1, 5",
@@ -223,7 +223,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-05T08:20:16",
+        "ts": "2026-08-05T08:38:07",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
