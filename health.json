@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-05 14:14:03",
+  "timestamp": "2026-08-05 14:17:50",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 165,
-        "ocr_last_time": "2026-08-05 14:11:06",
+        "ocr_count": 166,
+        "ocr_last_time": "2026-08-05 14:16:17",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 166,
+        "web_count": 167,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 167,
+        "web_count": 168,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -168,8 +168,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 166,
-        "ocr_last_time": "2026-08-05 14:12:20",
+        "ocr_count": 167,
+        "ocr_last_time": "2026-08-05 14:17:29",
         "status": "OCR"
       },
       "handler_eth": {
@@ -208,7 +208,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 166,
+        "web_count": 167,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -251,19 +251,14 @@
     {
       "name": "AP-1",
       "status": "ok",
-      "pythonw_count": 0,
-      "read_lot": 0,
-      "ess_lot_main": 0,
-      "ess_lot_worker": 0,
-      "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
-      ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
-      ],
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
       "drive": {
-        "status": "stale",
+        "status": "ok",
         "drive": "T",
         "remote": "\\\\172.18.155.223\\tester"
       },
