@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-06 08:29:45",
+  "timestamp": "2026-08-06 08:36:06",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 99,
-        "ocr_last_time": "2026-08-06 08:25:28",
+        "ocr_count": 101,
+        "ocr_last_time": "2026-08-06 08:35:51",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 100,
+        "web_count": 101,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 100,
+        "web_count": 101,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -162,8 +162,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 99,
-        "ocr_last_time": "2026-08-06 08:27:50",
+        "ocr_count": 100,
+        "ocr_last_time": "2026-08-06 08:32:59",
         "status": "OCR"
       },
       "handler_eth": {
@@ -202,7 +202,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 100,
+        "web_count": 101,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -270,12 +270,17 @@
     {
       "name": "AP-2",
       "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
+      "pythonw_count": 2,
+      "read_lot": 0,
+      "ess_lot_main": 0,
+      "ess_lot_worker": 2,
+      "warnings": [
+        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+      ],
+      "notices": [
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
+      ],
       "drive": {
         "status": "ok",
         "drive": "T",
@@ -283,7 +288,7 @@
       },
       "splashtop": {
         "status": "ok",
-        "pid": 9396
+        "pid": 13860
       },
       "lotsetting": {
         "status": "ok",
