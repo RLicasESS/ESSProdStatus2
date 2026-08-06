@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-06 06:47:41",
+  "timestamp": "2026-08-06 06:52:41",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 80,
-        "ocr_last_time": "2026-08-06 06:47:27",
+        "ocr_count": 81,
+        "ocr_last_time": "2026-08-06 06:52:36",
         "status": "OCR"
       },
       "handler_eth": {
@@ -78,7 +78,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 80,
+        "web_count": 81,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -120,7 +120,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 80,
+        "web_count": 81,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -131,15 +131,15 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "dual",
+        "csv": "single site 2",
         "png": [
           1,
           2
         ],
-        "result": "MATCH"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "MISMATCH",
         "ts": "2026-08-05T15:32:03",
         "json_bins": {
           "AUTO1": "1, 5",
@@ -147,9 +147,9 @@
           "AUTO3": "4, E"
         },
         "png_bins": {
-          "AUTO1": "1, 5",
-          "AUTO2": "2",
-          "AUTO3": "4, E"
+          "AUTO1": "3",
+          "AUTO2": "",
+          "AUTO3": "2, 14"
         }
       }
     },
@@ -163,8 +163,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 79,
-        "ocr_last_time": "2026-08-06 06:44:55",
+        "ocr_count": 80,
+        "ocr_last_time": "2026-08-06 06:50:03",
         "status": "OCR"
       },
       "handler_eth": {
@@ -203,7 +203,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 80,
+        "web_count": 81,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -222,18 +222,14 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-08-05T15:32:04",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     }
   ],
