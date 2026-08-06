@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-06 10:23:45",
+  "timestamp": "2026-08-06 13:44:40",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 121,
-        "ocr_last_time": "2026-08-06 10:19:36",
+        "ocr_count": 160,
+        "ocr_last_time": "2026-08-06 13:41:53",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 122,
+        "web_count": 161,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 122,
+        "web_count": 161,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -173,8 +173,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 121,
-        "ocr_last_time": "2026-08-06 10:21:05",
+        "ocr_count": 160,
+        "ocr_last_time": "2026-08-06 13:41:57",
         "status": "OCR"
       },
       "handler_eth": {
@@ -213,7 +213,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 122,
+        "web_count": 161,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -331,14 +331,12 @@
     {
       "name": "S100_2",
       "status": "ok",
-      "pythonw_count": 1,
+      "pythonw_count": 3,
       "read_lot": 1,
-      "ess_lot_main": 0,
-      "ess_lot_worker": 0,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
       "warnings": [],
-      "notices": [
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
-      ],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
