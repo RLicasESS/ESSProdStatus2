@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-07 14:23:37",
+  "timestamp": "2026-08-07 14:28:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 166,
-        "ocr_last_time": "2026-08-07 14:20:17",
+        "ocr_count": 167,
+        "ocr_last_time": "2026-08-07 14:25:29",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 168,
+        "web_count": 169,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 169,
+        "web_count": 170,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -148,18 +148,14 @@
         "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-08-07T14:10:34",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1, 5",
-          "AUTO2": "2",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     },
     {
@@ -172,8 +168,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 37,
-        "ocr_last_time": "2026-08-07 14:22:31",
+        "ocr_count": 38,
+        "ocr_last_time": "2026-08-07 14:27:39",
         "status": "OCR"
       },
       "handler_eth": {
@@ -212,7 +208,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 169,
+        "web_count": 170,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -308,7 +304,30 @@
     },
     {
       "name": "S100_2",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 5,
+      "read_lot": 1,
+      "ess_lot_main": 2,
+      "ess_lot_worker": 2,
+      "warnings": [
+        "EXTRA: 2 ESS Lot mains running (expected 1)"
+      ],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 13408
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "S100_4",
