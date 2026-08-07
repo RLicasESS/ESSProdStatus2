@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-07 10:21:40",
+  "timestamp": "2026-08-07 10:26:41",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 120,
-        "ocr_last_time": "2026-08-07 10:21:29",
+        "ocr_count": 121,
+        "ocr_last_time": "2026-08-07 10:26:40",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 121,
+        "web_count": 122,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -100,14 +100,25 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "MISMATCH",
+        "ts": "2026-08-07T08:40:23",
+        "json_bins": {
+          "AUTO1": "",
+          "AUTO2": "3",
+          "AUTO3": "2, 14"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
       }
     },
     {
@@ -119,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 122,
+        "web_count": 123,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -162,8 +173,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 121,
-        "ocr_last_time": "2026-08-07 10:20:49",
+        "ocr_count": 122,
+        "ocr_last_time": "2026-08-07 10:25:58",
         "status": "OCR"
       },
       "handler_eth": {
@@ -202,7 +213,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 121,
+        "web_count": 122,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
