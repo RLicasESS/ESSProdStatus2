@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-07 09:10:40",
+  "timestamp": "2026-08-07 09:15:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 106,
-        "ocr_last_time": "2026-08-07 09:08:53",
+        "ocr_count": 107,
+        "ocr_last_time": "2026-08-07 09:14:04",
         "status": "OCR"
       },
       "handler_eth": {
@@ -73,9 +73,9 @@
           "AUTO3": "4, E"
         },
         "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
+          "AUTO1": "",
+          "AUTO2": "1, 1",
+          "AUTO3": "1, R, R1, 1, R"
         }
       }
     },
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 107,
+        "web_count": 108,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 108,
+        "web_count": 109,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -173,8 +173,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 107,
-        "ocr_last_time": "2026-08-07 09:08:50",
+        "ocr_count": 108,
+        "ocr_last_time": "2026-08-07 09:13:58",
         "status": "OCR"
       },
       "handler_eth": {
@@ -213,7 +213,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 108,
+        "web_count": 109,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -225,14 +225,25 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-08-07T08:40:24",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
       }
     }
   ],
