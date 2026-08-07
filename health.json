@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-07 15:10:37",
+  "timestamp": "2026-08-07 15:15:50",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 175,
-        "ocr_last_time": "2026-08-07 15:07:01",
+        "ocr_count": 176,
+        "ocr_last_time": "2026-08-07 15:12:12",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 177,
+        "web_count": 178,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 178,
+        "web_count": 179,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -168,8 +168,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 46,
-        "ocr_last_time": "2026-08-07 15:08:47",
+        "ocr_count": 47,
+        "ocr_last_time": "2026-08-07 15:13:56",
         "status": "OCR"
       },
       "handler_eth": {
@@ -208,7 +208,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 178,
+        "web_count": 179,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -321,8 +321,8 @@
         "pid": 13408
       },
       "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
+        "status": "unreachable",
+        "detail": "SSH failed",
         "overflow_count": 0,
         "correction_count": 0
       }
