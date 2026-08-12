@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-12 09:20:18",
+  "timestamp": "2026-08-12 09:26:47",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 109,
-        "ocr_last_time": "2026-08-12 09:20:13",
+        "ocr_count": 110,
+        "ocr_last_time": "2026-08-12 09:25:25",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 110,
+        "web_count": 111,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 109,
+        "web_count": 111,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 109,
-        "ocr_last_time": "2026-08-12 09:20:21",
+        "ocr_count": 110,
+        "ocr_last_time": "2026-08-12 09:25:30",
         "status": "OCR"
       },
       "handler_eth": {
@@ -212,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 110,
+        "web_count": 111,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -224,20 +224,13 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [
-          1,
-          2
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "STALE",
-        "ts": "2026-08-11T17:41:44",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        },
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
         "png_bins": null
       }
     }
@@ -332,15 +325,14 @@
       "status": "ok",
       "pythonw_count": 2,
       "read_lot": 0,
-      "ess_lot_main": 0,
-      "ess_lot_worker": 2,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
       "warnings": [
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
         "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "STARTED: SCardSvr was stopped \u2014 started automatically",
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
