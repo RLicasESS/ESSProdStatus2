@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-13 21:38:41",
+  "timestamp": "2026-08-13 21:43:40",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 251,
-        "ocr_last_time": "2026-08-13 21:35:35",
+        "ocr_count": 252,
+        "ocr_last_time": "2026-08-13 21:40:46",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 253,
+        "web_count": 254,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 252,
-        "ocr_last_time": "2026-08-13 21:36:27",
+        "ocr_count": 253,
+        "ocr_last_time": "2026-08-13 21:41:35",
         "status": "OCR"
       },
       "handler_eth": {
@@ -341,8 +341,7 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "STARTED: SCardSvr was stopped \u2014 started automatically"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
       ],
       "drive": {
         "status": "ok",
