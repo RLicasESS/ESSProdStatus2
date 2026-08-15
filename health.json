@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-14 22:56:40",
+  "timestamp": "2026-08-14 23:01:43",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 267,
-        "ocr_last_time": "2026-08-14 22:54:30",
+        "ocr_count": 268,
+        "ocr_last_time": "2026-08-14 22:59:41",
         "status": "OCR"
       },
       "handler_eth": {
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 268,
+        "web_count": 269,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -99,25 +99,15 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "single site 1",
-        "png": [
-          1
-        ],
-        "result": "MATCH"
+        "csv": "unknown",
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-08-14T09:20:28",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        },
-        "png_bins": {
-          "AUTO1": "",
-          "AUTO2": "3",
-          "AUTO3": "2, 14"
-        }
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
+        "png_bins": null
       }
     },
     {
@@ -138,7 +128,7 @@
         "ip": "192.168.1.35",
         "status": "OK"
       },
-      "png_connected": "UNKNOWN",
+      "png_connected": "OK",
       "png_sites": {
         "csv": "unknown",
         "png": [
@@ -171,8 +161,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 268,
-        "ocr_last_time": "2026-08-14 22:54:00",
+        "ocr_count": 269,
+        "ocr_last_time": "2026-08-14 22:59:10",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +201,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 269,
+        "web_count": 270,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -341,7 +331,8 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
