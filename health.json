@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-14 23:32:53",
+  "timestamp": "2026-08-14 23:36:40",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 274,
-        "ocr_last_time": "2026-08-14 23:30:47",
+        "ocr_count": 275,
+        "ocr_last_time": "2026-08-14 23:35:58",
         "status": "OCR"
       },
       "handler_eth": {
@@ -65,7 +65,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
+        "status": "OK",
         "ts": "2026-08-14T23:02:02",
         "json_bins": {
           "AUTO1": "1",
@@ -73,9 +73,9 @@
           "AUTO3": "4, E"
         },
         "png_bins": {
-          "AUTO1": "",
-          "AUTO2": "1",
-          "AUTO3": "1, R, R1, 1, R"
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
         }
       }
     },
@@ -88,7 +88,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 275,
+        "web_count": 276,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 275,
-        "ocr_last_time": "2026-08-14 23:30:00",
+        "ocr_count": 276,
+        "ocr_last_time": "2026-08-14 23:35:09",
         "status": "OCR"
       },
       "handler_eth": {
@@ -322,33 +322,7 @@
     },
     {
       "name": "S100_4",
-      "status": "ok",
-      "pythonw_count": 2,
-      "read_lot": 0,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
-      ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "STARTED: SCardSvr was stopped \u2014 started automatically"
-      ],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "unreachable",
-        "pid": null
-      },
-      "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "HP-1",
