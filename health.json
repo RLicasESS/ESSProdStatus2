@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-18 06:21:45",
+  "timestamp": "2026-08-18 06:25:40",
   "local": [
     {
       "service": "testerstatus.service",
@@ -89,7 +89,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 74,
+        "web_count": 75,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -120,7 +120,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 74,
+        "web_count": 75,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -162,8 +162,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 74,
-        "ocr_last_time": "2026-08-18 06:17:10",
+        "ocr_count": 75,
+        "ocr_last_time": "2026-08-18 06:22:18",
         "status": "OCR"
       },
       "handler_eth": {
@@ -192,7 +192,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 74,
+        "web_count": 75,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -277,7 +277,28 @@
     },
     {
       "name": "S100_2",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 14452
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "S100_4",
@@ -290,8 +311,7 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "STARTED: SCardSvr was stopped \u2014 started automatically"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
       ],
       "drive": {
         "status": "ok",
