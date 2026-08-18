@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-18 12:09:49",
+  "timestamp": "2026-08-18 12:15:47",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 141,
-        "ocr_last_time": "2026-08-18 12:07:31",
+        "ocr_count": 142,
+        "ocr_last_time": "2026-08-18 12:12:40",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,7 +89,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 142,
+        "web_count": 143,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 142,
+        "web_count": 143,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 142,
-        "ocr_last_time": "2026-08-18 12:06:19",
+        "ocr_count": 143,
+        "ocr_last_time": "2026-08-18 12:11:28",
         "status": "OCR"
       },
       "handler_eth": {
@@ -212,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 142,
+        "web_count": 143,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -315,9 +315,9 @@
       "warnings": [],
       "notices": [],
       "drive": {
-        "status": "unreachable",
+        "status": "ok",
         "drive": "T",
-        "remote": null
+        "remote": "\\\\172.18.155.223\\tester"
       },
       "splashtop": {
         "status": "ok",
@@ -341,7 +341,8 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
