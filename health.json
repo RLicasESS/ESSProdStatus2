@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-18 02:35:45",
+  "timestamp": "2026-08-18 02:39:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,36 +48,29 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 30,
-        "ocr_last_time": "2026-08-18 02:34:29",
+        "ocr_count": 31,
+        "ocr_last_time": "2026-08-18 02:39:38",
         "status": "OCR"
       },
       "handler_eth": {
         "ip": null,
         "status": "N/A"
       },
-      "png_connected": "OK",
+      "png_connected": "UNKNOWN",
       "png_sites": {
         "csv": "single site 1",
-        "png": [
-          1,
-          2
-        ],
-        "result": "MISMATCH"
+        "png": [],
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-08-17T15:59:01",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     },
     {
@@ -89,7 +82,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 30,
+        "web_count": 31,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -120,7 +113,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 30,
+        "web_count": 31,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -162,8 +155,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 30,
-        "ocr_last_time": "2026-08-18 02:30:56",
+        "ocr_count": 31,
+        "ocr_last_time": "2026-08-18 02:36:04",
         "status": "OCR"
       },
       "handler_eth": {
@@ -192,7 +185,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 30,
+        "web_count": 31,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
