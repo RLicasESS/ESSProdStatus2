@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-18 05:21:42",
+  "timestamp": "2026-08-18 05:23:46",
   "local": [
     {
       "service": "testerstatus.service",
@@ -311,7 +311,8 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
