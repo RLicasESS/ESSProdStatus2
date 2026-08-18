@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-18 09:58:42",
+  "timestamp": "2026-08-18 10:02:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -67,7 +67,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-18T09:40:47",
+        "ts": "2026-08-18T09:59:24",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -108,7 +108,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-18T09:40:47",
+        "ts": "2026-08-18T09:59:24",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -149,7 +149,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-18T09:40:47",
+        "ts": "2026-08-18T09:59:24",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -182,7 +182,7 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "unknown",
+        "csv": "error",
         "png": [
           1
         ],
@@ -190,7 +190,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-18T09:40:47",
+        "ts": "2026-08-18T09:59:24",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -231,7 +231,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-18T09:40:48",
+        "ts": "2026-08-18T09:59:24",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -307,7 +307,28 @@
     },
     {
       "name": "S100_2",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 14452
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "S100_4",
@@ -320,7 +341,8 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
