@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-19 14:41:40",
+  "timestamp": "2026-08-19 14:45:37",
   "local": [
     {
       "service": "testerstatus.service",
@@ -83,8 +83,8 @@
       },
       "web_ocr": {
         "web_count": 132,
-        "ocr_count": 32,
-        "ocr_last_time": "2026-08-19 14:37:59",
+        "ocr_count": 33,
+        "ocr_last_time": "2026-08-19 14:43:08",
         "status": "WARN"
       },
       "handler_eth": {
@@ -135,14 +135,24 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "unknown",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1
+        ],
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-08-19T14:28:26",
+        "json_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "3, 4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "3, 4, E"
+        }
       }
     },
     {
@@ -155,8 +165,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 172,
-        "ocr_last_time": "2026-08-19 14:39:56",
+        "ocr_count": 173,
+        "ocr_last_time": "2026-08-19 14:45:05",
         "status": "OCR"
       },
       "handler_eth": {
