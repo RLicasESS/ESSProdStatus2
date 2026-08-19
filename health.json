@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-19 15:42:38",
+  "timestamp": "2026-08-19 15:46:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 179,
-        "ocr_last_time": "2026-08-19 15:38:00",
+        "ocr_count": 180,
+        "ocr_last_time": "2026-08-19 15:43:09",
         "status": "OCR"
       },
       "handler_eth": {
@@ -59,8 +59,10 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [],
-        "result": "MISMATCH"
+        "png": [
+          1
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "STALE",
@@ -70,7 +72,11 @@
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": null
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
       }
     },
     {
@@ -83,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 132,
-        "ocr_count": 44,
-        "ocr_last_time": "2026-08-19 15:39:55",
+        "ocr_count": 45,
+        "ocr_last_time": "2026-08-19 15:45:04",
         "status": "WARN"
       },
       "handler_eth": {
@@ -165,35 +171,29 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 184,
-        "ocr_last_time": "2026-08-19 15:41:39",
+        "ocr_count": 185,
+        "ocr_last_time": "2026-08-19 15:46:47",
         "status": "OCR"
       },
       "handler_eth": {
         "ip": "192.168.1.35",
         "status": "OK"
       },
-      "png_connected": "OK",
+      "png_connected": "UNKNOWN",
       "png_sites": {
         "csv": "dual",
-        "png": [
-          1
-        ],
-        "result": "MISMATCH"
+        "png": [],
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-08-19T14:28:26",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1, 5",
-          "AUTO2": "2",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     },
     {
