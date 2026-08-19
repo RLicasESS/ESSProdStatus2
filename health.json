@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-19 14:09:38",
+  "timestamp": "2026-08-19 14:13:48",
   "local": [
     {
       "service": "testerstatus.service",
@@ -42,15 +42,15 @@
       "name": "CHROMA",
       "ip": "172.18.179.225",
       "services": {
-        "handlerstatus.service": "OK",
-        "requestserver.service": "OK",
-        "ssh.service": "OK"
+        "handlerstatus.service": "DOWN",
+        "requestserver.service": "DOWN",
+        "ssh.service": "DOWN"
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 161,
-        "ocr_last_time": "2026-08-19 14:05:56",
-        "status": "OCR"
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "UNKNOWN"
       },
       "handler_eth": {
         "ip": null,
@@ -73,9 +73,9 @@
           "AUTO3": "4, E"
         },
         "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
+          "AUTO1": "",
+          "AUTO2": "1, 1",
+          "AUTO3": "1, R, R1, 1, R"
         }
       }
     },
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 132,
-        "ocr_count": 26,
-        "ocr_last_time": "2026-08-19 14:07:01",
+        "ocr_count": 27,
+        "ocr_last_time": "2026-08-19 14:12:11",
         "status": "WARN"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 165,
+        "web_count": 166,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -211,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 165,
+        "web_count": 166,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -337,11 +337,9 @@
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
       "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+        "MISSING: Read Lot Number.py \u2014 restart FAILED"
       ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
-      ],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
