@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-19 11:18:51",
+  "timestamp": "2026-08-19 11:24:07",
   "local": [
     {
       "service": "testerstatus.service",
@@ -42,15 +42,15 @@
       "name": "CHROMA",
       "ip": "172.18.179.225",
       "services": {
-        "handlerstatus.service": "OK",
-        "requestserver.service": "OK",
-        "ssh.service": "OK"
+        "handlerstatus.service": "DOWN",
+        "requestserver.service": "DOWN",
+        "ssh.service": "DOWN"
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 132,
-        "ocr_last_time": "2026-08-19 11:17:11",
-        "status": "OCR"
+        "ocr_count": 0,
+        "ocr_last_time": null,
+        "status": "UNKNOWN"
       },
       "handler_eth": {
         "ip": null,
@@ -123,7 +123,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 132,
+        "web_count": 133,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -165,8 +165,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 132,
-        "ocr_last_time": "2026-08-19 11:14:31",
+        "ocr_count": 133,
+        "ocr_last_time": "2026-08-19 11:19:40",
         "status": "OCR"
       },
       "handler_eth": {
@@ -176,14 +176,24 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1
+        ],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-08-19T09:20:46",
+        "json_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "4, E"
+        }
       }
     },
     {
@@ -195,7 +205,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 132,
+        "web_count": 133,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -324,7 +334,8 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
