@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-19 14:32:38",
+  "timestamp": "2026-08-19 14:36:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 166,
-        "ocr_last_time": "2026-08-19 14:31:04",
+        "ocr_count": 167,
+        "ocr_last_time": "2026-08-19 14:36:14",
         "status": "OCR"
       },
       "handler_eth": {
@@ -79,8 +79,8 @@
       },
       "web_ocr": {
         "web_count": 132,
-        "ocr_count": 30,
-        "ocr_last_time": "2026-08-19 14:27:40",
+        "ocr_count": 31,
+        "ocr_last_time": "2026-08-19 14:32:49",
         "status": "WARN"
       },
       "handler_eth": {
@@ -119,7 +119,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 170,
+        "web_count": 171,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -131,24 +131,14 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "unknown",
-        "png": [
-          1
-        ],
-        "result": "UNKNOWN"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-08-19T14:28:26",
-        "json_bins": {
-          "AUTO1": "1, 5",
-          "AUTO2": "2",
-          "AUTO3": "3, 4, E"
-        },
-        "png_bins": {
-          "AUTO1": "3",
-          "AUTO2": "",
-          "AUTO3": "2, 14"
-        }
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
+        "png_bins": null
       }
     },
     {
@@ -161,8 +151,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 170,
-        "ocr_last_time": "2026-08-19 14:29:39",
+        "ocr_count": 171,
+        "ocr_last_time": "2026-08-19 14:34:48",
         "status": "OCR"
       },
       "handler_eth": {
@@ -201,7 +191,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 170,
+        "web_count": 171,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -297,11 +287,13 @@
     {
       "name": "S100_2",
       "status": "ok",
-      "pythonw_count": 3,
+      "pythonw_count": 5,
       "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
+      "ess_lot_main": 2,
+      "ess_lot_worker": 2,
+      "warnings": [
+        "EXTRA: 2 ESS Lot mains running (expected 1)"
+      ],
       "notices": [],
       "drive": {
         "status": "ok",
