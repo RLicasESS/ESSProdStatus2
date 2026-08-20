@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-20 14:45:48",
+  "timestamp": "2026-08-20 14:51:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 171,
-        "ocr_last_time": "2026-08-20 14:40:39",
+        "ocr_count": 173,
+        "ocr_last_time": "2026-08-20 14:51:01",
         "status": "OCR"
       },
       "handler_eth": {
@@ -59,24 +59,18 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [
-          1
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-08-20T11:09:03",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     },
     {
@@ -89,8 +83,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 30,
-        "ocr_last_time": "2026-08-20 14:43:47",
+        "ocr_count": 31,
+        "ocr_last_time": "2026-08-20 14:48:57",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +123,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 172,
+        "web_count": 174,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -168,8 +162,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 42,
-        "ocr_last_time": "2026-08-20 14:45:26",
+        "ocr_count": 43,
+        "ocr_last_time": "2026-08-20 14:50:35",
         "status": "OCR"
       },
       "handler_eth": {
@@ -208,7 +202,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 172,
+        "web_count": 174,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -303,28 +297,7 @@
     },
     {
       "name": "S100_2",
-      "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "ok",
-        "pid": 15388
-      },
-      "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "S100_4",
