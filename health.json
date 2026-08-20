@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-20 16:15:39",
+  "timestamp": "2026-08-20 16:19:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 189,
-        "ocr_last_time": "2026-08-20 16:13:41",
+        "ocr_count": 190,
+        "ocr_last_time": "2026-08-20 16:18:52",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 47,
-        "ocr_last_time": "2026-08-20 16:11:33",
+        "ocr_count": 48,
+        "ocr_last_time": "2026-08-20 16:16:43",
         "status": "OCR"
       },
       "handler_eth": {
@@ -106,18 +106,14 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-08-20T15:27:55",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     },
     {
@@ -129,7 +125,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 190,
+        "web_count": 191,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +167,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 59,
-        "ocr_last_time": "2026-08-20 16:12:57",
+        "ocr_count": 60,
+        "ocr_last_time": "2026-08-20 16:18:06",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +207,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 190,
+        "web_count": 191,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -340,7 +336,8 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
