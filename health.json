@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-19 23:29:37",
+  "timestamp": "2026-08-19 23:33:37",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 270,
-        "ocr_last_time": "2026-08-19 23:27:19",
+        "ocr_count": 271,
+        "ocr_last_time": "2026-08-19 23:32:28",
         "status": "OCR"
       },
       "handler_eth": {
@@ -79,8 +79,8 @@
       },
       "web_ocr": {
         "web_count": 132,
-        "ocr_count": 134,
-        "ocr_last_time": "2026-08-19 23:24:38",
+        "ocr_count": 135,
+        "ocr_last_time": "2026-08-19 23:29:48",
         "status": "WARN"
       },
       "handler_eth": {
@@ -161,8 +161,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 274,
-        "ocr_last_time": "2026-08-19 23:24:46",
+        "ocr_count": 275,
+        "ocr_last_time": "2026-08-19 23:29:54",
         "status": "OCR"
       },
       "handler_eth": {
