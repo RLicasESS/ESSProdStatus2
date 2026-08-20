@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-19 19:31:37",
+  "timestamp": "2026-08-19 19:35:35",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 224,
-        "ocr_last_time": "2026-08-19 19:30:18",
+        "ocr_count": 225,
+        "ocr_last_time": "2026-08-19 19:35:28",
         "status": "OCR"
       },
       "handler_eth": {
@@ -60,21 +60,13 @@
       "png_sites": {
         "csv": "single site 1",
         "png": [],
-        "result": "MISMATCH"
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "STALE",
-        "ts": "2026-08-18T09:59:24",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        },
-        "png_bins": {
-          "AUTO1": "",
-          "AUTO2": "",
-          "AUTO3": "1"
-        }
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
+        "png_bins": null
       }
     },
     {
@@ -87,8 +79,8 @@
       },
       "web_ocr": {
         "web_count": 132,
-        "ocr_count": 88,
-        "ocr_last_time": "2026-08-19 19:27:01",
+        "ocr_count": 89,
+        "ocr_last_time": "2026-08-19 19:32:11",
         "status": "WARN"
       },
       "handler_eth": {
@@ -127,7 +119,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 228,
+        "web_count": 229,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -169,8 +161,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 228,
-        "ocr_last_time": "2026-08-19 19:28:00",
+        "ocr_count": 229,
+        "ocr_last_time": "2026-08-19 19:33:09",
         "status": "OCR"
       },
       "handler_eth": {
@@ -209,7 +201,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 228,
+        "web_count": 229,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -338,7 +330,8 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
