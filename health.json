@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-20 09:00:43",
+  "timestamp": "2026-08-20 09:04:42",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 105,
-        "ocr_last_time": "2026-08-20 08:59:21",
+        "ocr_count": 106,
+        "ocr_last_time": "2026-08-20 09:04:33",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 105,
-        "ocr_last_time": "2026-08-20 08:58:00",
+        "ocr_count": 106,
+        "ocr_last_time": "2026-08-20 09:03:09",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 105,
+        "web_count": 106,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -147,14 +147,18 @@
         "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
+        "status": "OK",
         "ts": "2026-08-19T14:28:26",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
           "AUTO3": "3, 4, E"
         },
-        "png_bins": null
+        "png_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "3, 4, E"
+        }
       }
     },
     {
@@ -207,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 105,
+        "web_count": 106,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -218,25 +222,21 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "dual",
+        "csv": "unknown",
         "png": [
           1
         ],
-        "result": "MISMATCH"
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-08-19T14:28:26",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     }
   ],
