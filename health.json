@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-20 14:55:44",
+  "timestamp": "2026-08-20 15:00:54",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 173,
-        "ocr_last_time": "2026-08-20 14:51:01",
+        "ocr_count": 174,
+        "ocr_last_time": "2026-08-20 14:56:09",
         "status": "OCR"
       },
       "handler_eth": {
@@ -83,8 +83,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 32,
-        "ocr_last_time": "2026-08-20 14:54:07",
+        "ocr_count": 33,
+        "ocr_last_time": "2026-08-20 14:59:17",
         "status": "OCR"
       },
       "handler_eth": {
@@ -123,7 +123,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 174,
+        "web_count": 175,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -162,8 +162,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 44,
-        "ocr_last_time": "2026-08-20 14:55:44",
+        "ocr_count": 45,
+        "ocr_last_time": "2026-08-20 15:00:53",
         "status": "OCR"
       },
       "handler_eth": {
@@ -202,7 +202,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 174,
+        "web_count": 175,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -314,8 +314,8 @@
         "pid": 15388
       },
       "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
+        "status": "unreachable",
+        "detail": "SSH failed",
         "overflow_count": 0,
         "correction_count": 0
       }
@@ -331,7 +331,8 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
