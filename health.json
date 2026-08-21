@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-21 15:22:43",
+  "timestamp": "2026-08-21 15:27:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 178,
-        "ocr_last_time": "2026-08-21 15:19:10",
+        "ocr_count": 179,
+        "ocr_last_time": "2026-08-21 15:24:20",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 179,
-        "ocr_last_time": "2026-08-21 15:20:27",
+        "ocr_count": 180,
+        "ocr_last_time": "2026-08-21 15:25:36",
         "status": "OCR"
       },
       "handler_eth": {
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 180,
-        "ocr_last_time": "2026-08-21 15:22:20",
+        "ocr_count": 181,
+        "ocr_last_time": "2026-08-21 15:27:29",
         "status": "OCR"
       },
       "handler_eth": {
@@ -223,13 +223,19 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "unknown",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1
+        ],
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
+        "status": "UNKNOWN",
+        "ts": "2026-08-21T14:00:52",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        },
         "png_bins": null
       }
     }
@@ -271,7 +277,28 @@
     },
     {
       "name": "S100_1",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 6680
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "S100_2",
