@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-21 14:00:44",
+  "timestamp": "2026-08-21 14:03:45",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 162,
-        "ocr_last_time": "2026-08-21 13:56:16",
+        "ocr_count": 163,
+        "ocr_last_time": "2026-08-21 14:01:27",
         "status": "OCR"
       },
       "handler_eth": {
@@ -66,7 +66,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-21T11:07:22",
+        "ts": "2026-08-21T14:00:52",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 163,
-        "ocr_last_time": "2026-08-21 13:57:45",
+        "ocr_count": 164,
+        "ocr_last_time": "2026-08-21 14:02:55",
         "status": "OCR"
       },
       "handler_eth": {
@@ -107,7 +107,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-21T11:07:22",
+        "ts": "2026-08-21T14:00:52",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -147,8 +147,8 @@
         "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "STALE",
-        "ts": "2026-08-20T15:27:55",
+        "status": "OK",
+        "ts": "2026-08-21T14:00:52",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -189,7 +189,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-21T11:07:22",
+        "ts": "2026-08-21T14:00:52",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -231,7 +231,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-21T11:07:22",
+        "ts": "2026-08-21T14:00:52",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
