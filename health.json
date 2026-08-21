@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-21 10:26:38",
+  "timestamp": "2026-08-21 10:31:43",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 121,
-        "ocr_last_time": "2026-08-21 10:23:56",
+        "ocr_count": 122,
+        "ocr_last_time": "2026-08-21 10:29:07",
         "status": "OCR"
       },
       "handler_eth": {
@@ -65,7 +65,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "MISMATCH",
         "ts": "2026-08-20T15:27:54",
         "json_bins": {
           "AUTO1": "1",
@@ -73,9 +73,9 @@
           "AUTO3": "4, E"
         },
         "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
+          "AUTO1": "",
+          "AUTO2": "1",
+          "AUTO3": "1, R, R1, 1, R"
         }
       }
     },
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 122,
-        "ocr_last_time": "2026-08-21 10:26:31",
+        "ocr_count": 123,
+        "ocr_last_time": "2026-08-21 10:31:41",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 122,
+        "web_count": 123,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -167,8 +167,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 122,
-        "ocr_last_time": "2026-08-21 10:23:37",
+        "ocr_count": 123,
+        "ocr_last_time": "2026-08-21 10:28:46",
         "status": "OCR"
       },
       "handler_eth": {
@@ -207,7 +207,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 123,
+        "web_count": 124,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -336,7 +336,8 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
