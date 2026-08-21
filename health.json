@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-21 12:37:56",
+  "timestamp": "2026-08-21 12:42:42",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 146,
-        "ocr_last_time": "2026-08-21 12:33:26",
+        "ocr_count": 147,
+        "ocr_last_time": "2026-08-21 12:38:37",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 147,
-        "ocr_last_time": "2026-08-21 12:35:19",
+        "ocr_count": 148,
+        "ocr_last_time": "2026-08-21 12:40:28",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 147,
+        "web_count": 148,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 148,
-        "ocr_last_time": "2026-08-21 12:37:32",
+        "ocr_count": 149,
+        "ocr_last_time": "2026-08-21 12:42:41",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 148,
+        "web_count": 149,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -222,11 +222,11 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "dual",
+        "csv": "unknown",
         "png": [
           1
         ],
-        "result": "MISMATCH"
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
         "status": "OK",
@@ -281,28 +281,7 @@
     },
     {
       "name": "S100_1",
-      "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "ok",
-        "pid": 6680
-      },
-      "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "S100_2",
