@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-20 18:01:38",
+  "timestamp": "2026-08-20 18:05:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 209,
-        "ocr_last_time": "2026-08-20 17:57:17",
+        "ocr_count": 210,
+        "ocr_last_time": "2026-08-20 18:02:27",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 68,
-        "ocr_last_time": "2026-08-20 17:59:56",
+        "ocr_count": 69,
+        "ocr_last_time": "2026-08-20 18:05:06",
         "status": "OCR"
       },
       "handler_eth": {
