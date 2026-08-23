@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-23 12:38:40",
+  "timestamp": "2026-08-23 12:42:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 147,
-        "ocr_last_time": "2026-08-23 12:35:34",
+        "ocr_count": 148,
+        "ocr_last_time": "2026-08-23 12:40:42",
         "status": "OCR"
       },
       "handler_eth": {
@@ -79,8 +79,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 147,
-        "ocr_last_time": "2026-08-23 12:35:13",
+        "ocr_count": 148,
+        "ocr_last_time": "2026-08-23 12:40:23",
         "status": "OCR"
       },
       "handler_eth": {
@@ -172,14 +172,24 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1
+        ],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-08-21T14:00:52",
+        "json_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "4, E"
+        }
       }
     },
     {
@@ -191,7 +201,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 148,
+        "web_count": 149,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -321,8 +331,7 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "STARTED: SCardSvr was stopped \u2014 started automatically"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
       ],
       "drive": {
         "status": "ok",
