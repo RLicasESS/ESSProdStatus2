@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-23 17:56:37",
+  "timestamp": "2026-08-23 18:00:35",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 209,
-        "ocr_last_time": "2026-08-23 17:54:17",
+        "ocr_count": 210,
+        "ocr_last_time": "2026-08-23 17:59:25",
         "status": "OCR"
       },
       "handler_eth": {
@@ -161,8 +161,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 209,
-        "ocr_last_time": "2026-08-23 17:51:47",
+        "ocr_count": 210,
+        "ocr_last_time": "2026-08-23 17:56:57",
         "status": "OCR"
       },
       "handler_eth": {
@@ -201,7 +201,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 210,
+        "web_count": 211,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -328,11 +328,9 @@
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
       "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+        "MISSING: Read Lot Number.py \u2014 restart FAILED"
       ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
-      ],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
