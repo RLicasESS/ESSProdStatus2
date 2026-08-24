@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-24 06:51:37",
+  "timestamp": "2026-08-24 06:56:36",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 80,
-        "ocr_last_time": "2026-08-24 06:50:29",
+        "ocr_count": 81,
+        "ocr_last_time": "2026-08-24 06:55:37",
         "status": "OCR"
       },
       "handler_eth": {
@@ -79,8 +79,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 80,
-        "ocr_last_time": "2026-08-24 06:48:42",
+        "ocr_count": 81,
+        "ocr_last_time": "2026-08-24 06:53:50",
         "status": "OCR"
       },
       "handler_eth": {
@@ -109,7 +109,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 80,
+        "web_count": 81,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -141,8 +141,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 80,
-        "ocr_last_time": "2026-08-24 06:48:01",
+        "ocr_count": 81,
+        "ocr_last_time": "2026-08-24 06:53:09",
         "status": "OCR"
       },
       "handler_eth": {
@@ -171,7 +171,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 80,
+        "web_count": 81,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -287,9 +287,11 @@
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
       "warnings": [
-        "MISSING: Read Lot Number.py \u2014 restart FAILED"
+        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
-      "notices": [],
+      "notices": [
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+      ],
       "drive": {
         "status": "ok",
         "drive": "T",
