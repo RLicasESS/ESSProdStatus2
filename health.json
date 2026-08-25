@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-25 09:20:38",
+  "timestamp": "2026-08-25 09:25:41",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 109,
-        "ocr_last_time": "2026-08-25 09:19:51",
+        "ocr_count": 110,
+        "ocr_last_time": "2026-08-25 09:25:02",
         "status": "OCR"
       },
       "handler_eth": {
@@ -60,12 +60,16 @@
       "png_sites": {
         "csv": "single site 1",
         "png": [],
-        "result": "ERROR"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
+        "status": "STALE",
+        "ts": "2026-08-21T14:00:52",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        },
         "png_bins": null
       }
     },
@@ -79,8 +83,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 109,
-        "ocr_last_time": "2026-08-25 09:18:00",
+        "ocr_count": 110,
+        "ocr_last_time": "2026-08-25 09:23:11",
         "status": "OCR"
       },
       "handler_eth": {
@@ -119,7 +123,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 109,
+        "web_count": 110,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -161,8 +165,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 109,
-        "ocr_last_time": "2026-08-25 09:19:14",
+        "ocr_count": 110,
+        "ocr_last_time": "2026-08-25 09:24:23",
         "status": "OCR"
       },
       "handler_eth": {
@@ -201,7 +205,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 109,
+        "web_count": 110,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -331,7 +335,8 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
