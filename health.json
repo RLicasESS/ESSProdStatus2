@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-25 15:02:36",
+  "timestamp": "2026-08-25 15:06:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 159,
-        "ocr_last_time": "2026-08-25 15:01:21",
+        "ocr_count": 160,
+        "ocr_last_time": "2026-08-25 15:06:31",
         "status": "OCR"
       },
       "handler_eth": {
@@ -59,9 +59,7 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [
-          2
-        ],
+        "png": [],
         "result": "MISMATCH"
       },
       "bin_mapping": {
@@ -72,7 +70,11 @@
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": null
+        "png_bins": {
+          "AUTO1": "",
+          "AUTO2": "1",
+          "AUTO3": ""
+        }
       }
     },
     {
@@ -85,8 +87,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 175,
-        "ocr_last_time": "2026-08-25 14:59:12",
+        "ocr_count": 176,
+        "ocr_last_time": "2026-08-25 15:04:22",
         "status": "OCR"
       },
       "handler_eth": {
@@ -103,7 +105,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-24T09:57:39",
+        "ts": "2026-08-25T15:03:24",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -125,7 +127,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 176,
+        "web_count": 177,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -144,7 +146,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-24T09:57:39",
+        "ts": "2026-08-25T15:03:24",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -167,8 +169,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 175,
-        "ocr_last_time": "2026-08-25 14:58:40",
+        "ocr_count": 176,
+        "ocr_last_time": "2026-08-25 15:03:49",
         "status": "OCR"
       },
       "handler_eth": {
@@ -185,7 +187,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-24T09:57:39",
+        "ts": "2026-08-25T15:03:24",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -207,7 +209,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 176,
+        "web_count": 177,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -226,7 +228,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-08-24T09:57:39",
+        "ts": "2026-08-25T15:03:24",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -333,11 +335,9 @@
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
       "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+        "MISSING: Read Lot Number.py \u2014 restart FAILED"
       ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
-      ],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
