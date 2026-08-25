@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-25 14:06:48",
+  "timestamp": "2026-08-25 14:10:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -42,27 +42,25 @@
       "name": "CHROMA",
       "ip": "172.18.179.225",
       "services": {
-        "handlerstatus.service": "DOWN",
-        "requestserver.service": "DOWN",
-        "ssh.service": "DOWN"
+        "handlerstatus.service": "OK",
+        "requestserver.service": "OK",
+        "ssh.service": "OK"
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 0,
-        "ocr_last_time": null,
-        "status": "UNKNOWN"
+        "ocr_count": 149,
+        "ocr_last_time": "2026-08-25 14:09:53",
+        "status": "OCR"
       },
       "handler_eth": {
         "ip": null,
         "status": "N/A"
       },
-      "png_connected": "OK",
+      "png_connected": "BLACK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [
-          1
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
         "status": "STALE",
@@ -72,11 +70,7 @@
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     },
     {
@@ -89,8 +83,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 164,
-        "ocr_last_time": "2026-08-25 14:02:18",
+        "ocr_count": 165,
+        "ocr_last_time": "2026-08-25 14:07:28",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +123,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 165,
+        "web_count": 166,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +165,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 164,
-        "ocr_last_time": "2026-08-25 14:01:59",
+        "ocr_count": 165,
+        "ocr_last_time": "2026-08-25 14:07:08",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +205,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 165,
+        "web_count": 166,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
