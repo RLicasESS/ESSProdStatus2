@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-25 14:54:35",
+  "timestamp": "2026-08-25 14:59:52",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 157,
-        "ocr_last_time": "2026-08-25 14:51:03",
+        "ocr_count": 158,
+        "ocr_last_time": "2026-08-25 14:56:12",
         "status": "OCR"
       },
       "handler_eth": {
@@ -83,8 +83,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 174,
-        "ocr_last_time": "2026-08-25 14:54:01",
+        "ocr_count": 175,
+        "ocr_last_time": "2026-08-25 14:59:12",
         "status": "OCR"
       },
       "handler_eth": {
@@ -123,7 +123,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 174,
+        "web_count": 175,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -165,8 +165,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 174,
-        "ocr_last_time": "2026-08-25 14:53:31",
+        "ocr_count": 175,
+        "ocr_last_time": "2026-08-25 14:58:40",
         "status": "OCR"
       },
       "handler_eth": {
@@ -205,7 +205,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 174,
+        "web_count": 175,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -218,10 +218,9 @@
       "png_sites": {
         "csv": "dual",
         "png": [
-          1,
           2
         ],
-        "result": "MATCH"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
         "status": "OK",
@@ -335,7 +334,8 @@
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
       "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically"
       ],
       "drive": {
         "status": "ok",
