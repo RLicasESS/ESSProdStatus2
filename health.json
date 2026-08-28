@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-28 01:11:36",
+  "timestamp": "2026-08-28 01:15:37",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 14,
-        "ocr_last_time": "2026-08-28 01:10:11",
+        "ocr_count": 15,
+        "ocr_last_time": "2026-08-28 01:15:21",
         "status": "OCR"
       },
       "handler_eth": {
@@ -161,8 +161,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 14,
-        "ocr_last_time": "2026-08-28 01:07:30",
+        "ocr_count": 15,
+        "ocr_last_time": "2026-08-28 01:12:39",
         "status": "OCR"
       },
       "handler_eth": {
@@ -250,7 +250,7 @@
       },
       "splashtop": {
         "status": "ok",
-        "pid": 16368
+        "pid": 21548
       },
       "lotsetting": {
         "status": "ok",
