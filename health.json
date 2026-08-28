@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-28 11:29:38",
+  "timestamp": "2026-08-28 11:34:40",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 133,
-        "ocr_last_time": "2026-08-28 11:24:40",
+        "ocr_count": 134,
+        "ocr_last_time": "2026-08-28 11:29:51",
         "status": "OCR"
       },
       "handler_eth": {
@@ -59,24 +59,18 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [
-          1
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-08-27T10:38:56",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     },
     {
@@ -89,8 +83,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 133,
-        "ocr_last_time": "2026-08-28 11:25:45",
+        "ocr_count": 134,
+        "ocr_last_time": "2026-08-28 11:30:55",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +123,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 134,
+        "web_count": 135,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +165,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 134,
-        "ocr_last_time": "2026-08-28 11:25:21",
+        "ocr_count": 135,
+        "ocr_last_time": "2026-08-28 11:30:30",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +205,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 134,
+        "web_count": 135,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
