@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-29 21:36:45",
+  "timestamp": "2026-08-29 21:40:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -79,8 +79,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 131,
-        "ocr_last_time": "2026-08-29 21:33:34",
+        "ocr_count": 132,
+        "ocr_last_time": "2026-08-29 21:38:44",
         "status": "OCR"
       },
       "handler_eth": {
@@ -151,8 +151,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 252,
-        "ocr_last_time": "2026-08-29 21:32:15",
+        "ocr_count": 253,
+        "ocr_last_time": "2026-08-29 21:37:23",
         "status": "OCR"
       },
       "handler_eth": {
@@ -276,28 +276,7 @@
     },
     {
       "name": "S100_2",
-      "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "ok",
-        "pid": 15388
-      },
-      "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "S100_4",
