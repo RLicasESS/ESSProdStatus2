@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-30 12:00:43",
+  "timestamp": "2026-08-30 12:05:46",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 140,
-        "ocr_last_time": "2026-08-30 11:56:28",
+        "ocr_count": 141,
+        "ocr_last_time": "2026-08-30 12:01:40",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 139,
-        "ocr_last_time": "2026-08-30 11:57:07",
+        "ocr_count": 140,
+        "ocr_last_time": "2026-08-30 12:02:18",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 140,
+        "web_count": 141,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 141,
-        "ocr_last_time": "2026-08-30 12:00:30",
+        "ocr_count": 142,
+        "ocr_last_time": "2026-08-30 12:05:39",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 141,
+        "web_count": 142,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -306,28 +306,7 @@
     },
     {
       "name": "S100_2",
-      "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "ok",
-        "pid": 15388
-      },
-      "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "S100_4",
