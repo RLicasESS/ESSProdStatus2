@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-29 17:49:53",
+  "timestamp": "2026-08-29 17:53:48",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 207,
-        "ocr_last_time": "2026-08-29 17:44:56",
+        "ocr_count": 208,
+        "ocr_last_time": "2026-08-29 17:50:08",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 87,
-        "ocr_last_time": "2026-08-29 17:46:05",
+        "ocr_count": 88,
+        "ocr_last_time": "2026-08-29 17:51:15",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 208,
+        "web_count": 209,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 208,
-        "ocr_last_time": "2026-08-29 17:46:07",
+        "ocr_count": 209,
+        "ocr_last_time": "2026-08-29 17:51:17",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 209,
+        "web_count": 210,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -294,8 +294,8 @@
         "remote": "\\\\172.18.155.223\\tester"
       },
       "splashtop": {
-        "status": "unreachable",
-        "pid": null
+        "status": "ok",
+        "pid": 13380
       },
       "lotsetting": {
         "status": "ok",
