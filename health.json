@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-01 16:25:35",
+  "timestamp": "2026-09-01 16:31:46",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 191,
-        "ocr_last_time": "2026-09-01 16:24:36",
+        "ocr_count": 192,
+        "ocr_last_time": "2026-09-01 16:29:46",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 191,
-        "ocr_last_time": "2026-09-01 16:23:39",
+        "ocr_count": 192,
+        "ocr_last_time": "2026-09-01 16:28:49",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 193,
+        "web_count": 194,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 191,
-        "ocr_last_time": "2026-09-01 16:22:36",
+        "ocr_count": 192,
+        "ocr_last_time": "2026-09-01 16:27:45",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 193,
+        "web_count": 194,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -222,11 +222,11 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "dual",
+        "csv": "single site 2",
         "png": [
           2
         ],
-        "result": "MISMATCH"
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "OK",
@@ -252,7 +252,28 @@
   "testers": [
     {
       "name": "AP-1",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "failed",
+        "pid": null
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "AP-2",
