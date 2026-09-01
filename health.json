@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-01 01:15:31",
+  "timestamp": "2026-09-01 01:20:29",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 14,
-        "ocr_last_time": "2026-09-01 01:10:50",
+        "ocr_count": 15,
+        "ocr_last_time": "2026-09-01 01:15:59",
         "status": "OCR"
       },
       "handler_eth": {
@@ -79,8 +79,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 14,
-        "ocr_last_time": "2026-09-01 01:10:25",
+        "ocr_count": 15,
+        "ocr_last_time": "2026-09-01 01:15:34",
         "status": "OCR"
       },
       "handler_eth": {
@@ -109,7 +109,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 15,
+        "web_count": 16,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -141,8 +141,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 14,
-        "ocr_last_time": "2026-09-01 01:11:34",
+        "ocr_count": 15,
+        "ocr_last_time": "2026-09-01 01:16:42",
         "status": "OCR"
       },
       "handler_eth": {
@@ -181,7 +181,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 15,
+        "web_count": 16,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -230,7 +230,7 @@
       },
       "splashtop": {
         "status": "ok",
-        "pid": 10472
+        "pid": 16936
       },
       "lotsetting": {
         "status": "ok",
