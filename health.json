@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-01 13:37:41",
+  "timestamp": "2026-09-01 13:45:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 158,
-        "ocr_last_time": "2026-09-01 13:33:50",
+        "ocr_count": 160,
+        "ocr_last_time": "2026-09-01 13:44:11",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 158,
-        "ocr_last_time": "2026-09-01 13:32:59",
+        "ocr_count": 160,
+        "ocr_last_time": "2026-09-01 13:43:20",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 160,
+        "web_count": 161,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -147,18 +147,14 @@
         "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
+        "status": "UNKNOWN",
         "ts": "2026-09-01T12:27:24",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
           "AUTO3": "3, 4, E"
         },
-        "png_bins": {
-          "AUTO1": "3",
-          "AUTO2": "",
-          "AUTO3": "2, 14"
-        }
+        "png_bins": null
       }
     },
     {
@@ -171,8 +167,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 158,
-        "ocr_last_time": "2026-09-01 13:32:47",
+        "ocr_count": 160,
+        "ocr_last_time": "2026-09-01 13:43:05",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +207,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 160,
+        "web_count": 161,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -222,11 +218,11 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "single site 2",
+        "csv": "single site 3",
         "png": [
           2
         ],
-        "result": "MATCH"
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
         "status": "OK",
