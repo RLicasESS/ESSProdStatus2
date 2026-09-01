@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-01 16:31:46",
+  "timestamp": "2026-09-01 16:34:45",
   "local": [
     {
       "service": "testerstatus.service",
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 192,
-        "ocr_last_time": "2026-09-01 16:28:49",
+        "ocr_count": 193,
+        "ocr_last_time": "2026-09-01 16:33:59",
         "status": "OCR"
       },
       "handler_eth": {
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 192,
-        "ocr_last_time": "2026-09-01 16:27:45",
+        "ocr_count": 193,
+        "ocr_last_time": "2026-09-01 16:32:54",
         "status": "OCR"
       },
       "handler_eth": {
@@ -222,11 +222,11 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "single site 2",
+        "csv": "dual",
         "png": [
           2
         ],
-        "result": "MATCH"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
         "status": "OK",
