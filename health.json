@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-01 13:50:36",
+  "timestamp": "2026-09-01 13:59:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 161,
-        "ocr_last_time": "2026-09-01 13:49:22",
+        "ocr_count": 162,
+        "ocr_last_time": "2026-09-01 13:54:33",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 161,
-        "ocr_last_time": "2026-09-01 13:48:30",
+        "ocr_count": 163,
+        "ocr_last_time": "2026-09-01 13:58:51",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 162,
+        "web_count": 164,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -147,14 +147,18 @@
         "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
+        "status": "OK",
         "ts": "2026-09-01T12:27:24",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
           "AUTO3": "3, 4, E"
         },
-        "png_bins": null
+        "png_bins": {
+          "AUTO1": "1, 5",
+          "AUTO2": "2",
+          "AUTO3": "3, 4, E"
+        }
       }
     },
     {
@@ -167,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 161,
-        "ocr_last_time": "2026-09-01 13:48:14",
+        "ocr_count": 163,
+        "ocr_last_time": "2026-09-01 13:58:32",
         "status": "OCR"
       },
       "handler_eth": {
@@ -207,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 162,
+        "web_count": 164,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -218,11 +222,11 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "single site 2",
+        "csv": "dual",
         "png": [
           2
         ],
-        "result": "MATCH"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
         "status": "OK",
