@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-01 19:20:44",
+  "timestamp": "2026-09-01 19:25:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 225,
-        "ocr_last_time": "2026-09-01 19:19:53",
+        "ocr_count": 226,
+        "ocr_last_time": "2026-09-01 19:25:03",
         "status": "OCR"
       },
       "handler_eth": {
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 225,
-        "ocr_last_time": "2026-09-01 19:19:25",
+        "ocr_count": 226,
+        "ocr_last_time": "2026-09-01 19:24:36",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 227,
+        "web_count": 228,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 225,
-        "ocr_last_time": "2026-09-01 19:17:40",
+        "ocr_count": 226,
+        "ocr_last_time": "2026-09-01 19:22:48",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 227,
+        "web_count": 228,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -223,14 +223,24 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 2",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          2
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-09-01T17:18:41",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
       }
     }
   ],
