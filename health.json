@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-01 18:17:43",
+  "timestamp": "2026-09-01 18:22:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 212,
-        "ocr_last_time": "2026-09-01 18:12:42",
+        "ocr_count": 213,
+        "ocr_last_time": "2026-09-01 18:17:52",
         "status": "OCR"
       },
       "handler_eth": {
@@ -73,9 +73,9 @@
           "AUTO3": "4, E"
         },
         "png_bins": {
-          "AUTO1": "",
-          "AUTO2": "1",
-          "AUTO3": "1, R, R1, 1, R"
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
         }
       }
     },
@@ -89,8 +89,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 213,
-        "ocr_last_time": "2026-09-01 18:17:24",
+        "ocr_count": 214,
+        "ocr_last_time": "2026-09-01 18:22:34",
         "status": "OCR"
       },
       "handler_eth": {
@@ -129,7 +129,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 215,
+        "web_count": 216,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -171,8 +171,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 213,
-        "ocr_last_time": "2026-09-01 18:15:54",
+        "ocr_count": 214,
+        "ocr_last_time": "2026-09-01 18:21:03",
         "status": "OCR"
       },
       "handler_eth": {
@@ -211,7 +211,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 214,
+        "web_count": 215,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -223,20 +223,13 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [
-          1,
-          2
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
-        "ts": "2026-09-01T17:18:41",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        },
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
         "png_bins": null
       }
     }
