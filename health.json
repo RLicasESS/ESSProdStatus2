@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-03 09:30:44",
+  "timestamp": "2026-09-03 09:34:58",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 110,
-        "ocr_last_time": "2026-09-03 09:26:32",
+        "ocr_count": 111,
+        "ocr_last_time": "2026-09-03 09:31:43",
         "status": "OCR"
       },
       "handler_eth": {
@@ -90,8 +90,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 102,
-        "ocr_last_time": "2026-09-03 09:29:02",
+        "ocr_count": 103,
+        "ocr_last_time": "2026-09-03 09:34:11",
         "status": "OCR"
       },
       "handler_eth": {
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 111,
-        "ocr_last_time": "2026-09-03 09:29:16",
+        "ocr_count": 112,
+        "ocr_last_time": "2026-09-03 09:34:25",
         "status": "OCR"
       },
       "handler_eth": {
@@ -212,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 111,
+        "web_count": 112,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -304,20 +304,25 @@
     {
       "name": "S100_1",
       "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
+      "pythonw_count": 0,
+      "read_lot": 0,
+      "ess_lot_main": 0,
+      "ess_lot_worker": 0,
+      "warnings": [
+        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+      ],
+      "notices": [
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
+      ],
       "drive": {
         "status": "ok",
         "drive": "T",
         "remote": "\\\\172.18.155.223\\tester"
       },
       "splashtop": {
-        "status": "ok",
-        "pid": 14168
+        "status": "failed",
+        "pid": null
       },
       "lotsetting": {
         "status": "ok",
