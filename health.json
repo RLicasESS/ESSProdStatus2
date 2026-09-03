@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-02 20:40:43",
+  "timestamp": "2026-09-02 20:46:49",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 240,
-        "ocr_last_time": "2026-09-02 20:38:42",
+        "ocr_count": 241,
+        "ocr_last_time": "2026-09-02 20:43:53",
         "status": "OCR"
       },
       "handler_eth": {
@@ -59,25 +59,18 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [
-          1,
-          2
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-09-02T18:27:22",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
-        }
+        "png_bins": null
       }
     },
     {
@@ -90,8 +83,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 241,
-        "ocr_last_time": "2026-09-02 20:40:09",
+        "ocr_count": 242,
+        "ocr_last_time": "2026-09-02 20:45:18",
         "status": "OCR"
       },
       "handler_eth": {
@@ -130,7 +123,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 242,
+        "web_count": 244,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -172,8 +165,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 216,
-        "ocr_last_time": "2026-09-02 20:36:32",
+        "ocr_count": 218,
+        "ocr_last_time": "2026-09-02 20:46:50",
         "status": "OCR"
       },
       "handler_eth": {
@@ -212,7 +205,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 242,
+        "web_count": 243,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
