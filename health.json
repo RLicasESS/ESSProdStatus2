@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-03 13:31:44",
+  "timestamp": "2026-09-03 13:35:46",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 157,
-        "ocr_last_time": "2026-09-03 13:30:15",
+        "ocr_count": 158,
+        "ocr_last_time": "2026-09-03 13:35:26",
         "status": "OCR"
       },
       "handler_eth": {
@@ -67,7 +67,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-02T18:27:22",
+        "ts": "2026-09-03T13:31:51",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -107,12 +107,12 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-09-02T18:27:23",
+        "status": "OK",
+        "ts": "2026-09-03T13:31:51",
         "json_bins": {
           "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
+          "AUTO2": "2, 3, 5, E",
+          "AUTO3": "4"
         },
         "png_bins": {
           "AUTO1": "1",
@@ -149,7 +149,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-02T18:27:23",
+        "ts": "2026-09-03T13:31:51",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -190,7 +190,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-02T18:27:23",
+        "ts": "2026-09-03T13:31:51",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -212,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 158,
+        "web_count": 159,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -231,11 +231,11 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-09-02T18:27:23",
+        "status": "OK",
+        "ts": "2026-09-03T13:31:51",
         "json_bins": {
           "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
+          "AUTO2": "3, 6, 8, 9",
           "AUTO3": "4, E"
         },
         "png_bins": {
