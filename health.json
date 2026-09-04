@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-04 09:25:03",
+  "timestamp": "2026-09-04 09:29:45",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 110,
-        "ocr_last_time": "2026-09-04 09:23:30",
+        "ocr_count": 111,
+        "ocr_last_time": "2026-09-04 09:28:42",
         "status": "OCR"
       },
       "handler_eth": {
@@ -90,8 +90,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 110,
-        "ocr_last_time": "2026-09-04 09:22:00",
+        "ocr_count": 111,
+        "ocr_last_time": "2026-09-04 09:27:09",
         "status": "OCR"
       },
       "handler_eth": {
@@ -120,7 +120,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 110,
+        "web_count": 111,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -159,8 +159,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 109,
-        "ocr_last_time": "2026-09-04 09:20:13",
+        "ocr_count": 110,
+        "ocr_last_time": "2026-09-04 09:25:22",
         "status": "OCR"
       },
       "handler_eth": {
@@ -199,7 +199,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 110,
+        "web_count": 111,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -317,25 +317,22 @@
     {
       "name": "S100_2",
       "status": "ok",
-      "pythonw_count": 0,
-      "read_lot": 0,
-      "ess_lot_main": 0,
-      "ess_lot_worker": 0,
+      "pythonw_count": 5,
+      "read_lot": 1,
+      "ess_lot_main": 2,
+      "ess_lot_worker": 2,
       "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+        "EXTRA: 2 ESS Lot mains running (expected 1)"
       ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
-      ],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
         "remote": "\\\\172.18.155.223\\tester"
       },
       "splashtop": {
-        "status": "failed",
-        "pid": null
+        "status": "ok",
+        "pid": 1644
       },
       "lotsetting": {
         "status": "ok",
