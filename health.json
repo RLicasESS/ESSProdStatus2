@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-06 05:08:48",
+  "timestamp": "2026-09-06 05:13:45",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 59,
-        "ocr_last_time": "2026-09-06 05:06:11",
+        "ocr_count": 60,
+        "ocr_last_time": "2026-09-06 05:11:23",
         "status": "OCR"
       },
       "handler_eth": {
@@ -90,8 +90,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 60,
-        "ocr_last_time": "2026-09-06 05:05:52",
+        "ocr_count": 61,
+        "ocr_last_time": "2026-09-06 05:11:00",
         "status": "OCR"
       },
       "handler_eth": {
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 60,
+        "web_count": 61,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -162,8 +162,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 60,
-        "ocr_last_time": "2026-09-06 05:04:48",
+        "ocr_count": 61,
+        "ocr_last_time": "2026-09-06 05:09:57",
         "status": "OCR"
       },
       "handler_eth": {
@@ -192,7 +192,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 60,
+        "web_count": 61,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -298,7 +298,28 @@
     },
     {
       "name": "S100_2",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 1644
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "S100_4",
