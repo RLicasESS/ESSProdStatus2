@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-06 00:11:05",
+  "timestamp": "2026-09-06 00:14:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -90,8 +90,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 2,
-        "ocr_last_time": "2026-09-06 00:07:59",
+        "ocr_count": 3,
+        "ocr_last_time": "2026-09-06 00:13:07",
         "status": "OCR"
       },
       "handler_eth": {
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 2,
+        "web_count": 3,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -162,8 +162,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 2,
-        "ocr_last_time": "2026-09-06 00:06:28",
+        "ocr_count": 3,
+        "ocr_last_time": "2026-09-06 00:11:36",
         "status": "OCR"
       },
       "handler_eth": {
@@ -192,7 +192,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 2,
+        "web_count": 3,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -311,12 +311,12 @@
         "remote": "\\\\172.18.155.223\\tester"
       },
       "splashtop": {
-        "status": "unreachable",
-        "pid": null
+        "status": "ok",
+        "pid": 1644
       },
       "lotsetting": {
-        "status": "unreachable",
-        "detail": "SSH failed",
+        "status": "ok",
+        "detail": "no overflow errors detected",
         "overflow_count": 0,
         "correction_count": 0
       }
