@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-07 15:54:47",
+  "timestamp": "2026-09-07 15:57:42",
   "local": [
     {
       "service": "testerstatus.service",
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 186,
+        "web_count": 187,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 186,
-        "ocr_last_time": "2026-09-07 15:50:55",
+        "ocr_count": 187,
+        "ocr_last_time": "2026-09-07 15:56:02",
         "status": "OCR"
       },
       "handler_eth": {
