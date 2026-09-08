@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-08 00:39:49",
+  "timestamp": "2026-09-08 00:43:49",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 8,
-        "ocr_last_time": "2026-09-08 00:37:01",
+        "ocr_count": 9,
+        "ocr_last_time": "2026-09-08 00:42:12",
         "status": "OCR"
       },
       "handler_eth": {
@@ -90,8 +90,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 7,
-        "ocr_last_time": "2026-09-08 00:36:01",
+        "ocr_count": 8,
+        "ocr_last_time": "2026-09-08 00:41:12",
         "status": "OCR"
       },
       "handler_eth": {
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 8,
+        "web_count": 9,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 8,
-        "ocr_last_time": "2026-09-08 00:38:44",
+        "ocr_count": 9,
+        "ocr_last_time": "2026-09-08 00:43:51",
         "status": "OCR"
       },
       "handler_eth": {
@@ -212,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 7,
+        "web_count": 8,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -318,28 +318,7 @@
     },
     {
       "name": "S100_2",
-      "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "ok",
-        "pid": 1644
-      },
-      "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "S100_4",
