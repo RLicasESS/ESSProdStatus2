@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-09 09:03:49",
+  "timestamp": "2026-09-09 09:06:48",
   "local": [
     {
       "service": "testerstatus.service",
@@ -101,14 +101,24 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-09-08T10:21:00",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "3, 5",
+          "AUTO3": "2"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "3, 5",
+          "AUTO3": "2"
+        }
       }
     },
     {
@@ -120,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 106,
+        "web_count": 107,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -162,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 106,
-        "ocr_last_time": "2026-09-09 09:00:45",
+        "ocr_count": 107,
+        "ocr_last_time": "2026-09-09 09:05:53",
         "status": "OCR"
       },
       "handler_eth": {
@@ -192,7 +202,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 106,
+        "web_count": 107,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -284,28 +294,7 @@
     },
     {
       "name": "S100_1",
-      "status": "ok",
-      "pythonw_count": 3,
-      "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
-      "drive": {
-        "status": "ok",
-        "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
-      },
-      "splashtop": {
-        "status": "ok",
-        "pid": 12764
-      },
-      "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
-        "overflow_count": 0,
-        "correction_count": 0
-      }
+      "status": "unreachable"
     },
     {
       "name": "S100_2",
