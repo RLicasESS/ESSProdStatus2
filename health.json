@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-10 09:52:45",
+  "timestamp": "2026-09-10 09:55:57",
   "local": [
     {
       "service": "testerstatus.service",
@@ -90,8 +90,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 115,
-        "ocr_last_time": "2026-09-10 09:50:48",
+        "ocr_count": 116,
+        "ocr_last_time": "2026-09-10 09:55:58",
         "status": "OCR"
       },
       "handler_eth": {
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 116,
+        "web_count": 117,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 115,
-        "ocr_last_time": "2026-09-10 09:48:03",
+        "ocr_count": 116,
+        "ocr_last_time": "2026-09-10 09:53:12",
         "status": "OCR"
       },
       "handler_eth": {
@@ -212,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 116,
+        "web_count": 117,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -231,18 +231,14 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-09-08T10:21:01",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "3, 6, 8, 9",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "3, 6, 8, 9",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     }
   ],
@@ -321,8 +317,8 @@
         "pid": 12764
       },
       "lotsetting": {
-        "status": "ok",
-        "detail": "no overflow errors detected",
+        "status": "unreachable",
+        "detail": "SSH failed",
         "overflow_count": 0,
         "correction_count": 0
       }
