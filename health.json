@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-10 03:49:50",
+  "timestamp": "2026-09-10 03:56:02",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 44,
-        "ocr_last_time": "2026-09-10 03:47:43",
+        "ocr_count": 45,
+        "ocr_last_time": "2026-09-10 03:52:55",
         "status": "OCR"
       },
       "handler_eth": {
@@ -90,8 +90,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 45,
-        "ocr_last_time": "2026-09-10 03:49:01",
+        "ocr_count": 46,
+        "ocr_last_time": "2026-09-10 03:54:11",
         "status": "OCR"
       },
       "handler_eth": {
@@ -130,7 +130,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 45,
+        "web_count": 46,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 45,
-        "ocr_last_time": "2026-09-10 03:47:59",
+        "ocr_count": 46,
+        "ocr_last_time": "2026-09-10 03:53:08",
         "status": "OCR"
       },
       "handler_eth": {
@@ -202,7 +202,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 45,
+        "web_count": 46,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -213,7 +213,7 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "dual",
+        "csv": "unknown",
         "png": [],
         "result": "ERROR"
       },
@@ -291,9 +291,9 @@
       "warnings": [],
       "notices": [],
       "drive": {
-        "status": "ok",
+        "status": "unreachable",
         "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
+        "remote": null
       },
       "splashtop": {
         "status": "ok",
