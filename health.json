@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-10 07:42:52",
+  "timestamp": "2026-09-10 07:45:52",
   "local": [
     {
       "service": "testerstatus.service",
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 90,
-        "ocr_last_time": "2026-09-10 07:39:23",
+        "ocr_count": 91,
+        "ocr_last_time": "2026-09-10 07:44:31",
         "status": "OCR"
       },
       "handler_eth": {
@@ -291,9 +291,9 @@
       "warnings": [],
       "notices": [],
       "drive": {
-        "status": "ok",
+        "status": "unreachable",
         "drive": "T",
-        "remote": "\\\\172.18.155.223\\tester"
+        "remote": null
       },
       "splashtop": {
         "status": "ok",
