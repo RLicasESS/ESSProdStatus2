@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-11 16:02:48",
+  "timestamp": "2026-09-11 16:05:47",
   "local": [
     {
       "service": "testerstatus.service",
@@ -90,8 +90,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 187,
-        "ocr_last_time": "2026-09-11 15:58:48",
+        "ocr_count": 188,
+        "ocr_last_time": "2026-09-11 16:03:57",
         "status": "OCR"
       },
       "handler_eth": {
@@ -130,10 +130,10 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 0,
+        "web_count": 118,
         "ocr_count": 2,
         "ocr_last_time": "grep: /home/raspberrichard/Documents/PYTHON/png2csv.log: binary file matches",
-        "status": "OCR"
+        "status": "WARN"
       },
       "handler_eth": {
         "ip": "192.168.1.35",
@@ -212,7 +212,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 188,
+        "web_count": 189,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
