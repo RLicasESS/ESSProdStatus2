@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-11 00:49:42",
+  "timestamp": "2026-09-11 00:52:47",
   "local": [
     {
       "service": "testerstatus.service",
@@ -120,7 +120,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 10,
+        "web_count": 11,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
