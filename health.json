@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-13 00:21:46",
+  "timestamp": "2026-09-13 00:25:45",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 4,
-        "ocr_last_time": "2026-09-13 00:17:18",
+        "ocr_count": 5,
+        "ocr_last_time": "2026-09-13 00:22:28",
         "status": "OCR"
       },
       "handler_eth": {
@@ -79,8 +79,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 4,
-        "ocr_last_time": "2026-09-13 00:19:45",
+        "ocr_count": 5,
+        "ocr_last_time": "2026-09-13 00:24:54",
         "status": "OCR"
       },
       "handler_eth": {
@@ -141,8 +141,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 4,
-        "ocr_last_time": "2026-09-13 00:20:08",
+        "ocr_count": 5,
+        "ocr_last_time": "2026-09-13 00:25:16",
         "status": "OCR"
       },
       "handler_eth": {
@@ -181,7 +181,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 4,
+        "web_count": 5,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -212,7 +212,28 @@
   "testers": [
     {
       "name": "AP-1",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "failed",
+        "pid": null
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "AP-2",
