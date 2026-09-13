@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-13 13:38:49",
+  "timestamp": "2026-09-13 13:41:47",
   "local": [
     {
       "service": "testerstatus.service",
@@ -100,11 +100,11 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "single site 1",
+        "csv": "error",
         "png": [
           1
         ],
-        "result": "MATCH"
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
         "status": "OK",
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 159,
-        "ocr_last_time": "2026-09-13 13:35:21",
+        "ocr_count": 160,
+        "ocr_last_time": "2026-09-13 13:40:30",
         "status": "OCR"
       },
       "handler_eth": {
