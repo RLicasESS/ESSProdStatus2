@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-13 11:19:54",
+  "timestamp": "2026-09-13 11:23:45",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 132,
-        "ocr_last_time": "2026-09-13 11:18:02",
+        "ocr_count": 133,
+        "ocr_last_time": "2026-09-13 11:23:14",
         "status": "OCR"
       },
       "handler_eth": {
@@ -172,8 +172,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 132,
-        "ocr_last_time": "2026-09-13 11:16:26",
+        "ocr_count": 133,
+        "ocr_last_time": "2026-09-13 11:21:34",
         "status": "OCR"
       },
       "handler_eth": {
@@ -310,9 +310,7 @@
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
       "warnings": [],
-      "notices": [
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
-      ],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
