@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-16 07:43:43",
+  "timestamp": "2026-09-16 07:49:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 90,
-        "ocr_last_time": "2026-09-16 07:42:12",
+        "ocr_count": 91,
+        "ocr_last_time": "2026-09-16 07:47:21",
         "status": "OCR"
       },
       "handler_eth": {
@@ -79,8 +79,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 90,
-        "ocr_last_time": "2026-09-16 07:39:26",
+        "ocr_count": 92,
+        "ocr_last_time": "2026-09-16 07:49:41",
         "status": "OCR"
       },
       "handler_eth": {
@@ -120,8 +120,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 66,
-        "ocr_last_time": "2026-09-16 07:40:10",
+        "ocr_count": 67,
+        "ocr_last_time": "2026-09-16 07:45:19",
         "status": "OCR"
       },
       "handler_eth": {
@@ -161,8 +161,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 90,
-        "ocr_last_time": "2026-09-16 07:41:53",
+        "ocr_count": 91,
+        "ocr_last_time": "2026-09-16 07:47:02",
         "status": "OCR"
       },
       "handler_eth": {
@@ -201,7 +201,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 91,
+        "web_count": 92,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
@@ -213,25 +213,14 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [
-          1,
-          2
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "OK",
-        "ts": "2026-09-15T10:24:34",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "3, 8, 9",
-          "AUTO3": "4, E"
-        },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "3, 8, 9",
-          "AUTO3": "4, E"
-        }
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
+        "png_bins": null
       }
     }
   ],
