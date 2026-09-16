@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-16 12:44:12",
+  "timestamp": "2026-09-16 12:51:17",
   "local": [
     {
       "service": "testerstatus.service",
@@ -48,8 +48,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 148,
-        "ocr_last_time": "2026-09-16 12:42:40",
+        "ocr_count": 149,
+        "ocr_last_time": "2026-09-16 12:47:53",
         "status": "OCR"
       },
       "handler_eth": {
@@ -60,16 +60,12 @@
       "png_sites": {
         "csv": "dual",
         "png": [],
-        "result": "MISMATCH"
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
-        "ts": "2026-09-16T10:51:42",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
-        },
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
         "png_bins": null
       }
     },
@@ -83,8 +79,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 149,
-        "ocr_last_time": "2026-09-16 12:42:16",
+        "ocr_count": 150,
+        "ocr_last_time": "2026-09-16 12:47:37",
         "status": "OCR"
       },
       "handler_eth": {
@@ -124,8 +120,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 125,
-        "ocr_last_time": "2026-09-16 12:44:18",
+        "ocr_count": 126,
+        "ocr_last_time": "2026-09-16 12:49:31",
         "status": "OCR"
       },
       "handler_eth": {
@@ -165,8 +161,8 @@
       },
       "web_ocr": {
         "web_count": 0,
-        "ocr_count": 148,
-        "ocr_last_time": "2026-09-16 12:40:25",
+        "ocr_count": 150,
+        "ocr_last_time": "2026-09-16 12:51:16",
         "status": "OCR"
       },
       "handler_eth": {
@@ -205,7 +201,7 @@
         "ssh.service": "OK"
       },
       "web_ocr": {
-        "web_count": 150,
+        "web_count": 151,
         "ocr_count": 0,
         "ocr_last_time": null,
         "status": "OK"
