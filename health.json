@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-17 19:21:01",
+  "timestamp": "2026-09-17 19:26:55",
   "local": [
     {
       "service": "testerstatus.service",
@@ -59,25 +59,18 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [
-          1,
-          2
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-09-17T10:22:49",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
-        }
+        "png_bins": null
       }
     },
     {
@@ -267,7 +260,7 @@
         "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
       ],
       "drive": {
-        "status": "ok",
+        "status": "stale",
         "drive": "T",
         "remote": "\\\\172.18.155.223\\tester"
       },
