@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-22 14:01:43",
+  "timestamp": "2026-09-22 14:05:49",
   "local": [
     {
       "service": "testerstatus.service",
@@ -98,10 +98,12 @@
         "ip": "192.168.1.35",
         "status": "UNKNOWN"
       },
-      "png_connected": "BLACK",
+      "png_connected": "OK",
       "png_sites": {
         "csv": "unknown",
-        "png": [],
+        "png": [
+          1
+        ],
         "result": "UNKNOWN"
       },
       "bin_mapping": {
