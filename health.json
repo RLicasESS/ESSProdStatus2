@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-24 13:19:46",
+  "timestamp": "2026-09-24 13:23:50",
   "local": [
     {
       "service": "testerstatus.service",
@@ -66,7 +66,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "MISMATCH",
         "ts": "2026-09-23T14:22:10",
         "json_bins": {
           "AUTO1": "1",
@@ -74,9 +74,9 @@
           "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
         },
         "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
+          "AUTO1": "",
+          "AUTO2": "1, 1",
+          "AUTO3": "1, 1, 1, 1, 1"
         }
       }
     },
@@ -285,7 +285,9 @@
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
       "warnings": [],
-      "notices": [],
+      "notices": [
+        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
+      ],
       "drive": {
         "status": "ok",
         "drive": "T",
