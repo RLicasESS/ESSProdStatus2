@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-25 09:44:44",
+  "timestamp": "2026-09-25 09:48:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -67,7 +67,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-23T14:22:10",
+        "ts": "2026-09-25T09:45:17",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -107,17 +107,17 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "OK",
-        "ts": "2026-09-23T14:22:10",
+        "status": "MISMATCH",
+        "ts": "2026-09-25T09:45:17",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
         "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
+          "AUTO1": "",
+          "AUTO2": "3",
+          "AUTO3": "2, 14"
         }
       }
     },
@@ -149,7 +149,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-23T14:22:10",
+        "ts": "2026-09-25T09:45:17",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -183,24 +183,18 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [
-          1
-        ],
-        "result": "MISMATCH"
+        "png": [],
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "OK",
-        "ts": "2026-09-23T14:22:10",
+        "status": "UNKNOWN",
+        "ts": "2026-09-25T09:45:17",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
           "AUTO3": "4, E"
         },
-        "png_bins": {
-          "AUTO1": "1, 5",
-          "AUTO2": "2",
-          "AUTO3": "4, E"
-        }
+        "png_bins": null
       }
     },
     {
@@ -232,7 +226,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-23T14:22:10",
+        "ts": "2026-09-25T09:45:17",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "3, 6, 8, 9",
