@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-26 11:42:42",
+  "timestamp": "2026-09-26 11:48:40",
   "local": [
     {
       "service": "testerstatus.service",
@@ -67,7 +67,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-26T11:15:45",
+        "ts": "2026-09-26T11:43:40",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -108,7 +108,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-26T11:15:45",
+        "ts": "2026-09-26T11:43:41",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -149,7 +149,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-26T11:15:45",
+        "ts": "2026-09-26T11:43:41",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -190,7 +190,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-26T11:15:45",
+        "ts": "2026-09-26T11:43:41",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
