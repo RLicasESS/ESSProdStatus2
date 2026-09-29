@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-29 12:24:44",
+  "timestamp": "2026-09-29 12:28:45",
   "local": [
     {
       "service": "testerstatus.service",
@@ -305,12 +305,14 @@
     {
       "name": "S100_1",
       "status": "ok",
-      "pythonw_count": 3,
+      "pythonw_count": 1,
       "read_lot": 1,
-      "ess_lot_main": 1,
-      "ess_lot_worker": 1,
+      "ess_lot_main": 0,
+      "ess_lot_worker": 0,
       "warnings": [],
-      "notices": [],
+      "notices": [
+        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
+      ],
       "drive": {
         "status": "ok",
         "drive": "T",
