@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-29 12:20:49",
+  "timestamp": "2026-09-29 12:24:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -305,17 +305,12 @@
     {
       "name": "S100_1",
       "status": "ok",
-      "pythonw_count": 0,
-      "read_lot": 0,
-      "ess_lot_main": 0,
-      "ess_lot_worker": 0,
-      "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
-      ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
-      ],
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
@@ -323,7 +318,7 @@
       },
       "splashtop": {
         "status": "ok",
-        "pid": 14220
+        "pid": 10788
       },
       "lotsetting": {
         "status": "ok",
