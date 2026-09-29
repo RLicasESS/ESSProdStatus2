@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-29 10:36:50",
+  "timestamp": "2026-09-29 10:40:50",
   "local": [
     {
       "service": "testerstatus.service",
@@ -314,6 +314,7 @@
       ],
       "notices": [
         "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "STARTED: SCardSvr was stopped \u2014 started automatically",
         "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
       ],
       "drive": {
