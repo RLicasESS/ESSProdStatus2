@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-30 08:25:54",
+  "timestamp": "2026-09-30 08:29:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -309,13 +309,8 @@
       "read_lot": 1,
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
-      "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
-      ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
-      ],
+      "warnings": [],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
