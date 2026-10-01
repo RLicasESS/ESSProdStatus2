@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-30 18:43:46",
+  "timestamp": "2026-09-30 18:47:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -66,12 +66,12 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-09-30T15:12:50",
+        "status": "OK",
+        "ts": "2026-09-30T18:44:17",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
-          "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
+          "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
         },
         "png_bins": {
           "AUTO1": "1",
@@ -101,24 +101,14 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [
-          1
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-09-30T15:12:50",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
-        },
-        "png_bins": {
-          "AUTO1": "",
-          "AUTO2": "3",
-          "AUTO3": "2, 14"
-        }
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
+        "png_bins": null
       }
     },
     {
@@ -149,7 +139,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-30T15:12:50",
+        "ts": "2026-09-30T18:44:17",
         "json_bins": {
           "AUTO1": "5",
           "AUTO2": "2",
@@ -182,15 +172,15 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "single site 2",
+        "csv": "error",
         "png": [
           1
         ],
-        "result": "MISMATCH"
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-09-30T15:12:50",
+        "ts": "2026-09-30T18:44:17",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -231,8 +221,8 @@
         "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "OK",
-        "ts": "2026-09-30T15:12:50",
+        "status": "MISMATCH",
+        "ts": "2026-09-30T18:44:17",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "3, 5, 6, 8, 10, 11",
@@ -241,7 +231,7 @@
         "png_bins": {
           "AUTO1": "1",
           "AUTO2": "3, 5, 6, 8, 10, 11",
-          "AUTO3": ""
+          "AUTO3": "7"
         }
       }
     }
