@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-02 08:48:40",
+  "timestamp": "2026-10-02 08:51:41",
   "local": [
     {
       "service": "testerstatus.service",
@@ -268,8 +268,8 @@
         "remote": "\\\\172.18.155.223\\tester"
       },
       "splashtop": {
-        "status": "ok",
-        "pid": 15480
+        "status": "failed",
+        "pid": null
       },
       "lotsetting": {
         "status": "ok",
