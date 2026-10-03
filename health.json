@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-03 05:36:41",
+  "timestamp": "2026-10-03 05:41:43",
   "local": [
     {
       "service": "testerstatus.service",
@@ -245,7 +245,7 @@
       "warnings": [],
       "notices": [],
       "drive": {
-        "status": "not_mapped",
+        "status": "ok",
         "drive": "T",
         "remote": "\\\\172.18.155.223\\tester"
       },
