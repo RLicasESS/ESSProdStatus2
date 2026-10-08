@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-08 06:59:36",
+  "timestamp": "2026-10-08 07:12:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -90,14 +90,24 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-10-07T18:04:43",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
       }
     },
     {
@@ -121,14 +131,25 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "MISMATCH",
+        "ts": "2026-10-07T18:04:43",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 4, 5, 6, 10, 11, E",
+          "AUTO3": "7"
+        },
+        "png_bins": {
+          "AUTO1": "",
+          "AUTO2": "2, 3, 4, 8, 9, 14",
+          "AUTO3": "5"
+        }
       }
     },
     {
@@ -183,14 +204,25 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "unknown",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1,
+          2
+        ],
+        "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-10-07T18:04:44",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "3, 5, 6, 8, 10, 11",
+          "AUTO3": "4"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "3, 5, 6, 8, 10, 11",
+          "AUTO3": "4"
+        }
       }
     }
   ],
