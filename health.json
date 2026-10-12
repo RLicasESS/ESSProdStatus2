@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-12 16:26:47",
+  "timestamp": "2026-10-12 16:31:39",
   "local": [
     {
       "service": "testerstatus.service",
@@ -100,11 +100,11 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "error",
+        "csv": "single site 1",
         "png": [
           1
         ],
-        "result": "UNKNOWN"
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "MISMATCH",
@@ -260,9 +260,7 @@
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
       "warnings": [],
-      "notices": [
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
-      ],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
