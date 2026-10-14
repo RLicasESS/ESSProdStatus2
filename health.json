@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-14 09:26:40",
+  "timestamp": "2026-10-14 09:30:40",
   "local": [
     {
       "service": "testerstatus.service",
@@ -225,7 +225,8 @@
       "png_sites": {
         "csv": "unknown",
         "png": [
-          1
+          1,
+          2
         ],
         "result": "UNKNOWN"
       },
@@ -238,9 +239,9 @@
           "AUTO3": "4, E"
         },
         "png_bins": {
-          "AUTO1": "",
-          "AUTO2": "3, 5, 6",
-          "AUTO3": "11"
+          "AUTO1": "1",
+          "AUTO2": "11",
+          "AUTO3": "12"
         }
       }
     }
