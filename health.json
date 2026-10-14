@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-14 08:44:40",
+  "timestamp": "2026-10-14 08:47:40",
   "local": [
     {
       "service": "testerstatus.service",
@@ -142,9 +142,7 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "unknown",
-        "png": [
-          1
-        ],
+        "png": [],
         "result": "UNKNOWN"
       },
       "bin_mapping": {
