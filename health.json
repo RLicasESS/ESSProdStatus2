@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-18 09:00:43",
+  "timestamp": "2026-10-18 09:03:46",
   "local": [
     {
       "service": "testerstatus.service",
@@ -58,12 +58,12 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "unknown",
+        "csv": "dual",
         "png": [
           1,
           2
         ],
-        "result": "UNKNOWN"
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "OK",
@@ -100,11 +100,11 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "unknown",
+        "csv": "single site 1",
         "png": [
           1
         ],
-        "result": "UNKNOWN"
+        "result": "MATCH"
       },
       "bin_mapping": {
         "status": "OK",
@@ -141,25 +141,15 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "unknown",
-        "png": [
-          1
-        ],
-        "result": "UNKNOWN"
+        "csv": "single site 1",
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-10-16T17:38:09",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5, E",
-          "AUTO3": "4"
-        },
-        "png_bins": {
-          "AUTO1": "",
-          "AUTO2": "3, 14",
-          "AUTO3": "2"
-        }
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
+        "png_bins": null
       }
     },
     {
@@ -182,9 +172,9 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "unknown",
+        "csv": "single site 2",
         "png": [],
-        "result": "UNKNOWN"
+        "result": "MISMATCH"
       },
       "bin_mapping": {
         "status": "MISMATCH",
@@ -222,20 +212,13 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "unknown",
-        "png": [
-          1,
-          2
-        ],
-        "result": "UNKNOWN"
+        "png": [],
+        "result": "ERROR"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
-        "ts": "2026-10-16T17:38:09",
-        "json_bins": {
-          "AUTO1": "1",
-          "AUTO2": "3, 5, 6, 8, 10, 11, E",
-          "AUTO3": "4"
-        },
+        "status": "ERROR",
+        "ts": null,
+        "json_bins": null,
         "png_bins": null
       }
     }
