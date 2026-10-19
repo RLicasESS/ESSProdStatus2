@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-19 09:52:39",
+  "timestamp": "2026-10-19 09:55:51",
   "local": [
     {
       "service": "testerstatus.service",
@@ -244,7 +244,33 @@
   "testers": [
     {
       "name": "AP-1",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 0,
+      "read_lot": 0,
+      "ess_lot_main": 0,
+      "ess_lot_worker": 0,
+      "warnings": [
+        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+      ],
+      "notices": [
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
+        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
+      ],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "failed",
+        "pid": null
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "AP-2",
