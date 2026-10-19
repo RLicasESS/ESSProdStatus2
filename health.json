@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-19 08:13:51",
+  "timestamp": "2026-10-19 08:19:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -239,9 +239,7 @@
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
       "warnings": [],
-      "notices": [
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
-      ],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
