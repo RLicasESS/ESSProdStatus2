@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-19 10:38:44",
+  "timestamp": "2026-10-19 10:41:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -142,13 +142,11 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "single site 1",
-        "png": [
-          1
-        ],
-        "result": "MATCH"
+        "png": [],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "MISMATCH",
         "ts": "2026-10-19T10:14:28",
         "json_bins": {
           "AUTO1": "1",
@@ -156,9 +154,9 @@
           "AUTO3": "4"
         },
         "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5, E",
-          "AUTO3": "4"
+          "AUTO1": "",
+          "AUTO2": "11",
+          "AUTO3": ""
         }
       }
     },
