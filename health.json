@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-19 09:55:51",
+  "timestamp": "2026-10-19 09:59:53",
   "local": [
     {
       "service": "testerstatus.service",
@@ -257,7 +257,7 @@
         "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
       ],
       "drive": {
-        "status": "ok",
+        "status": "stale",
         "drive": "T",
         "remote": "\\\\172.18.155.223\\tester"
       },
