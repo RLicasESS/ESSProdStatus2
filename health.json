@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-22 12:29:54",
+  "timestamp": "2026-10-22 12:34:02",
   "local": [
     {
       "service": "testerstatus.service",
@@ -215,7 +215,7 @@
         "ip": "192.168.0.5",
         "status": "UNKNOWN"
       },
-      "png_connected": "UNKNOWN",
+      "png_connected": "OK",
       "png_sites": {
         "csv": "unknown",
         "png": [
