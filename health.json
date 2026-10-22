@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-22 01:12:56",
+  "timestamp": "2026-10-22 01:17:00",
   "local": [
     {
       "service": "testerstatus.service",
@@ -255,7 +255,7 @@
       },
       "splashtop": {
         "status": "ok",
-        "pid": 17104
+        "pid": 16476
       },
       "lotsetting": {
         "status": "ok",
