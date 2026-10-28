@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-28 14:17:20",
+  "timestamp": "2026-10-28 14:20:58",
   "local": [
     {
       "service": "testerstatus.service",
@@ -67,7 +67,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-10-28T10:48:32",
+        "ts": "2026-10-28T14:18:04",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -107,12 +107,12 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-10-28T10:48:32",
+        "status": "OK",
+        "ts": "2026-10-28T14:18:04",
         "json_bins": {
-          "AUTO1": "",
-          "AUTO2": "3",
-          "AUTO3": "2, 14"
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
         },
         "png_bins": {
           "AUTO1": "1",
@@ -150,7 +150,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-10-28T10:48:32",
+        "ts": "2026-10-28T14:18:04",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
@@ -227,7 +227,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-10-28T10:48:33",
+        "ts": "2026-10-28T14:18:04",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "3, 5, 6, 8, 10, 11, E",
@@ -325,17 +325,12 @@
     {
       "name": "S100_2",
       "status": "ok",
-      "pythonw_count": 2,
-      "read_lot": 0,
-      "ess_lot_main": 0,
-      "ess_lot_worker": 2,
-      "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
-      ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
-      ],
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
