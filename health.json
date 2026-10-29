@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-29 14:07:55",
+  "timestamp": "2026-10-29 14:12:05",
   "local": [
     {
       "service": "testerstatus.service",
@@ -63,14 +63,18 @@
         "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
+        "status": "MISMATCH",
         "ts": "2026-10-29T09:05:58",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
         },
-        "png_bins": null
+        "png_bins": {
+          "AUTO1": "",
+          "AUTO2": "",
+          "AUTO3": "1, 1, 1, 1"
+        }
       }
     },
     {
