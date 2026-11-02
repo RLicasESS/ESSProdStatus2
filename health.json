@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-02 08:26:01",
+  "timestamp": "2026-11-02 08:29:09",
   "local": [
     {
       "service": "testerstatus.service",
@@ -149,7 +149,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "MISMATCH",
         "ts": "2026-10-29T09:05:59",
         "json_bins": {
           "AUTO1": "1",
@@ -157,9 +157,9 @@
           "AUTO3": "4, E"
         },
         "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
+          "AUTO1": "",
+          "AUTO2": "3",
+          "AUTO3": "2, 14"
         }
       }
     },
@@ -326,19 +326,23 @@
       "name": "S100_2",
       "status": "ok",
       "pythonw_count": 3,
-      "read_lot": 1,
+      "read_lot": 0,
       "ess_lot_main": 1,
       "ess_lot_worker": 1,
-      "warnings": [],
-      "notices": [],
+      "warnings": [
+        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
+      ],
+      "notices": [
+        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated"
+      ],
       "drive": {
         "status": "ok",
         "drive": "T",
         "remote": "\\\\172.18.155.223\\tester"
       },
       "splashtop": {
-        "status": "ok",
-        "pid": 16880
+        "status": "failed",
+        "pid": null
       },
       "lotsetting": {
         "status": "ok",
