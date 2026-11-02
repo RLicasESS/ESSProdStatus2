@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-02 07:51:24",
+  "timestamp": "2026-11-02 07:55:15",
   "local": [
     {
       "service": "testerstatus.service",
@@ -59,14 +59,25 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-10-29T09:05:58",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "1, 1, 1, 1, 1, 1, 1, 1, 1, 1"
+        }
       }
     },
     {
@@ -268,25 +279,20 @@
     {
       "name": "S100_1",
       "status": "ok",
-      "pythonw_count": 0,
-      "read_lot": 0,
-      "ess_lot_main": 0,
-      "ess_lot_worker": 0,
-      "warnings": [
-        "MISSING: Read Lot Number.py \u2014 reader may not be connected"
-      ],
-      "notices": [
-        "RESTARTED: Read Lot Number.py was missing \u2014 restart initiated",
-        "RESTARTED: ESS Lot Setting was missing \u2014 restart initiated"
-      ],
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
       "drive": {
         "status": "ok",
         "drive": "T",
         "remote": "\\\\172.18.155.223\\tester"
       },
       "splashtop": {
-        "status": "failed",
-        "pid": null
+        "status": "ok",
+        "pid": 11488
       },
       "lotsetting": {
         "status": "ok",
