@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-03 12:56:57",
+  "timestamp": "2026-11-03 13:00:57",
   "local": [
     {
       "service": "testerstatus.service",
@@ -100,7 +100,7 @@
       },
       "png_connected": "OK",
       "png_sites": {
-        "csv": "error",
+        "csv": "unknown",
         "png": [
           1
         ],
