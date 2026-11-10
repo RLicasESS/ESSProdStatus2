@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-10 08:17:46",
+  "timestamp": "2026-11-10 08:20:44",
   "local": [
     {
       "service": "testerstatus.service",
@@ -284,7 +284,28 @@
     },
     {
       "name": "S100_1",
-      "status": "unreachable"
+      "status": "ok",
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
+      "warnings": [],
+      "notices": [],
+      "drive": {
+        "status": "ok",
+        "drive": "T",
+        "remote": "\\\\172.18.155.223\\tester"
+      },
+      "splashtop": {
+        "status": "ok",
+        "pid": 15980
+      },
+      "lotsetting": {
+        "status": "ok",
+        "detail": "no overflow errors detected",
+        "overflow_count": 0,
+        "correction_count": 0
+      }
     },
     {
       "name": "S100_2",
