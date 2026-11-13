@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-13 01:16:44",
+  "timestamp": "2026-11-13 01:20:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -194,19 +194,23 @@
       "png_sites": {
         "csv": "unknown",
         "png": [
-          1
+          2
         ],
         "result": "UNKNOWN"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
+        "status": "OK",
         "ts": "2026-11-12T19:09:55",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "3, 5, 6, 8, 10, 11, E",
           "AUTO3": "4"
         },
-        "png_bins": null
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "3, 5, 6, 8, 10, 11, E",
+          "AUTO3": "4"
+        }
       }
     }
   ],
@@ -235,7 +239,7 @@
         "remote": "\\\\172.18.155.223\\tester"
       },
       "splashtop": {
-        "status": "started",
+        "status": "ok",
         "pid": 34420
       },
       "lotsetting": {
