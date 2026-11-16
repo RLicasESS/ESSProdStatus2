@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-15 17:37:40",
+  "timestamp": "2026-11-15 17:41:38",
   "local": [
     {
       "service": "testerstatus.service",
@@ -65,12 +65,12 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "MISMATCH",
-        "ts": "2026-11-13T23:36:38",
+        "status": "OK",
+        "ts": "2026-11-15T17:38:38",
         "json_bins": {
-          "AUTO1": "",
-          "AUTO2": "1, 1",
-          "AUTO3": "1, R, R1, 1, R"
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
         },
         "png_bins": {
           "AUTO1": "1",
@@ -107,7 +107,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-11-13T23:36:38",
+        "ts": "2026-11-15T17:38:38",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5, E",
@@ -141,14 +141,25 @@
       "png_connected": "OK",
       "png_sites": {
         "csv": "dual",
-        "png": [],
-        "result": "ERROR"
+        "png": [
+          1,
+          2
+        ],
+        "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "ERROR",
-        "ts": null,
-        "json_bins": null,
-        "png_bins": null
+        "status": "OK",
+        "ts": "2026-11-15T17:38:38",
+        "json_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        },
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
       }
     },
     {
@@ -180,7 +191,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-11-13T23:36:39",
+        "ts": "2026-11-15T17:38:38",
         "json_bins": {
           "AUTO1": "1, 5",
           "AUTO2": "2",
@@ -222,7 +233,7 @@
       },
       "bin_mapping": {
         "status": "OK",
-        "ts": "2026-11-13T23:36:39",
+        "ts": "2026-11-15T17:38:38",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 4, 5, 6, 8, 9, 10, 11, E",
