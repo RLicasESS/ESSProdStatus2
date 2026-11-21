@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-20 16:24:16",
+  "timestamp": "2026-11-20 16:29:16",
   "local": [
     {
       "service": "testerstatus.service",
@@ -66,14 +66,18 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "UNKNOWN",
+        "status": "OK",
         "ts": "2026-11-20T13:34:06",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 5",
           "AUTO3": "4, E"
         },
-        "png_bins": null
+        "png_bins": {
+          "AUTO1": "1",
+          "AUTO2": "2, 3, 5",
+          "AUTO3": "4, E"
+        }
       }
     },
     {
@@ -265,7 +269,7 @@
       },
       "splashtop": {
         "status": "ok",
-        "pid": 8828
+        "pid": 12596
       },
       "lotsetting": {
         "status": "ok",
