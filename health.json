@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-24 11:24:03",
+  "timestamp": "2026-11-24 11:28:05",
   "local": [
     {
       "service": "testerstatus.service",
@@ -289,10 +289,10 @@
     {
       "name": "S100_2",
       "status": "ok",
-      "pythonw_count": 0,
-      "read_lot": 0,
-      "ess_lot_main": 0,
-      "ess_lot_worker": 0,
+      "pythonw_count": 3,
+      "read_lot": 1,
+      "ess_lot_main": 1,
+      "ess_lot_worker": 1,
       "warnings": [
         "MISSING: Read Lot Number.py \u2014 reader may not be connected"
       ],
@@ -307,7 +307,7 @@
       },
       "splashtop": {
         "status": "ok",
-        "pid": 12316
+        "pid": 16128
       },
       "lotsetting": {
         "status": "ok",
