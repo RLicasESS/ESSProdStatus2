@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-24 13:54:48",
+  "timestamp": "2026-11-24 13:58:50",
   "local": [
     {
       "service": "testerstatus.service",
@@ -66,7 +66,7 @@
         "result": "MATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "MISMATCH",
         "ts": "2026-11-24T13:48:58",
         "json_bins": {
           "AUTO1": "1",
@@ -74,9 +74,9 @@
           "AUTO3": "4, E"
         },
         "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 5",
-          "AUTO3": "4, E"
+          "AUTO1": "",
+          "AUTO2": "1, 1",
+          "AUTO3": "1, R, R1, 1, R"
         }
       }
     },
@@ -219,28 +219,21 @@
         "ip": "192.168.0.5",
         "status": "UNKNOWN"
       },
-      "png_connected": "OK",
+      "png_connected": "BLACK",
       "png_sites": {
-        "csv": "unknown",
-        "png": [
-          1,
-          2
-        ],
-        "result": "UNKNOWN"
+        "csv": "dual",
+        "png": [],
+        "result": "MISMATCH"
       },
       "bin_mapping": {
-        "status": "OK",
+        "status": "UNKNOWN",
         "ts": "2026-11-24T13:48:59",
         "json_bins": {
           "AUTO1": "1",
           "AUTO2": "2, 3, 4, 6, 7, E",
           "AUTO3": "5"
         },
-        "png_bins": {
-          "AUTO1": "1",
-          "AUTO2": "2, 3, 4, 6, 7, E",
-          "AUTO3": "5"
-        }
+        "png_bins": null
       }
     }
   ],
